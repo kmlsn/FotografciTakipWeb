@@ -1,0 +1,18 @@
+﻿@using FotografciTakipWeb.Models
+@{ string ustmenuclass = ViewBag.UstMenu == "Destek Talepleri" ? "active open" : "";}
+@model List<DestekTalepleriDetay>
+<li class=@ustmenuclass>
+    <a href="~/Admin/Destek/DestekTalepleri" title="Destek Talepleri" data-filter-tags="destek talepleri">
+        <i class="fal fa-info"></i>
+        <span class="nav-link-text" data-i18n="nav.destek_talepleri">Destek Talepleri</span>
+        @*<span class="dl-ref bg-primary-500 hidden-nav-function-minify hidden-nav-function-top">0</span>*@
+        @if (Model.Count == 0)
+        {
+            <span class="badge badge-detached badge-secondary">@Model.Count</span>
+        }
+        else
+        {
+            <span class="badge badge-detached badge-danger">@Model.Count</span>
+        }
+    </a>
+</li>

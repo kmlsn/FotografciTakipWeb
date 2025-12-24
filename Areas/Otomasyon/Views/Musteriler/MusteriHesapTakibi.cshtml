@@ -1,0 +1,1048 @@
+﻿
+@{
+    ViewBag.Title = "Müşteri Hesap Takibi";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    List<Sube> SubeListesi = ViewBag.SubeListesi;
+    List<Musteri> MusteriListesi = ViewBag.Musteriler;
+    List<SubeToKullanici> SubeKullanici = ViewBag.SubeKullanici;
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    List<SmsMetinleri> Smsmetinleri = ViewBag.SmsMetinleri;
+    string EkleYetki = KullaniciYetki.KayitEkle.ToString();
+    string SMSYetki = KullaniciYetki.SmsGonder.ToString();
+    string YazdirYetki = KullaniciYetki.Yazdir.ToString();
+}
+@section Head
+{
+    <style type="text/css">
+        a {
+            color: black;
+        }
+
+        .swal2-container {
+            display: -webkit-box;
+            display: flex;
+            position: fixed;
+            z-index: 300000; /*Uyarı penceresini herşeyin önüne getimek için*/
+        }
+    </style>
+    <link href="~/Areas/Otomasyon/Content/css/SMSMesajStyle.css" rel="stylesheet" />
+}
+<!-- Ödeme Al Modal Penceresi -->
+<div class="modal fade" id="OdemeAlModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Ödeme Al
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="alert border border-primary bg-transparent text-primary" role="alert" id="OdemeAlModalMusteriAdi">
+
+                    </div>
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="OdemeAlIslemTarihi">İşlem Tarihi</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="OdemeAlIslemTarihi" disabled>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="OdemeAlTutarHata">
+                                    <label class="form-label" for="OdemeAlTutar">Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control bg-success-50" name="OdemeAlTutar" maxlength="50" id="OdemeAlTutar">
+                                </div>
+                                <div class="form-group col-sm-6" id="OdemeAlOdemeSekliHata">
+                                    <label class="form-label" for="OdemeAlOdemeSekli">Ödeme Şekli</label>
+                                    <select class="custom-select form-control custom-select-sm" id="OdemeAlOdemeSekli" name="OdemeAlOdemeSekli" title="Ödeme Şeklini Seçiniz.">
+                                        <option selected value="0">---</option>
+                                        <option value="1">Nakit</option>
+                                        <option value="2">Kredi Kartı</option>
+                                        <option value="3">Banka Havalesi</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="OdemeAlOdemeTarihi">Ödeme Tarihi</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="OdemeAlOdemeTarihi">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="OdemeAlOdemeYapan">Ödeme Yapan Ad-Soyad</label>
+                                    <input type="text" id="OdemeAlOdemeYapan" class="form-control form-control-sm" name="OdemeAlOdemeYapan" maxlength="250">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <label class="form-label" for="OdemeAlAciklama">Açıklama</label>
+                                    <input type="text" id="OdemeAlAciklama" class="form-control form-control-sm" name="OdemeAlAciklama" maxlength="250">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="OdemeAlKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Tahsilat Yap Modal Penceresi -->
+<!-- Borç Bilgi SMS'i Modal Penceresi -->
+<div class="modal fade" id="BorcBilgiSMSGonder" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Borç Bilgisi SMS Gönder
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="alert border border-primary bg-transparent text-primary" role="alert" id="SMSGonderModalMusteriAdi">
+
+                    </div>
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-12 mb-3">
+                                    <select class="custom-select form-control custom-select-sm" id="SmsMetinleri" name="SmsMetinleri" title="SMS Metini seçiniz">
+                                        <option selected="" value="0">SMS Metinini seçiniz</option>
+                                        @foreach (var smsmetin in Smsmetinleri)
+                                        {
+                                            <option value="@smsmetin.Id" data-smsmetni="@smsmetin.SMSMetni">@smsmetin.MetinAdi</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="SMSGonderTutar">Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control bg-success-50" name="SMSGonderTutar" maxlength="50" id="SMSGonderTutar" disabled>
+                                </div>
+                            </div>
+                            <div class="row mt-4" style="display:none" id="SmsBalonuGoster">
+                                <div class="bubble bubble-bottom-left mb-4" id="SMSMetni" contenteditable></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="SMSGonder">SMS Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Borç Bilgi SMS'i Modal Penceresi -->
+<!-- Gelir - Gider Tolapamları Satırı -->
+<div class="row">
+    <div class="col-sm-6 col-xl-3">
+        <div class="p-3 bg-primary-500 rounded overflow-hidden position-relative text-white mb-g">
+            <div class="">
+                <h3 class="display-4 d-block l-h-n m-0 fw-500" id="AlinanOdemeToplam">
+
+                    <small class="m-0 l-h-n">Alınan Ödemeler Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-plus-circle position-absolute pos-right pos-bottom opacity-15 mb-n0 mr-n0" style="font-size:6rem"></i>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="p-3 bg-warning-500 rounded overflow-hidden position-relative text-white mb-g">
+            <div class="">
+                <h3 class="display-4 d-block l-h-n m-0 fw-500" id="GelecekOdemeToplam">
+
+                    <small class="m-0 l-h-n">Gelecek Ödemeler Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-minus-circle position-absolute pos-right pos-bottom opacity-15  mb-n0 mr-n0" style="font-size: 6rem;"></i>
+        </div>
+    </div>
+</div>
+<!-- Gelir - Gider Tolapamları Satırı -->
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="row col col-12 mt-3" id="date_filter">
+                <div class="form-group col-sm-2">
+                    <div class="input-group mt-2">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="tarihsecim">
+                            <label class="custom-control-label" for="tarihsecim" id="tarihsecimetiket">İşlem Tarihi</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="IlkTarih">
+                        <div class="input-group-append">
+                            <span class="input-group-text fs-sm">
+                                <i class="fal fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="SonTarih">
+                        <div class="input-group-append">
+                            <span class="input-group-text fs-sm">
+                                <i class="fal fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-2">
+                    <select class="custom-select form-control custom-select-sm" id="Sube" name="Sube" title="Görüntülenecek Şube">
+                        <option value="0">Tüm Şubeler</option>
+                        @foreach (var sube in SubeKullanici)
+                        {
+                            if (ViewBag.AktifSubeId == sube.SubeId && sube.Sube.Aktif == true)
+                            {
+                                <option selected="" value="@sube.Sube.SubeAdi">@sube.Sube.SubeAdi</option>
+                            }
+                            else if (sube.Sube.Aktif == true)
+                            {
+                                <option value="@sube.Sube.SubeAdi">@sube.Sube.SubeAdi</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group col-sm-2">
+                    <select class="custom-select form-control custom-select-sm" id="GoruntuleTip" name="GoruntuleTip" title="Görüntülenecek Alacak - Borç Tipi">
+                        <option selected="" value="0">--TÜMÜ--</option>
+                        <option value="1">Alınan Ödemeler</option>
+                        <option value="2">Gelecek Ödemeler</option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-4">
+                    <select class="custom-select form-control custom-select-sm" id="Musteri" name="Musteri" title="Müşteri Seçiniz">
+                        <option selected="" value="0">Müşteri Seçiniz</option>
+                        @foreach (var musteri in MusteriListesi)
+                        {
+                            <option value="@musteri.Id">@musteri.AdiSoyadi</option>
+                        }
+                    </select>
+                </div>
+
+                @*@if (yetki.KayitEkle == true)
+                    {
+                        <div class="form-group col-sm-3">
+                            <button type="button" class="btn btn-sm btn-primary" @*data-toggle="modal" data-target="#HareketEkleModal" id="YeniEkle"> Hareket Ekle </button>
+                        </div>
+                    }*@
+            </div>
+            <div class="border-bottom mt-3"></div>
+            <input type="text" id="FiltreAyar" style="display:none" data-filtreayar="@ViewBag.FiltreAyar">
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtmusterihesap" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th style="vertical-align:middle">Şube</th> @* //  1   *@
+                                <th style="vertical-align:middle">MüşteriID</th> @* //  2   *@
+                                <th style="vertical-align:middle" class="w-25">Müşteri</th> @* //  3   *@
+                                <th style="vertical-align:middle">İşlem Tarihi</th> @* //  4   *@
+                                <th style="vertical-align:middle">Ödeme Tarihi</th> @* //  5   *@
+                                <th style="vertical-align:middle">Sözleşme No <br /> Günlük İş Takip No</th> @* //  6   *@
+                                <th style="vertical-align:middle">Ödeme<br />  Türü</th> @* //  7   *@
+                                @*<th style="vertical-align:middle">Alınan / Gelecek<br />  Ödeme</th> @* //  7   *@
+                                <th style="vertical-align:middle">Tutar</th> @* //  8   *@
+                                <th style="vertical-align:middle">Açıklama</th> @* //  9   *@
+                                <th style="vertical-align:middle" class="w-10">İşlem</th> @* //  10   *@
+                                <th style="vertical-align:middle">OdemeAlBit</th> @* //  11   *@
+                                <th style="vertical-align:middle">İşlem Tarihi Sıralama</th> @* //  12   *@
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert alert-primary">
+    <div class="d-flex flex-start w-100">
+        @*<div class="mr-2 hidden-md-down">
+            <span class="icon-stack icon-stack-lg">
+                <i class="base base-6 icon-stack-3x opacity-100 color-primary-500"></i>
+                @*<i class="base base-10 icon-stack-2x opacity-100 color-primary-300 fa-flip-vertical"></i>
+                <i class="fal fa-info icon-stack-1x opacity-100 color-white pb-1"></i>
+            </span>
+        </div>*@
+        <div class="alert-icon">
+            <i class="fal fa-info-circle"></i>
+        </div>
+        <div class="d-flex flex-fill">
+            <div class="flex-fill">
+                <span class="h5">Satır renk bilgileri</span>
+                <p> <strong class="color-primary-500">Alinan Ödemeler</strong>, <strong class="color-warning-500">Gelecek Ödemeler</strong>, <strong class="color-success-800">Ödemesi Yapılmış Gelecek Ödemeler</strong></p>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="text" id="KullaniciYetkiKayitEkle" class="form-control" name="Id" maxlength="50" style="display:none" value="@EkleYetki">
+<input type="text" id="KullaniciYetkiSMSGonder" class="form-control" name="Id" maxlength="50" style="display:none" value="@SMSYetki">
+<input type="text" id="KullaniciYetkiYazdir" class="form-control" name="Id" maxlength="50" style="display:none" value="@YazdirYetki">
+
+@section Script
+{
+    <script src="~/Areas/Otomasyon/Content/js/tablotarihsirala.js"></script>
+    <script>
+        var controls = {
+            leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
+            rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
+        }
+        var filtreayar = $('#FiltreAyar').data("filtreayar");
+        var runDatePicker = function () {
+            if (filtreayar == "0") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+            } // 1 Gün
+            else if (filtreayar == "1") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() + 7)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() - 7)));
+            } // 1 Hafta Öncesi - 1 Hafta Sonrası
+            else if (filtreayar == "2") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() - 1)));
+            } // 1 Ay Öncesi - 1 Ay Sonrası
+            else if (filtreayar == "3") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
+            } // 1 Yıl Öncesi - 1 Yıl Sonrası
+            else if (filtreayar == "4") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+            } // Ayın başından bu güne
+            else if (filtreayar == "5") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), 0, 1));
+            } // Yılın başından bu güne
+            $('#IslemTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#OdemeAlIslemTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#OdemeAlOdemeTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+        }
+        $(document).ready(function () {
+            var EkleYetki = $("#KullaniciYetkiKayitEkle").val();
+            var SMSGonderYetki = $("#KullaniciYetkiSMSGonder").val();
+            var YazdirYetki = $("#KullaniciYetkiYazdir").val();
+            $(":input").inputmask();
+            $("#Tutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#DuzenleTutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#OdemeAlTutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#SMSGonderTutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+
+            runDatePicker();
+            function ParaFormat(fiyat) {
+                var para_sembol = "TL"
+                var format = new Intl.NumberFormat('de-DE', {
+                    style: 'currency',
+                    currency: 'TRY',
+                    minumumFractionDigits: 2
+                })
+                //return format.format(fiyat)
+                return format.format(fiyat).replace('TRY', para_sembol)
+            }
+            function parseDateValue(rawDate) {
+                var dateArray = rawDate.split(".");
+                var parsedDate = dateArray[2] + dateArray[1] + dateArray[0];
+                return parsedDate;
+            }
+            $(function () {
+                $('#Musteri').select2();
+            });
+            var MusteriId = 0, dt, url, MusteriAdi;
+            url = "/Otomasyon/Musteriler/MusteriHesapBakiyeler/" + MusteriId;
+            var alinanodemetoplam = 0, gelecekodemetoplam = 0, alinan, gelecek, tarihsecim = "Islem", smsmetinid = 0, odemetarihi = 0, smsgondertutar = 0;
+            $("#Musteri").change(function () {
+                alinanodemetoplam = 0; gelecekodemetoplam = 0;
+                MusteriId = $(this).val();
+                MusteriAdi = $("#Musteri option:selected").text();
+                url = "/Otomasyon/Musteriler/MusteriHesapBakiyeler/" + MusteriId;
+                dt.api().ajax.url(url).load();
+                //dt.fnDraw();
+            });
+            $("#tarihsecim").on('click', function () {
+                if ($(this).is(':checked')) {
+                    $("#tarihsecimetiket").html("Ödeme Tarihi");
+                    tarihsecim = "Odeme";
+                }
+                else {
+                    $("#tarihsecimetiket").html("İşlem Tarihi");
+                    tarihsecim = "Islem";
+                }
+                alinanodemetoplam = 0; gelecekodemetoplam = 0; dt.fnDraw();
+            }); // Tarih filtrelemenin hangi tarihe göre yapılacağı seçimi
+
+            $("#AlinanOdemeToplam").html(accounting.formatMoney(alinanodemetoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+            $("#GelecekOdemeToplam").html(accounting.formatMoney(gelecekodemetoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#OdemeAlOdemeSekli').on('change', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.odemealodemehata").remove();
+                }
+            });
+            $('#OdemeAlOdemeSekli').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.odemealodemehata").remove();
+                }
+            });
+            $("#dtmusterihesap").on('click', '.makbuzyazdir', function () {
+                var id = $(this).data("odemeid");
+                window.open("/Otomasyon/RezervasyonIslemleri/AlinanOdemeMakbuzYazdir/" + id, '_blank');
+            }); // Ödeme Makbuzu Yazdır
+            $("#dtmusterihesap").on('click', '.OdemeAl', function () {
+                $("#OdemeAlKaydet").val($(this).data("odemeid"));
+                $("#OdemeAlKaydet").data("tutar", $(this).data("tutar"));
+                $("#OdemeAlModalMusteriAdi").html(MusteriAdi);
+                $("#OdemeAlTutar").val($(this).data("tutar"));
+                $("#OdemeAlOdemeYapan").val("");
+                $("#OdemeAlAciklama").val($(this).data("aciklama"));
+            });
+
+            // Alacak Metni için SMS metinleri içinden seçim yapılacak.
+            // SMS gönder butonuna basılınca popup açılacak ve SMS metni seçilmesi istenilecek.
+            // SMS metin listesi bu popup a detayları ile birlikte yüklenecek.
+            $("#dtmusterihesap").on('click', '.alacaksmsgonder', function () {
+                $("#SMSGonderModalMusteriAdi").html("");
+                $("#SMSGonderTutar").val("");
+                $("#SMSMetni").html("");
+                $("#SmsMetinleri").val("0");
+                var musteritel = $(this).data("musteritel");
+                smsgondertutar = $(this).data("tutar");
+                $("#SMSGonder").val($(this).data("odemeid"));
+                $("#SMSGonder").data("tutar", $(this).data("tutar"));
+                $("#SMSGonder").data("odemetarihi", $(this).data("odemetarihi"));
+                $("#SMSGonderModalMusteriAdi").html(MusteriAdi + " - " + musteritel);
+                $("#SMSGonderTutar").val($(this).data("tutar"));
+                $("#SmsBalonuGoster").attr("style", "display:none");
+            });
+            $("#SmsMetinleri").change(function () {
+                var metin = $(this).find("option:selected").data("smsmetni");
+                odemetarihi = $("#SMSGonder").data("odemetarihi");
+                smsgondertutar = $("#SMSGonder").data("tutar").replace("TL", "").trim();
+                metin = metin.replace("{AdSoyad}", MusteriAdi);
+                metin = metin.replace("{OdemeTarihi}", odemetarihi);
+                metin = metin.replace("{Tutar}", smsgondertutar);
+                smsmetinid = $(this).find("option:selected").val();
+                $("#SMSMetni").html(metin);
+                $("#SmsBalonuGoster").removeAttr("style");
+            });
+            $("#SMSGonder").click(function () {
+                Swal.fire(
+                    {
+                        title: "Bilgi SMS'i Gönder",
+                        //text: "< " + giskategori + " > adlı Günlük İş Katergorisi silinsin mi?",
+                        html: "<p style='color:red;font-size:12pt;'><h3> Müşteriye Borç Bilgi SMS'i gönderilsin mi?</h3></p> ",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Gönder!"
+                    }).then(function (result) {
+                        if (result.value) {
+                            var SMSGonderData = new FormData();
+                            SMSGonderData.append("MusteriId", MusteriId);
+                            SMSGonderData.append("OdemeTarihi", odemetarihi)
+                            SMSGonderData.append("SmsMetinId", smsmetinid);
+                            SMSGonderData.append("Tutar", smsgondertutar);
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                data: SMSGonderData,
+                                contentType: false,
+                                processData: false,
+                                beforeSend: function () {
+                                    Swal.fire(
+                                        {
+                                            title: "Müşteriye Bilgi SMS'i Gönderiliyor!",
+                                            html: "<strong>Lütfen Bekleyin.</strong>",
+                                            onBeforeOpen: function onBeforeOpen() {
+                                                Swal.showLoading();
+                                            }
+                                        });
+                                },
+                                url: "/Otomasyon/Musteriler/AlacakOdemeSMSGonder/",
+                                success: function (data) {
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                        swal.close();
+                                        $('#BorcBilgiSMSGonder').modal('hide');
+                                        $("#SMSGonderModalMusteriAdi").html("");
+                                        $("#SMSGonderTutar").val("");
+                                        $("#SMSMetni").html("");
+                                        $("#SmsMetinleri").val("0");
+                                        $("#SmsBalonuGoster").attr("style", "display:none");
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        swal.close();
+                                        $('#BorcBilgiSMSGonder').modal('hide');
+                                        $("#SMSGonderModalMusteriAdi").html("");
+                                        $("#SMSGonderTutar").val("");
+                                        $("#SMSMetni").html("");
+                                        $("#SmsMetinleri").val("0");
+                                        $("#SmsBalonuGoster").attr("style", "display:none");
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            });
+
+            $("#OdemeAlKaydet").click(function () {
+                var odemesekli;
+                id = $(this).val();
+                if ($("#OdemeAlOdemeSekli").val() == "0") {
+                    odemesekli = "---";
+                }
+                else if ($("#OdemeAlOdemeSekli").val() == "1") {
+                    odemesekli = "Nakit";
+                }
+                else if ($("#OdemeAlOdemeSekli").val() == "2") {
+                    odemesekli = "Kredi Kartı";
+                }
+                else if ($("#OdemeAlOdemeSekli").val() == "3") {
+                    odemesekli = "Banka Havalesi";
+                }
+
+                var borctutar = $("#OdemeAlKaydet").data("tutar").replace(" ", "");
+                borctutar = borctutar.replace("TL", "");
+                borctutar = borctutar.replace(".", "");
+                borctutar = borctutar.replace(",", ".");
+
+                var odenentutar = $("#OdemeAlTutar").val().replace(" ", "");
+                odenentutar = odenentutar.replace("TL", "");
+                odenentutar = odenentutar.replace(".", "");
+                odenentutar = odenentutar.replace(",", ".");
+
+                // Zorunlu Alan Kontrolü
+                if ($("#OdemeAlTutar").val() == "0,00 TL") {
+                    $("#OdemeAlTutar").focus();
+                    $("#OdemeAlTutarHata").append("<div class='hata' style='color:red'>Bir Tutar giriniz!</div>");
+                }
+                else if ($("#OdemeAlOdemeSekli").val() == "0") {
+                    $("#OdemeAlOdemeSekliHata").append("<div class='odemealodemehata' style='color:red'>Ödeme şeklini seçiniz!</div>");
+                }
+                else {
+                    if (parseFloat(odenentutar) > parseFloat(borctutar)) {
+                        Swal.fire(
+                            {
+                                type: "warning",
+                                title: "Borç tutarından fazla bir tutar ödemesi alamazsınız!"
+                            });
+                    }
+                    else if (parseFloat(odenentutar) < parseFloat(borctutar)) {
+                        Swal.fire(
+                            {
+                                type: "warning",
+                                title: "Borç tutarından düşük bir tutar girdiniz.<br />Kalan tutar yeni bir Borç olarak Kaydedilecek!",
+                                showCancelButton: true,
+                                confirmButtonText: "Tamam, Kaydet",
+                                cancelButtonText: "İptal"
+                            }).then(function (result) {
+                                if (result.value) {
+                                    $('#OdemeAlModal').modal('hide');
+                                    var Tutar = $("#OdemeAlTutar").val().replace(" TL", "");
+                                    var MusteriHareketData = new FormData();
+                                    MusteriHareketData.append("MusteriId", MusteriId);
+                                    MusteriHareketData.append("MusteriId", MusteriId);
+                                    MusteriHareketData.append("IslemTarihi", $("#OdemeAlIslemTarihi").val());
+                                    MusteriHareketData.append("OdemeTarihi", $("#OdemeAlOdemeTarihi").val());
+                                    MusteriHareketData.append("Tutar", Tutar);
+                                    MusteriHareketData.append("OdemeSekli", odemesekli);
+                                    MusteriHareketData.append("Aciklama", $("#OdemeAlAciklama").val());
+                                    MusteriHareketData.append("OdemeYapan", $("#OdemeAlOdemeYapan").val());
+                                    $.ajax({
+                                        type: "POST",
+                                        datatype: 'json',
+                                        data: MusteriHareketData,
+                                        contentType: false,
+                                        processData: false,
+                                        url: "/Otomasyon/Musteriler/MusteriHareketOdemeAl/" + id,
+                                        success: function (data) {
+                                            alinanodemetoplam = 0; gelecekodemetoplam = 0;
+                                            if (data.Sonuc == false) {
+                                                alertify.set('notifier', 'delay', 5);
+                                                alertify.set('notifier', 'position', 'top-center');
+                                                alertify.error(data.Mesaj);
+                                            }
+                                            else if (data.Sonuc == true) {
+                                                alertify.set('notifier', 'delay', 3);
+                                                alertify.set('notifier', 'position', 'top-center');
+                                                alertify.success(data.Mesaj);
+                                                dt.api().ajax.reload();
+                                            }
+                                        },
+                                        error: function (err) {
+                                            alert("HATA");
+                                        }
+                                    });
+                                }
+                            });
+                    }
+                    else {
+                        $('#OdemeAlModal').modal('hide');
+                        var Tutar = $("#OdemeAlTutar").val().replace(" TL", "");
+                        var MusteriHareketData = new FormData();
+                        MusteriHareketData.append("MusteriId", MusteriId);
+                        MusteriHareketData.append("IslemTarihi", $("#OdemeAlIslemTarihi").val());
+                        MusteriHareketData.append("OdemeTarihi", $("#OdemeAlOdemeTarihi").val());
+                        MusteriHareketData.append("Tutar", Tutar);
+                        MusteriHareketData.append("OdemeSekli", odemesekli);
+                        MusteriHareketData.append("Aciklama", $("#OdemeAlAciklama").val());
+                        MusteriHareketData.append("OdemeYapan", $("#OdemeAlOdemeYapan").val());
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            data: MusteriHareketData,
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Musteriler/MusteriHareketOdemeAl/" + id,
+                            success: function (data) {
+                                alinanodemetoplam = 0; gelecekodemetoplam = 0;
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                }
+            });
+
+            $.fn.dataTableExt.afnFiltering.push(
+                function (Settings, Data, DataIndex) {
+                    var ilktarih = parseDateValue($("#IlkTarih").val());
+                    var sontarih = parseDateValue($("#SonTarih").val());
+                    var subeadi = $("#Sube").val();
+                    var goruntuletip = $("#GoruntuleTip").val(); // 0: Tümü , 1: Alınan Ödeme , 2: Gelecek Ödeme
+                    var musteriid = $("#Musteri").val();
+                    var tarih, sube, tip, musteri, odemealbit;
+                    if (tarihsecim == "Islem")
+                        tarih = parseDateValue(Data[3]);
+                    else if (tarihsecim == "Odeme")
+                        tarih = parseDateValue(Data[4]);
+
+                    sube = Data[0];
+                    musteri = Data[1]; // Tablodaki MusteriId
+                    odemealbit = Data[10];
+
+
+                    // ÖdemeAlBit true ise gelecek ödeme satırı alınan ödemeye dönüştürlmüş demektir. bu nedenle gelecek ödemeler toplamına dahil edilmez.
+                    if (Data[6] == "Alınan Ödeme" && Data[10] == "false") {
+                        tip = 1;
+                        alinan = Data[7];
+                        alinan = alinan.replace("TL", "");
+                        alinan = alinan.replace(".", "");
+                        alinan = alinan.replace(",", ".");
+                    }
+                    else if (Data[6] == "Alınan Ödeme" && Data[10] == "true") {
+                        tip = 1;
+                        alinan = Data[7];
+                        alinan = alinan.replace("TL", "");
+                        alinan = alinan.replace(".", "");
+                        alinan = alinan.replace(",", ".");
+                    }
+                    else if (Data[6] == "Gelecek Ödeme" && Data[10] == "false") {
+                        tip = 2;
+                        gelecek = Data[7];
+                        gelecek = gelecek.replace("TL", "");
+                        gelecek = gelecek.replace(".", "");
+                        gelecek = gelecek.replace(",", ".");
+                    }
+                    else if (Data[6] == "Gelecek Ödeme" && Data[10] == "true") {
+                        tip = 2;
+                        gelecek = Data[7];
+                        gelecek = gelecek.replace("TL", "");
+                        gelecek = gelecek.replace(".", "");
+                        gelecek = gelecek.replace(",", ".");
+                    }
+
+                    if (ilktarih == null && sontarih == null) return true;
+                    if (ilktarih == null && tarih <= sontarih) return true;
+                    if (sontarih == null && tarih >= ilktarih) return true;
+                    if (tarih <= sontarih && tarih >= ilktarih) {
+                        if (subeadi == 0 && goruntuletip == 0 && musteriid == musteri) {
+                            if (odemealbit == 'false') {
+                                if (tip == 1) {
+                                    alinanodemetoplam = parseFloat(alinanodemetoplam) + parseFloat(alinan);
+                                }
+                                else {
+                                    gelecekodemetoplam = parseFloat(gelecekodemetoplam) + parseFloat(gelecek);
+                                }
+                            }
+                            $("#AlinanOdemeToplam").html(accounting.formatMoney(alinanodemetoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+                            $("#GelecekOdemeToplam").html(accounting.formatMoney(gelecekodemetoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                            return true;
+                        }
+                        else if (subeadi == 0 && goruntuletip == tip && musteriid == musteri) {
+                            if (odemealbit == 'false') {
+                                if (tip == 1) {
+                                    alinanodemetoplam = parseFloat(alinanodemetoplam) + parseFloat(alinan);
+                                }
+                                else {
+                                    gelecekodemetoplam = parseFloat(gelecekodemetoplam) + parseFloat(gelecek);
+                                }
+                            }
+                            $("#AlinanOdemeToplam").html(accounting.formatMoney(alinanodemetoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+                            $("#GelecekOdemeToplam").html(accounting.formatMoney(gelecekodemetoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                            return true;
+                        }
+                        else if (subeadi == sube && goruntuletip == 0 && musteriid == musteri) {
+                            if (odemealbit == 'false') {
+                                if (tip == 1) {
+                                    alinanodemetoplam = parseFloat(alinanodemetoplam) + parseFloat(alinan);
+                                }
+                                else {
+                                    gelecekodemetoplam = parseFloat(gelecekodemetoplam) + parseFloat(gelecek);
+                                }
+                            }
+                            $("#AlinanOdemeToplam").html(accounting.formatMoney(alinanodemetoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+                            $("#GelecekOdemeToplam").html(accounting.formatMoney(gelecekodemetoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                            return true;
+                        }
+                        else if (subeadi == sube && goruntuletip == tip && musteriid == musteri) {
+                            if (odemealbit == 'false') {
+                                if (tip == 1) {
+                                    alinanodemetoplam = parseFloat(alinanodemetoplam) + parseFloat(alinan);
+                                }
+                                else {
+                                    gelecekodemetoplam = parseFloat(gelecekodemetoplam) + parseFloat(gelecek);
+                                }
+                            }
+                            $("#AlinanOdemeToplam").html(accounting.formatMoney(alinanodemetoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+                            $("#GelecekOdemeToplam").html(accounting.formatMoney(gelecekodemetoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                            return true;
+                        }
+                        else
+                            return false;
+                    }
+                    return false;
+                });
+
+            dt = $('#dtmusterihesap').dataTable(
+                {
+                    responsive: true,
+                    "destroy": true,
+                    "createdRow": function (row, data, dataIndex) { // Ödemesi yapılmış veya Tahsilat yapılmış Kayıtlar yeşil olacak
+                        if (data["OdemeAl"] == false && data["OdemeTuru"] == "AlinanOdeme") {
+                            $('td', row).addClass('bg-primary-100 text-black');
+                        }
+                        else if (data["OdemeAl"] == true && data["OdemeTuru"] == "GelecekOdeme") {
+                            $('td', row).addClass('bg-success-100 text-black');
+                        }
+                        else if (data["OdemeAl"] == false && data["OdemeTuru"] == "GelecekOdeme") {
+                            $('td', row).addClass('bg-warning-100 text-black');
+                        }
+                    },
+                    "order": [[11, "asc"], [2, "desc"]],
+                    "columnDefs": [{ "targets": 11, "type": "date-eu" }],
+                    "columns": [
+                        { "data": "SubeAdi", "autowidth": true, "visible": false, "className": "align-middle" },     // 1
+                        { "data": "MusteriId", "autowidth": true, "visible": false, "className": "align-middle" },   // 2
+                        { "data": "Musteri", "autowidth": true, "className": "align-middle" },                       // 3
+                        { "data": "IslemTarihi", "autowidth": true, "className": "align-middle" },                   // 4
+                        { "data": "OdemeTarihi", "autowidth": true, "className": "align-middle" },                   // 5
+                        { // Sözleşme No, Günlük İş Takip No:                           // 6
+                            "data": null, "autowidth": true, "className": "align-middle",
+                            "render": function (data, type, row) {
+                                if (row.SozlesmeId == "1") {
+                                    return "Takip No: " + row.GunlukIsTakipNo;
+                                }
+                                else {
+                                    return "Sözleşme No: " + row.SozlesmeNo;
+                                }
+                            }
+                        },
+                        { // Ödeme Türü                                                 // 7
+                            "data": null, "autowidth": true, "className": "align-middle",
+                            "render": function (data, type, row) {
+                                if (row.OdemeTuru == "AlinanOdeme") {
+                                    return "Alınan Ödeme";
+                                }
+                                else if (row.OdemeTuru == "GelecekOdeme") {
+                                    return "Gelecek Ödeme";
+                                }
+                                else if (row.OdemeTuru == "CariTahsilat") {
+                                    return "Cari Tahsilat";
+                                }
+                                else if (row.OdemeTuru == "CariOdeme") {
+                                    return "Cariye Ödeme";
+                                }
+                                else if (row.OdemeTuru == "Kapora") {
+                                    return "Kapora";
+                                }
+                            }
+                        },
+                        { // Tutar
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                return ParaFormat(row.Tutar)
+                            }
+                        },                                                              //8
+                        { "data": "Aciklama", "autowidth": true, "className": "align-middle" },                      // 9
+                        {                                                               // 10
+                            "data": null, "className": "align-middle",
+                            "render": function (data, type, row) {
+                                islem = "";
+
+                                if (row.OdemeTuru == "GelecekOdeme") { // Ödemetürü Gelecek Ödeme ise Ödeme alınabilir ve müşteriye borç bilgilendirme SMS i gönderilebilir.
+                                    if (row.OdemeAl == false) {
+                                        if (EkleYetki == "True") {
+                                            islem = islem + "<a href='#' data-toggle='modal' data-target='#OdemeAlModal' class='btn btn-xs mr-1 btn-success btn-icon OdemeAl' data-odemeid='" + row.Id + "' data-musteriid='" + row.MusteriId + "' data-subeadi='" + row.SubeAdi + "' data-musterikodu='" + row.MusteriKodu + "' data-musteriadi='" + row.Musteri + "'" +
+                                                "data-tutar='" + ParaFormat(row.Tutar) + "' data-aciklama='" + row.Aciklama + "' title='Ödeme Al'>" +
+                                                "<i class='fal fa-plus-square'></i>" +
+                                                "</a>"
+                                        }
+                                        if (SMSGonderYetki == "True") {
+                                            islem = islem + "<a href='#' data-toggle='modal' data-target='#BorcBilgiSMSGonder' class='btn btn-xs btn-primary btn-icon mr-1 alacaksmsgonder' data-odemeid='" + row.Id + "'data-musteriid='" + row.MusteriId + "' data-musteritel='" + row.MusteriTel + "' data-subeadi='" + row.SubeAdi + "' data-musterikodu='" + row.MusteriKodu + "' data-tutar='" + ParaFormat(row.Tutar) +
+                                                "' data-odemetarihi='" + row.OdemeTarihi + "' title='SMS Gönder'>" +
+                                                "<i class='fal fa-mobile-alt'></i>" +
+                                                "</a>"
+                                        }
+                                    }
+                                }
+                                else if (row.OdemeTuru == "AlinanOdeme") { // Ödemetürü Gelecek Ödeme ise makbuz yazdırılabilir.
+                                    if (YazdirYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-info btn-icon mr-1 makbuzyazdir' data-odemeid='" + row.Id + "' data-makbuzno='" + row.AlinanOdemeMakbuzNo + "' title='Makbuz Yazdır'>" +
+                                            "<i class='fal fa-print'></i>" +
+                                            "</a>"
+                                    }
+                                }
+                                return islem
+                            }
+                        },
+                        { "data": "OdemeAl", "autowidth": true, "visible": false, "className": "align-middle" },                      // 11 ÖdemeAlBit
+                        { "data": "IslemTarihi", "autowidth": true, "visible": false, "className": "align-middle" }                   // 12
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": url,
+                        "contentType": 'application/json; charset=utf-8',
+                        'type': 'POST',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "processing": "Yükleniyor... Lütfen Bekleyin",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+
+            $("#IlkTarih").keyup(function () { alinanodemetoplam = 0; gelecekodemetoplam = 0; dt.fnDraw(); });
+            $("#IlkTarih").change(function () { alinanodemetoplam = 0; gelecekodemetoplam = 0; dt.fnDraw(); });
+            $("#SonTarih").keyup(function () { alinanodemetoplam = 0; gelecekodemetoplam = 0; dt.fnDraw(); });
+            $("#SonTarih").change(function () { alinanodemetoplam = 0; gelecekodemetoplam = 0; dt.fnDraw(); });
+            $("#GoruntuleTip").change(function () { alinanodemetoplam = 0; gelecekodemetoplam = 0; dt.fnDraw(); });
+            $("#Sube").change(function () { alinanodemetoplam = 0; gelecekodemetoplam = 0; dt.fnDraw(); });
+            $("input[type='search']").keydown(function () {
+                alinanodemetoplam = 0; gelecekodemetoplam = 0;
+            });
+        });
+    </script>
+}

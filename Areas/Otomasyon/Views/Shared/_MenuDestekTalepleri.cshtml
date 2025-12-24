@@ -1,0 +1,17 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    //List<KullaniciYetki> ky = ViewBag.KullaniciYetkileri;
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool dashboard = ky.FirstOrDefault(x => x.SayfaId == 109 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 109 && x.Sil == false && x.Aktif == true).SayfaYetki;
+
+}
+@{ string ustmenuclass = ViewBag.UstMenu == "Destek" ? "active open" : "";}
+@if (dashboard)
+{
+    <li class=@ustmenuclass>
+        <a href="~/Otomasyon/Destek/DestekTalepleri" title="Destek Talepleri" data-filter-tags="destek talepleri">
+            <i class="fal fa-comments"></i>
+            <span class="nav-link-text" data-i18n="nav.destek_talepleri">Destek Talepleri</span>
+        </a>
+    </li>
+}

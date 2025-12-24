@@ -1,0 +1,169 @@
+﻿
+@{
+    ViewBag.Title = "Müşteri Ayarları";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model AyarlarMusteri
+
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h3>Müşteri Ayarları</h3>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <form action="/Otomasyon/Ayarlar/MusteriAyarlari" method="post" enctype="multipart/form-data">
+                        @if (Model != null)
+                        {
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.OdemeleriGor == true)
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="OdemeleriGor" name="OdemeleriGor" checked>
+                                    }
+                                    else
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="OdemeleriGor" name="OdemeleriGor">
+                                    }
+                                    <label class="custom-control-label" for="OdemeleriGor">Müşteri yaptığı ödemeleri görebilir</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.RezervasyonGor == true)
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="RezervasyonGor" name="RezervasyonGor" checked>
+                                    }
+                                    else
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="RezervasyonGor" name="RezervasyonGor">
+                                    }
+                                    <label class="custom-control-label" for="RezervasyonGor">Müşteri rezarvasyonları görebilir</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.TeklifleriGor == true)
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="TeklifleriGor" name="TeklifleriGor" checked>
+                                    }
+                                    else
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="TeklifleriGor" name="TeklifleriGor">
+                                    }
+                                    <label class="custom-control-label" for="TeklifleriGor">Müşteri rezervasyon tekliflerini görebilir</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.SozlesmeYazdir == true)
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="SozlesmeYazdir" name="SozlesmeYazdir" checked>
+                                    }
+                                    else
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="SozlesmeYazdir" name="SozlesmeYazdir">
+                                    }
+                                    <label class="custom-control-label" for="SozlesmeYazdir">Müşteri sözleşmeyi yazdırabilir</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.OdemeMakbuzYazdir == true)
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="OdemeMakbuzYazdir" name="OdemeMakbuzYazdir" checked>
+                                    }
+                                    else
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="OdemeMakbuzYazdir" name="OdemeMakbuzYazdir">
+                                    }
+                                    <label class="custom-control-label" for="OdemeMakbuzYazdir">Müşteri ödeme makbuzu yazdırabilir</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.MesajGonder == true)
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="MesajGonder" name="MesajGonder" checked>
+                                    }
+                                    else
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="MesajGonder" name="MesajGonder">
+                                    }
+                                    <label class="custom-control-label" for="MesajGonder">Müşteri mesajlaşa yapabilir</label>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.FotografSecim == true)
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="FotografSecim" name="FotografSecim" checked>
+                                    }
+                                    else
+                                    {
+                                    <input type="checkbox" class="custom-control-input" id="FotografSecim" name="FotografSecim">
+                                    }
+                                    <label class="custom-control-label" for="FotografSecim">Müşteri fotoğraf seçimi yapabilir</label>
+                                </div>
+                            </div>
+                            <input type="text" id="Id" class="form-control" name="Id" maxlength="50" style="display:none" value="@Model.Id">
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="OdemeleriGor" name="OdemeleriGor" checked>
+                                    <label class="custom-control-label" for="OdemeleriGor">Müşteri yaptığı ödemeleri görebilir</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="RezervasyonGor" name="RezervasyonGor" checked>
+                                    <label class="custom-control-label" for="RezervasyonGor">Müşteri rezarvasyonları görebilir</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="TeklifleriGor" name="TeklifleriGor" checked>
+                                    <label class="custom-control-label" for="TeklifleriGor">Müşteri rezervasyon tekliflerini görebilir</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="SozlesmeYazdir" name="SozlesmeYazdir" checked>
+                                    <label class="custom-control-label" for="SozlesmeYazdir">Müşteri sözleşmeyi yazdırabilir</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="OdemeMakbuzYazdir" name="OdemeMakbuzYazdir" checked>
+                                    <label class="custom-control-label" for="OdemeMakbuzYazdir">Müşteri ödeme makbuzu yazdırabilir</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="MesajGonder" name="MesajGonder" checked>
+                                    <label class="custom-control-label" for="MesajGonder">Müşteri mesajlaşa yapabilir</label>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="FotografSecim" name="FotografSecim" checked>
+                                    <label class="custom-control-label" for="FotografSecim">Müşteri fotoğraf seçimi yapabilir</label>
+                                </div>
+                            </div>
+                            <input type="text" id="Id" class="form-control" name="Id" maxlength="50" style="display:none" value="0">
+                        }
+                        @if (ViewBag.KullaniciYetki)
+                        {
+                            <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                                <button type="submit" class="btn btn-primary ml-auto waves-effect waves-themed"><i class="fal fa-save mr-2"></i> Kaydet</button>
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            $(":input").inputmask();
+        });
+    </script>
+}
+

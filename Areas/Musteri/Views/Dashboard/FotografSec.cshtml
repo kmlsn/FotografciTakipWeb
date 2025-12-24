@@ -1,0 +1,512 @@
+﻿@{
+    ViewBag.Title = "Fotoğraf Seç";
+    Layout = "~/Areas/Musteri/Views/Shared/_Layout.cshtml";
+    ViewBag.AdSoyad = Session["AdSoyad"];
+    ViewBag.Email = Session["Email"];
+    ViewBag.Firma = Session["Firma"];
+    ViewBag.FirmaLogo = Session["FirmaLogo"];
+}
+@section Head
+{
+    <link href="~/Areas/Musteri/Content/light-box/jquery.zbox.css" rel="stylesheet" />
+    <style type="text/css">
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            margin-top: auto;
+        }
+        .form-control {
+            display: flex;
+            flex-direction: column;
+            margin-top: auto;
+        }
+        .card-img-top {
+            width: 100%;
+            height: 40vh;
+            object-fit: cover;
+        }
+    </style>
+}
+@using FotografciTakipWeb.Models
+@model List<MusteriFotograf>
+@{  List<Sozlesme> AktifSozlesmeler = ViewBag.AktifSozlesmeler;}
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h2> Fotoğraf Seçimi</h2>
+                <input type="hidden" data-yetki="@ViewBag.MusteriYetkileri.FotografSecim" id="fotografsecim" />
+                <input type="hidden" id="SozlesmeId" />
+                <div class="form-group col-sm-3 mt-4">
+                    @if (AktifSozlesmeler.Count > 0)
+                    {
+                        <select class="custom-select form-control custom-select-sm" id="Sozlesme" name="Sozlesme" title="Sözleşme Seçiniz">
+                            <option selected="" value="0">Sözleşme Seçiniz</option>
+                            @foreach (var item in AktifSozlesmeler)
+                            {
+                                <option value="@item.Id">@item.SozlesmeNo - @item.RezervasyonTarihi.ToShortDateString()</option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <select class="custom-select form-control custom-select-sm" id="Sozlesme" name="Sozlesme" title="Sözleşme Seçiniz" disabled>
+                            <option selected="" value="0" disabled>Sözleşme Seçiniz</option>
+                        </select>
+                    }
+
+                </div>
+                <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                    @*<button type="button" class="btn btn-secondary ml-auto waves-effect waves-themed Bildir" id="Bildir">Seçimleri Fotoğrafçıya Bildir</button>*@
+                    <button type="button" class="btn bg-success-800 ml-auto waves-effect waves-themed text-white BaskiOnay" id="BaskiOnay">Seçimleri Baskı İçin Onayla</button>
+                    <button type="button" class="btn btn-primary ml-2 waves-effect waves-themed Kaydet" id="Kaydet">Seçimleri Kaydet</button>
+                </div>
+            </div>
+
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!--  DropZone Resim Yükleme işlemleri   -->
+                    <input type="hidden" id="MusteriId" value="@ViewBag.MusteriId" />
+                    @if (ViewBag.MusteriYetkileri.FotografSecim == false)
+                    {
+                        <div id="musteriSecUayari">
+                            <div class="alert alert-danger" role="alert">
+                                Üzgünüz. Fotoğraf seçimi yapamazsınız.
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="musteriSecUyari">
+                            <div class="alert alert-danger" role="alert">
+                                Lütfen Sözleşme Seçiniz.
+                            </div>
+                        </div>
+                        <div id="ResimlerGoster" class="row">
+                            @*@if (Model.Count > 0)
+                                {
+                                    <div class="row">
+                                        @foreach (var foto in Model)
+                                        {
+                                            string borderclass = "";
+                                            string dissab = "";
+                                            if (foto.SecildiDurum == "0")
+                                            {
+                                                borderclass = "border-danger";
+                                            }
+                                            else if (foto.SecildiDurum == "1")
+                                            {
+                                                borderclass = "border-primary";
+                                            }
+                                            else if (foto.SecildiDurum == "2")
+                                            {
+                                                borderclass = "border-success";
+                                                dissab = "disabled";
+                                            }
+                                            <div class="col-sm-3 mt-3">
+                                                <div class="card border @borderclass" id="Card-@foto.Id" style="height:100%">
+                                                    <a href="@foto.FotografYol" data-toggle="lightbox" data-gallery="example-gallery" class="foto-geleri">
+                                                        <img class="card-img-top" src="@foto.FotografYol">
+                                                    </a>
+                                                    <div class="card-body">
+                                                        <h5 class="card-title fw-700 mb-2">@foto.FotografAdi</h5>
+                                                        <p class="card-text mb-2">@foto.FotografAciklama</p>
+                                                        <textarea class="form-control form-control-sm justify-content-end" @dissab id="Notlar-@foto.Id" rows="2" name="Notlar" placeholder="Notlar" style="overflow:auto;resize:none">@foto.Notlar</textarea>
+                                                        <div class="frame-wrap mt-3 mb-3">
+                                                            <div class="custom-control custom-radio custom-control-inline">
+                                                                @if (foto.SecildiDurum == "0")
+                                                                {
+                                                                    <input type="radio" class="custom-control-input" id="Secilmedi-@foto.Id" name="@foto.FotografAdi" data-id="Secilmedi-@foto.Id" data-fotoid="@foto.Id" checked="">
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="radio" @dissab class="custom-control-input" id="Secilmedi-@foto.Id" name="@foto.FotografAdi" data-id="Secilmedi-@foto.Id" data-fotoid="@foto.Id">
+                                                                }
+                                                                <label class="custom-control-label" for="Secilmedi-@foto.Id">Seçilmedi</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio custom-control-inline">
+                                                                @if (foto.SecildiDurum == "1")
+                                                                {
+                                                                    <input type="radio" class="custom-control-input" id="Duzenle-@foto.Id" name="@foto.FotografAdi" data-id="Duzenle-@foto.Id" data-fotoid="@foto.Id" checked="">
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="radio" @dissab class="custom-control-input" id="Duzenle-@foto.Id" name="@foto.FotografAdi" data-id="Duzenle-@foto.Id" data-fotoid="@foto.Id">
+                                                                }
+                                                                <label class="custom-control-label" for="Duzenle-@foto.Id">Düzenleme yapılmalı</label>
+                                                            </div>
+                                                            <div class="custom-control custom-radio custom-control-inline">
+                                                                @if (foto.SecildiDurum == "2")
+                                                                {
+                                                                    <input type="radio" @dissab class="custom-control-input" id="Baski-@foto.Id" name="@foto.FotografAdi" data-id="Baski-@foto.Id" data-fotoid="@foto.Id" checked="">
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="radio" class="custom-control-input" id="Baski-@foto.Id" name="@foto.FotografAdi" data-id="Baski-@foto.Id" data-fotoid="@foto.Id">
+                                                                }
+                                                                <label class="custom-control-label" for="Baski-@foto.Id">Baskı Yapılabilir</label>
+                                                            </div>
+                                                            <div class="custom-control custom-checkbox custom-control-inline">
+                                                                @if (foto.KapakFotograf == true)
+                                                                {
+                                                                    <input type="checkbox" class="custom-control-input" id="KapakFotograf-@foto.Id" data-id="Kapak-@foto.Id" data-fotoid="@foto.Id" checked>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="checkbox" class="custom-control-input" id="KapakFotograf-@foto.Id" data-id="Kapak-@foto.Id" data-fotoid="@foto.Id">
+                                                                }
+                                                                <label class="custom-control-label" for="KapakFotograf-@foto.Id">Albüm Kapağı</label>
+                                                            </div>
+                                                            <div class="custom-control custom-checkbox custom-control-inline">
+                                                                @if (foto.PosterFotograf == true)
+                                                                {
+                                                                    <input type="checkbox" class="custom-control-input" id="PosterFotograf-@foto.Id" data-id="Poster-@foto.Id" data-fotoid="@foto.Id" checked>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <input type="checkbox" class="custom-control-input" id="PosterFotograf-@foto.Id" data-id="Poster-@foto.Id" data-fotoid="@foto.Id">
+                                                                }
+                                                                <label class="custom-control-label" for="PosterFotograf-@foto.Id">Poster Fotoğraf</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-warning" role="alert">
+                                        Fotoğraflar henüz yüklenmemiş.
+                                    </div>
+                                }*@
+                        </div>
+                    }
+                </div>
+                <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                    @*<button type="button" class="btn btn-secondary ml-auto waves-effect waves-themed Bildir" id="Bildir">Seçimleri Fotoğrafçıya Bildir</button>*@
+                    <button type="button" class="btn bg-success-800 ml-auto waves-effect waves-themed text-white BaskiOnay" id="BaskiOnay">Seçimleri Baskı İçin Onayla</button>
+                    <button type="button" class="btn btn-primary ml-2 waves-effect waves-themed Kaydet" id="Kaydet">Seçimleri Kaydet</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script src="~/Areas/Musteri/Content/light-box/jquery.zbox.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".foto-geleri").zbox();
+            var Secilmedi = new Array();
+            var Duzenlenecek = new Array();
+            var Basilacak = new Array();
+            var Kapak = 0, Poster = 0;
+            var Foto_id, Not, SozlesmeId = 0;
+            //var Notlar=new Array();
+            $("input[type=radio]").on("change", function () {
+                var fotoid = $(this).data("fotoid");
+                if ($(this).data("id") == "Secilmedi-" + fotoid) {
+                    $("#Card-" + fotoid).removeClass("border-primary");
+                    $("#Card-" + fotoid).removeClass("border-success");
+                    $("#Card-" + fotoid).addClass("border-danger");
+                }
+                else if ($(this).data("id") == "Duzenle-" + fotoid) {
+                    $("#Card-" + fotoid).removeClass("border-danger");
+                    $("#Card-" + fotoid).removeClass("border-success");
+                    $("#Card-" + fotoid).addClass("border-primary");
+                }
+                else if ($(this).data("id") == "Baski-" + fotoid) {
+                    $("#Card-" + fotoid).removeClass("border-primary");
+                    $("#Card-" + fotoid).removeClass("border-danger");
+                    $("#Card-" + fotoid).addClass("border-success");
+                }
+            });
+            $("input[type=checkbox]").on("change", function () {
+                var fotoid = $(this).data("fotoid");
+                if ($(this).is(':checked') == false && ($(this).data("id") == "Kapak-" + fotoid)) {
+                    Kapak = 0;
+                }
+                if ($(this).is(':checked') == false && ($(this).data("id") == "Poster-" + fotoid)) {
+                    Poster = 0;
+                }
+                if ($(this).is(':checked') && ($(this).data("id") == "Kapak-" + fotoid)) {
+                    if (Kapak != 0) {
+                        $(this).prop("checked", true);
+                        $(this).prop("checked", false);
+                        Swal.fire(
+                            {
+                                title: "Dikkat!",
+                                html: "Sadece bir adet kapak fotoğrafı seçebilirsiniz.",
+                                type: "error",
+                                showCancelButton: false,
+                                confirmButtonText: "Tamam"
+                            });
+                    }
+                    else {
+
+                        Kapak = fotoid;
+                    }
+                }
+                if ($(this).is(':checked') && ($(this).data("id") == "Poster-" + fotoid)) {
+                    if (Poster != 0) {
+                        $(this).prop("checked", true);
+                        $(this).prop("checked", false);
+                        Swal.fire(
+                            {
+                                title: "Dikkat!",
+                                html: "Sadece bir adet poster fotoğrafı seçebilirsiniz.",
+                                type: "error",
+                                showCancelButton: false,
+                                confirmButtonText: "Tamam"
+                            });
+                    }
+                    else {
+                        Poster = fotoid;
+                    }
+                }
+                console.log("Kapak:" + Kapak);
+                console.log("Poster:" + Poster);
+            });
+
+            $("#Sozlesme").change(function () {
+                SozlesmeId = $(this).val();
+                $("#SozlesmeId").data("SozId", $(this).val());
+                var MusteriData = new FormData();
+                MusteriData.append("SozlesmeId", SozlesmeId);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: MusteriData,
+                    contentType: false,
+                    processData: false,
+                    url: "/Musteri/Dashboard/MusteriFotografListesi",
+                    success: function (data) {
+                        $("#ResimlerGoster").empty();
+                        if (data.data.length > 0) {
+                            $("#musteriSecUyari").attr("style", "display:none");
+                            $.each(data.data, function (index, item) {
+                                var borderclass = "";
+                                var dissab = "";
+                                var secilmedi = "", duzenle = "", baski = "", kapak = "", poster = "";
+                                if (item.SecildiDurum == "0") {
+                                    borderclass = "border-danger";
+                                }
+                                else if (item.SecildiDurum == "1") {
+                                    borderclass = "border-primary";
+                                }
+                                else if (item.SecildiDurum == "2") {
+                                    borderclass = "border-success";
+                                    dissab = "disabled";
+                                }
+                                if (item.SecildiDurum == "0") {
+                                    secilmedi = "<input type='radio' class='custom-control-input' id='Secilmedi-" + item.Id + "' name='" + item.FotografAdi + "' data-id='Secilmedi-" + item.Id + "' data-fotoid='" + item.Id + "' checked>";
+                                }
+                                else {
+                                    secilmedi = "<input type='radio'" + dissab + " class='custom-control-input' id='Secilmedi-" + item.Id + "' name='" + item.FotografAdi + "' data-id='Secilmedi-" + item.Id + "' data-fotoid='" + item.Id + "'>";
+                                }
+                                if (item.SecildiDurum == "1") {
+                                    duzenle = "<input type='radio' class='custom-control-input' id='Duzenle-" + item.Id + "' name='" + item.FotografAdi + "' data-id='Duzenle-" + item.Id + "' data-fotoid='" + item.Id + "' checked>";
+                                }
+                                else {
+                                    duzenle = "<input type='radio'" + dissab + " class='custom-control-input' id='Duzenle-" + item.Id + "' name='" + item.FotografAdi + "' data-id='Duzenle-" + item.Id + "' data-fotoid='" + item.Id + "'>";
+                                }
+                                if (item.SecildiDurum == "2") {
+                                    baski = "<input type='radio' class='custom-control-input' id='Baski-" + item.Id + "' name='" + item.FotografAdi + "' data-id='Baski-" + item.Id + "' data-fotoid='" + item.Id + "' checked>";
+                                }
+                                else {
+                                    baski = "<input type='radio'" + dissab + "class='custom-control-input' id='Baski-" + item.Id + "' name='" + item.FotografAdi + "' data-id='Baski-" + item.Id + "' data-fotoid='" + item.Id + "'>";
+                                }
+                                if (item.KapakFotograf == true) {
+                                    kapak = "<input type='checkbox' class='custom-control-input' id='KapakFotograf-" + item.Id + "' data-id='Kapak-" + item.Id + "' data-fotoid='" + item.Id + "' checked>";
+                                }
+                                else {
+                                    kapak = "<input type='checkbox' class='custom-control-input' id='KapakFotograf-" + item.Id + "' data-id='Kapak-" + item.Id + "' data-fotoid='" + item.Id + "'>";
+                                }
+                                if (item.PosterFotograf == true) {
+                                    poster = "<input type='checkbox' class='custom-control-input' id='PosterFotograf-" + item.Id + "' data-id='Poster-" + item.Id + "' data-fotoid='" + item.Id + "' checked>";
+                                }
+                                else {
+                                    poster = "<input type='checkbox' class='custom-control-input' id='PosterFotograf-" + item.Id + "' data-id='Poster-" + item.Id + "' data-fotoid='" + item.Id + "'>";
+                                }
+
+                                $("#ResimlerGoster").append("<div class='col-sm-3 mt-3'>" +
+                                                                "<div class='card border " + borderclass + "' id='Card-" + item.Id + "' style='height:100%'>" +
+                                                                    "<a href='" + item.FotografYol + "' data-toggle='lightbox' data-gallery='example-gallery' class='foto-geleri'>" +
+                                                                        "<img class='card-img-top' src='" + item.FotografYol + "'>" +
+                                                                    "</a>" +
+                                                                    "<div class='card-body'>" +
+                                                                        "<h5 class='card-title fw-700 mb-2'>" + item.FotografAdi + "</h5>" +
+                                                                        "<p class='card-text mb-2'>" + item.FotografAciklama + "</p>" +
+                                                                        "<textarea class='form-control form-control-sm justify-content-end'" + dissab + " id='Notlar-" + item.Id + "' rows='2' name='Notlar' placeholder='Notlar' style='overflow:auto;resize:none'>" + item.Notlar + "</textarea>" +
+                                                                        "<div class='frame-wrap mt-3 mb-3'>" +
+                                                                            "<div class='custom-control custom-radio custom-control-inline'>" +
+                                                                                secilmedi +
+                                                                                "<label class='custom-control-label' for='Secilmedi-" + item.Id + "'>Seçilmedi</label>" +
+                                                                            "</div>" +
+                                                                            "<div class='custom-control custom-radio custom-control-inline'>" +
+                                                                                duzenle +
+                                                                                "<label class='custom-control-label' for='Duzenle-" + item.Id + "'>Düzenleme yapılmalı</label>" +
+                                                                            "</div>" +
+                                                                            "<div class='custom-control custom-radio custom-control-inline'>" +
+                                                                                baski +
+                                                                                "<label class='custom-control-label' for='Baski-" + item.Id + "'>Baskı Yapılabilir</label>" +
+                                                                            "</div>" +
+                                                                            "<div class='custom-control custom-checkbox custom-control-inline'>" +
+                                                                                kapak +
+                                                                                "<label class='custom-control-label' for='KapakFotograf-" + item.Id + "'>Albüm Kapağı</label>" +
+                                                                            "</div>" +
+                                                                            "<div class='custom-control custom-checkbox custom-control-inline'>" +
+                                                                                poster +
+                                                                                "<label class='custom-control-label' for='PosterFotograf-" + item.Id + "'>Poster Fotoğraf</label>" +
+                                                                            "</div>" +
+                                                                        "</div>" +
+                                                                    "</div>" +
+                                                                "</div>" +
+                                                            "</div>");
+                            });
+                        }
+                        else {
+                            $("#musteriSecUyari").removeAttr("style");
+                            $("#musteriSecUyari").empty();
+                            $("#musteriSecUyari").append("<div class='alert alert-warning' role='alert'>" +
+                                                            "Fotoğraflar henüz yüklenmemiş." +
+                                                          "</div>");
+
+                        }
+
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $(".Kaydet").click(function () {
+                console.log("SözleşmeId: " + $("#SozlesmeId").data("SozId"))
+                Secilmedi = [];
+                Duzenlenecek = [];
+                Basilacak = [];
+                $("input[type=radio]:checked").each(function (i) {
+                    var fotoid = $(this).data("fotoid");
+                    var secici = "#Notlar-" + fotoid;
+                    if ($(this).data("id") == "Secilmedi-" + fotoid) {
+                        Foto_id = "Foto_Id:" + fotoid;
+                        Not = "Foto_Not:" + $(secici).val().replace(",", "&");
+                        Secilmedi.push(Foto_id);
+                        Secilmedi.push(Not);
+                    }
+                    else if ($(this).data("id") == "Duzenle-" + fotoid) {
+                        Foto_id = "Foto_Id:" + fotoid;
+                        Not = "Foto_Not:" + $(secici).val().replace(",", "&");
+                        Duzenlenecek.push(Foto_id);
+                        Duzenlenecek.push(Not);
+                    }
+                    else if ($(this).data("id") == "Baski-" + fotoid) {
+                        Foto_id = "Foto_Id:" + fotoid;
+                        Not = "Foto_Not:" + $(secici).val().replace(",", "&");
+                        Basilacak.push(Foto_id);
+                        Basilacak.push(Not);
+                    }
+                });
+                //console.log("Kapak:" + Kapak);
+                //console.log("Poster:" + Poster);
+                //var disputeKeyDataJSON = JSON.stringify(Notlar);
+                var SecimKaydetData = new FormData();
+                SecimKaydetData.append("Secilmedi", Secilmedi);
+                SecimKaydetData.append("Duzenlenecek", Duzenlenecek);
+                SecimKaydetData.append("Basilacak", Basilacak);
+                SecimKaydetData.append("Kapak", Kapak);
+                SecimKaydetData.append("Poster", Poster);
+                SecimKaydetData.append("SozlesmeId", $("#SozlesmeId").data("SozId"));
+                //SecimKaydetData.append("jsonNotlar", Notlar);
+                console.log(SecimKaydetData);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: SecimKaydetData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        Swal.fire(
+                        {
+                            title: "Seçimler Kaydediliyor!",
+                            html: "<strong>Lütfen Bekleyin.</strong>",
+                            onBeforeOpen: function onBeforeOpen() {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    url: "/Musteri/Dashboard/SecimleriKaydet/",
+                    success: function (data) {
+                        if (data.Sonuc == false && data.Mesaj != "") {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                            swal.close();
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            swal.close();
+                            window.location.replace("/Musteri/Dashboard/FotografSec");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+
+            });
+            $(".BaskiOnay").click(function () {
+                Swal.fire(
+                    {
+                        title: "Albüm Baskı Onayı",
+                        //text: "Seçimlerinize göre albümünüz baskıya gönderilecek!",
+                        html: "<p style='color:red;font-weight:bold;font-size:12pt;'>&laquo; Öncelikle Seçimlerinizi Kaydedin &raquo;</p> <p style='font-size:12pt;'><h3>Seçimlerinize göre albümünüz baskıya gönderilecek!</h3></p> ",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Onayla",
+                        cancelButtonText: "Vazgeç"
+                    }).then(function (result) {
+                        if (result.value) {
+                            var BaskiData = new FormData();
+                            BaskiData.append("SozlesmeId", SozlesmeId);
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                data: BaskiData,
+                                contentType: false,
+                                processData: false,
+                                url: "/Musteri/Dashboard/AlbumBaskiOnay",
+                                success: function (data) { // Personel ile ilgili diğer tablolarda kayıt var ise silinemeyecek uyarı verecek.
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        Swal.fire(
+                                        {
+                                            title: "Seçimleriniz Gönderildi!",
+                                            html: "Albümüzü en kısa sürede size teslim edeceğiz.<br/> Teşekkür ederiz.",
+                                            type: "success",
+                                            showCancelButton: false,
+                                            confirmButtonText: "Tamam"
+                                        });
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            });
+        });
+    </script>
+
+}
+

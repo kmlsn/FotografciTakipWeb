@@ -1,0 +1,198 @@
+﻿
+@{
+    Layout = null;
+}
+@using FotografciTakipWeb.Models;
+@model Odemeler
+@{
+    Firma frm = ViewBag.Firma;
+}
+<!DOCTYPE html>
+
+<style>
+    .breakhere {
+        page-break-after: always;
+    }
+
+    .table.table-striped2:not(.table-bordered) th,
+    .table.table-striped2:not(.table-bordered) tbody th,
+    .table.table-striped2:not(.table-bordered) tbody td {
+        border: 0;
+    }
+</style>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Makbuz Yazdır</title>
+    <link href="~/Areas/Otomasyon/Content/css/bootstrap.css" rel="stylesheet" />
+    <script src="~/Areas/Otomasyon/Content/js/jquery-3.2.1.min.js"></script>
+    <script src="~/Areas/Otomasyon/Content/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <div class="row">
+        <div class="container breakhere">
+            <!-- ---------------- Form Başlık Bölümü --------------------------------- -->
+            <table class="w-100">
+                <tr>
+                    <td class="w-50">
+                        @if (ViewBag.SozlesmeAyar.LogoGoster == true)
+                        {
+                            <img src="@frm.Resim.ResimAdres" class="pos-top pos-right height-6 mt-1 hidden-md-down" height="50" alt="@frm.FirmaAdi">
+                            <h6 class="keep-print-font fw-500 mb-0 text-primary flex-1 position-relative">
+                                @if (ViewBag.SozlesmeAyar.FirmaAdiGoster == true)
+                                {   @frm.FirmaAdi <br /> }
+                                <small class="text-muted mb-0 fs-xs">
+                                    @frm.Adres @frm.Il.Il1 / @frm.Ilce.Ilce1
+                                </small>
+                            </h6>
+                        }
+                        else
+                        {
+                            <h3 class="keep-print-font fw-500 mb-0 text-primary flex-1 position-relative">
+                                @if (ViewBag.SozlesmeAyar.FirmaAdiGoster == true)
+                                {   @frm.FirmaAdi <br /> }
+                                <small class="text-muted mb-0 fs-xs">
+                                    @frm.Adres @frm.Il.Il1 / @frm.Ilce.Ilce1
+                                </small>
+                            </h3>
+                        }
+                    </td>
+                    <td class="w-50">
+                        <h6 style="text-align: right">@DateTime.Now.ToShortDateString() - @DateTime.Now.ToShortTimeString()</h6>
+                        <h5 style="text-align: right; font-size:18px">Makbuz No: @Model.AlinanOdemeMakbuzNo</h5>
+                    </td>
+                </tr>
+            </table>
+            <!-- ---------------- Firma Bilgileri & Müşteri Bilgileri ---------------- -->
+            <div class="text-dark fw-700 h3 mb-g keep-print-font text-center pt-4">
+                ÖDEME MAKBUZU
+            </div>
+            <div class="row col col-xs-12 pt-4">
+                <div class="col-xs-12 d-flex">
+                    <div class="table-responsive">
+                        <table class="table table-striped2 table-clean table-sm align-self-end">
+                            <tbody>
+                                <tr class="border-bottom h6">
+                                    <td class="w-15">
+                                        <strong>İşlem Tarihi:</strong>
+                                    </td>
+                                    <td class="w-85" id="SozlesmeFirmaBilgiFirma">@Model.Tarih.ToShortDateString() - @Model.Tarih.ToShortTimeString()</td>
+                                </tr>
+                                @if (ViewBag.Musteri != null)
+                                {
+                                    <tr class="border-bottom h6">
+                                        <td class="w-15">
+                                            <strong>Müşteri Adı:</strong>
+                                        </td>
+                                        <td class="w-85" id="SozlesmeFirmaBilgiFirma">@ViewBag.Musteri.AdiSoyadi</td>
+                                    </tr>
+                                    <tr class="border-bottom h6">
+                                        <td class="w-15">
+                                            <strong>Telefon:</strong>
+                                        </td>
+                                        <td class="w-85" id="SozlesmeFirmaBilgiYetkili">@ViewBag.Musteri.CepTel</td>
+                                    </tr>
+                                    <tr class="border-bottom h6">
+                                        <td class="w-15">
+                                            <strong>Adres:</strong>
+                                        </td>
+                                        <td class="w-85" id="SozlesmeFirmaBilgiAdres">@ViewBag.Musteri.Adres</td>
+                                    </tr>
+                                }
+                                else
+                                {
+                                    <tr class="border-bottom h6">
+                                        <td class="w-15">
+                                            <strong>Müşteri Adı:</strong>
+                                        </td>
+                                        <td class="w-85" id="SozlesmeFirmaBilgiFirma">@Model.OdemeYapanAdSoyad</td>
+                                    </tr>
+                                }
+                                @if(ViewBag.SozlesmeNo!=null)
+                                {
+                                <tr class="border-bottom h6">
+                                    <td class="w-15">
+                                        <strong>Yapılan İş:</strong>
+                                    </td>
+                                    <td class="w-85" id="SozlesmeFirmaBilgiTelefon">@ViewBag.SozlesmeNo numaralı sözleşmeye ait ödeme</td>
+                                </tr>
+                                }
+                                @if (ViewBag.GisTakipNo != null)
+                                {
+                                    <tr class="border-bottom h6">
+                                        <td class="w-15">
+                                            <strong>Yapılan İş:</strong>
+                                        </td>
+                                        <td class="w-85" id="SozlesmeFirmaBilgiTelefon">@ViewBag.GisTakipNo takip numaralı günlük işe ait ödeme</td>
+                                    </tr>
+                                }
+                                <tr class="border-bottom h6">
+                                    <td class="w-15">
+                                        <strong>Ödeme Şekli:</strong>
+                                    </td>
+                                    <td class="w-85" id="SozlesmeFirmaBilgiTelefon">@Model.OdemeSekli</td>
+                                    @*@if (Model.OdemeTuru == "AlinanOdeme")
+                                    {
+                                        <td class="w-85" id="SozlesmeFirmaBilgiTelefon">Alınan Ödeme</td>
+                                    }
+                                    else if (Model.OdemeTuru == "GelecekOdeme")
+                                    {
+                                        <td class="w-85" id="SozlesmeFirmaBilgiTelefon">Gelecek Ödeme</td>
+                                    }
+                                    else if (Model.OdemeTuru == "CariTahsilat")
+                                    {
+                                        <td class="w-85" id="SozlesmeFirmaBilgiTelefon">Cari Tahsilat</td>
+                                    }
+                                    else if (Model.OdemeTuru == "CariOdeme")
+                                    {
+                                        <td class="w-85" id="SozlesmeFirmaBilgiTelefon">Cari Ödemesi</td>
+                                    }
+                                    else if (Model.OdemeTuru == "Kapora")
+                                    {
+                                        <td class="w-85" id="SozlesmeFirmaBilgiTelefon">Kapora</td>
+                                    }*@
+                                </tr>
+                                <tr class="border-bottom h6">
+                                    <td class="w-15">
+                                        <strong>Tutar:</strong>
+                                    </td>
+                                    <td class="w-85" id="SozlesmeFirmaBilgiTelefon">@Model.Tutar.ToString("C").Replace("₺", "") TL</td>
+                                </tr>
+                                <tr class="border-bottom h6">
+                                    <td class="w-15">
+                                        <strong>Açıklama:</strong>
+                                    </td>
+                                    <td class="w-85" id="SozlesmeFirmaBilgiTelefon">@Model.Notlar</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="row pt-5" id="SozlesmeImzalar">
+                <div class="col-sm-12 d-flex">
+                    <div class="table-responsive">
+                        <table class="table table-striped2 table-clean table-sm align-self-end">
+                            <tbody>
+                                <tr>
+                                    <td class="w-50 text-center">
+                                        Firma Yetkilisi
+                                    </td>
+                                    <td class="w-50 text-center">
+                                        Müşteri
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="SozlesmeImzalarFirmaYetkili" class="w-50 text-center">@frm.Yetkili</td>
+                                    <td id="SozlesmeImzalarMusteri" class="w-50 text-center">@Model.OdemeYapanAdSoyad</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

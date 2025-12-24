@@ -1,0 +1,768 @@
+﻿
+@{
+    ViewBag.Title = "Rehber";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    List<RehberGrup> rehbergruplari = ViewBag.gruplar;
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Şube Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row" style="margin-bottom:20px">
+                            <div class="form-group col-sm-6" id="RehberGrupIdhata">
+                                <label class="form-label" for="RehberGrupId">Rehber Grubu</label>
+                                <select class="custom-select form-control custom-select-sm" id="RehberGrupId" name="RehberGrupId" required>
+                                    <option selected="" value="0">Grup Seçiniz</option>
+                                    @foreach (var gruplar in rehbergruplari)
+                                    {
+                                    <option value="@gruplar.Id">@gruplar.GrupAdi</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-6" id="AdSoyadhata">
+                                <label class="form-label" for="AdSoyad">Firma Adı / Ad Soyad</label>
+                                <input type="text" id="AdSoyad" class="form-control form-control-sm" name="AdSoyad" maxlength="50" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            @*<div class="form-group col-sm-6">
+                                    <label class="form-label" for="FirmaAdi">Firma Adı (Varsa)</label>
+                                    <input type="text" id="FirmaAdi" class="form-control" name="FirmaAdi" maxlength="50">
+                                </div>*@
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="CepTel1hata">
+                                <label class="form-label">Cep Telefonu 1</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="CepTel1" id="CepTel1" required>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label">Cep Telefonu 2</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="CepTel2" id="CepTel2">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label">Sabit Telefon 1</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="SabitTel1" id="SabitTel1">
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label">Sabit Telefon 2</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="SabitTel2" id="SabitTel2">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label">Email Adresi</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-mouse-pointer width-1 text-align-center"></i></span>
+                                    </div>
+                                    <input type="text" data-inputmask="'alias': 'email'" class="form-control form-control-sm" im-insert="true" name="Email" id="Email" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="Notlar">Notlar</label>
+                                <textarea class="form-control form-control-sm" id="Notlar" rows="2" name="Notlar" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Kaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row" style="margin-bottom:20px">
+                            <div class="form-group col-sm-6" id="RehberGrupIdduzenlehata">
+                                <label class="form-label" for="RehberGrupIdduzenle">Rehber Grubu</label>
+                                <select class="custom-select form-control custom-select-sm " id="RehberGrupIdduzenle" name="RehberGrupId">
+                                    <option selected="" value="0">Grup Seçiniz</option>
+                                    @foreach (var gruplar in rehbergruplari)
+                                    {
+                                    <option value="@gruplar.Id">@gruplar.GrupAdi</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-6" id="AdSoyadduzenlehata">
+                                <label class="form-label" for="AdSoyadduzenle">Firma Adı / Ad Soyad</label>
+                                <input type="text" id="AdSoyadduzenle" class="form-control form-control-sm" name="AdSoyad" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="row">
+                            @*<div class="form-group col-sm-6">
+                                    <label class="form-label" for="FirmaAdiduzenle">Firma Adı (Varsa)</label>
+                                    <input type="text" id="rehberId" class="form-control" name="Id" style="display:none" maxlength="50">
+                                    <input type="text" id="FirmaAdiduzenle" class="form-control" name="FirmaAdi" maxlength="50">
+                                </div>*@
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="CepTel1duzenlehata">
+                                <label class="form-label">Cep Telefonu 1</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="CepTel1" id="CepTel1duzenle">
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label">Cep Telefonu 2</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="CepTel2" id="CepTel2duzenle">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label">Sabit Telefon 1</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="SabitTel1" id="SabitTel1duzenle">
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label">Sabit Telefon 2</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="SabitTel2" id="SabitTel2duzenle">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label">Email Adresi</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-mouse-pointer width-1 text-align-center"></i></span>
+                                    </div>
+                                    <input type="text" data-inputmask="'alias': 'email'" class="form-control form-control-sm" im-insert="true" name="Email" id="Emailduzenle" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="Notlarduzenle">Notlar</label>
+                                <textarea class="form-control form-control-sm" id="Notlarduzenle" rows="2" name="Notlar" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Guncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="row col col-12" id="date_filter">
+                <div class="form-group col-sm-3 my-3">
+                    <select class="custom-select form-control" id="GrupId" name="GrupId" title="Görüntülenecek Rehber Grubu">
+                        <option selected="" value="0">Rehber Grupları - Tümü</option>
+                        @foreach (var grup in rehbergruplari)
+                        {
+                            <option value="@grup.GrupAdi">@grup.GrupAdi</option>
+                        }
+                    </select>
+                </div>
+                @if (KullaniciYetki.KayitEkle)
+                {
+                    <div class="form-group col-sm-3 my-3">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" id="YeniEkle"> Yeni Kayıt Ekle </button>
+                    </div>
+                }
+            </div>
+            <div class="border-bottom"></div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtRehber" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Firma</th>
+                                <th class="w-10">Grup Adı</th>
+                                <th>Firma Adı / Ad Soyad</th>
+                                <th>Cep Telefonu</th>
+                                <th>Sabit Telefon</th>
+                                <th>Fax</th>
+                                <th>Email</th>
+                                <th class="w-5">Email Kabul</th>
+                                <th class="w-5">SMS Kabul</th>
+                                <th>Notlar</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            var GrupAdi = $("#GrupId").find("option:selected").val(); // Seçilen GrupId ye göre tablo filtrelenecek
+            var dt,islem;
+            var rolid = $('#RolId').data("rolid");
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            
+            $(":input").inputmask();
+            $("#GrupId").change(function () { dt.fnDraw(); });
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $('#RehberGrupId').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    document.getElementById("grupidhata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $('#RehberGrupIdduzenle').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    document.getElementById("grupidduzenlehata").remove();
+                }
+            }); // zorunlu alan kontrolü
+
+            $("#YeniEkle").click(function () {
+                $("#RehberGrupId").val("0");
+                $("#AdSoyad").val("");
+                $("#CepTel1").val("");
+                $("#CepTel2").val("");
+                $("#SabitTel1").val("");
+                $("#SabitTel2").val("");
+                $("#Email").val("");
+                $("#Notlar").val("");
+            });
+            $("#Kaydet").click(function () {
+                if ($("#RehberGrupId").val() == "0") {
+                    $("#RehberGrupId").focus();
+                    $("#RehberGrupIdhata").append("<div id='grupidhata' style='color:red'>Grup Seçiniz.</div>");
+                }
+                else if ($("#AdSoyad").val() == "") {
+                    $("#AdSoyad").focus();
+                    $("#AdSoyadhata").append("<div class='hata' style='color:red'>Ad-Soyad veya Firma Adını Giriniz.</div>");
+                }
+                else if ($("#CepTel1").val() == "") {
+                    $("#CepTel1").focus();
+                    $("#CepTel1hata").append("<div class='hata' style='color:red'>Cep Telefonu Giriniz.</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var AdSoyad = $("#AdSoyad").val();
+                    var RehberData = new FormData();
+                    RehberData.append("RehberGrupId", $("#RehberGrupId").val());
+                    RehberData.append("AdSoyad", $("#AdSoyad").val());
+                    RehberData.append("CepTel1", $("#CepTel1").val());
+                    RehberData.append("CepTel2", $("#CepTel2").val());
+                    RehberData.append("SabitTel1", $("#SabitTel1").val());
+                    RehberData.append("SabitTel2", $("#SabitTel2").val());
+                    RehberData.append("Email", $("#Email").val());
+                    RehberData.append("Notlar", $("#Notlar").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: RehberData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/TelefonRehberi/KayıtVarmi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: RehberData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/TelefonRehberi/RehberEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir kayıt var ise uyarı ver ve gücelleme sor
+                            {
+                                Swal.fire(
+                                {
+                                    title: "Varolan Kayıt",
+                                    html: "<p><h2 style='font-size:16px; color:red'><strong>Ad-Soyad : </strong>" + AdSoyad + "</h2></p><h2> Bu isime ait bir kayıt mecut!</h2>",
+                                    type: "warning",
+                                    //showCancelButton: true,
+                                    //confirmButtonText: "Güncelle"
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            }); // Yeni Kayıt Modal KAYDET
+
+            $("#dtRehber").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#Guncelle").val($(this).data("id"));
+                $("#RehberGrupIdduzenle").val($(this).data("grupid"));
+                $("#AdSoyadduzenle").val($(this).data("adsoyad"));
+                $("#CepTel1duzenle").val($(this).data("cep1"));
+                $("#CepTel2duzenle").val($(this).data("cep2"));
+                $("#SabitTel1duzenle").val($(this).data("sabit1"));
+                $("#SabitTel2duzenle").val($(this).data("sabit2"));
+                $("#Emailduzenle").val($(this).data("email"));
+                var notlar = $(this).data("notlar").replace(/\<br \/\>/g, "\r\n")  // textarea daki bilgi veri tabanına kaydedilirken "\r\n" karakterleri "<br />" tagına dönüştürülmüştü, bura da da tersi yapılıyor.
+                $("#Notlarduzenle").val(notlar);
+            }); // Kayıt Düzenleme için Modal'a bilgileri yükle
+
+            $("#Guncelle").click(function () {
+                if ($("#RehberGrupIdduzenle").val() == "0") {
+                    $("#RehberGrupIdduzenle").focus();
+                    $("#RehberGrupIdduzenlehata").append("<div id='grupidduzenlehata' style='color:red'>Grup Seçiniz.</div>");
+                }
+                else if ($("#AdSoyadduzenle").val() == "") {
+                    $("#AdSoyadduzenle").focus();
+                    $("#AdSoyadduzenlehata").append("<div class='hata' style='color:red'>Ad-Soyad veya Firma Adını Giriniz.</div>");
+                }
+                else if ($("#CepTel1duzenle").val() == "") {
+                    $("#CepTel1duzenle").focus();
+                    $("#CepTel1duzenlehata").append("<div class='hata' style='color:red'>Cep Telefonu Giriniz.</div>");
+                }
+                else {
+                    $('#KayitDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    var RehberData = new FormData();
+                    RehberData.append("RehberGrupId", $("#RehberGrupIdduzenle").val());
+                    RehberData.append("AdSoyad", $("#AdSoyadduzenle").val());
+                    RehberData.append("CepTel1", $("#CepTel1duzenle").val());
+                    RehberData.append("CepTel2", $("#CepTel2duzenle").val());
+                    RehberData.append("SabitTel1", $("#SabitTel1duzenle").val());
+                    RehberData.append("SabitTel2", $("#SabitTel2duzenle").val());
+                    RehberData.append("Email", $("#Emailduzenle").val());
+                    RehberData.append("Notlar", $("#Notlarduzenle").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: RehberData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/TelefonRehberi/RehberGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            }); // Kayıt Güncelle Modal GÜNCELLE
+
+            $("#dtRehber").on('click', '.Sil', function () {
+                var id = $(this).data("id");
+                var adsoyad = $(this).data("adsoyad");
+                Swal.fire(
+                {
+                    title: "Kayıt Silinecek",
+                    //text: "< " + giskategori + " > adlı Günlük İş Katergorisi silinsin mi?",
+                    html: "<p><h2 style='font-size:16px; color:red'><strong>Ad-Soyad : </strong>" + adsoyad + "</h2></p><h2> Rehber Kaydı Silinsin mi?</h2>",
+                    type: "error",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Silinsin!"
+                }).then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/TelefonRehberi/RehberSil/" + id,
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            }); // Kayıt SİLME
+
+            $("#dtRehber").on('click', '.emaildurumdegistir', function () {
+                var id = $(this).data("rehberid");
+                var emailkabuldurum = $(this).data("emailkabuldurum");
+                var adsoyad = $(this).data("adsoyad");
+                var rehbergrup = $(this).data("rehbergrup");
+                if (rehbergrup == "Müşteriler" && emailkabuldurum == false) {
+                    Swal.fire(
+                        {
+                            title: "Dikkat",
+                            html: "<p><h2 style='font-size:16px; color:red'><strong>Müşteri : </strong>" + adsoyad + "</h2></p><h2>Email Almayı Reddeşmiş. Yine de durumunu değiştirmek istiyor musunuz?</h2>",
+                            type: "error",
+                            showCancelButton: true,
+                            confirmButtonText: "Evet, Değiştir!",
+                            cancelButtonText: "İptal"
+                        }).then(function (result) {
+                            if (result.value) {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/TelefonRehberi/EmailDurumDegistir/" + id,
+                                    success: function (data) {
+                                        if (data == "degisti") {
+                                            dt.api().ajax.reload();
+                                        }
+                                        else {
+                                            alert("HATA");
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                        });
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/TelefonRehberi/EmailDurumDegistir/" + id,
+                        success: function (data) {
+                            if (data == "degisti") {
+                                dt.api().ajax.reload();
+                            }
+                            else {
+                                alert("HATA");
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+
+            $("#dtRehber").on('click', '.smsdurumdegistir', function () {
+                var id = $(this).data("rehberid");
+                var smskabuldurum = $(this).data("smskabuldurum");
+                var adsoyad = $(this).data("adsoyad");
+                var rehbergrup = $(this).data("rehbergrup");
+                if (rehbergrup == "Müşteriler" && smskabuldurum == false) {
+                    Swal.fire(
+                        {
+                            title: "Dikkat",
+                            html: "<p><h2 style='font-size:16px; color:red'><strong>Müşteri : </strong>" + adsoyad + "</h2></p><h2>SMS Almayı Reddeşmiş. Yine de durumunu değiştirmek istiyor musunuz?</h2>",
+                            type: "error",
+                            showCancelButton: true,
+                            confirmButtonText: "Evet, Değiştir!",
+                            cancelButtonText: "İptal"
+                        }).then(function (result) {
+                            if (result.value) {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/TelefonRehberi/SmsDurumDegistir/" + id,
+                                    success: function (data) {
+                                        if (data == "degisti") {
+                                            dt.api().ajax.reload();
+                                        }
+                                        else {
+                                            alert("HATA");
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                        });
+                }
+                else {
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/TelefonRehberi/SmsDurumDegistir/" + id,
+                        success: function (data) {
+                            if (data == "degisti") {
+                                dt.api().ajax.reload();
+                            }
+                            else {
+                                alert("HATA");
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+
+            $.fn.dataTableExt.afnFiltering.push(
+              function (Settings, Data, DataIndex) {
+                  var firmaadi = $("#Firma").val();
+                  var grupadi = $("#GrupId").val();
+                  var grupadi;
+                  grup = Data[1];
+                  if (grupadi == 0)
+                      return true;
+                  else if (grupadi == grup)
+                      return true;
+                  else
+                      return false;
+              });
+            dt = $('#dtRehber').dataTable(
+                 {
+                     responsive: true,
+                     "destroy": true,
+                     "order": [[0, "asc"], [2, "asc"]],
+                     "columns": [
+                         { "data": "Firma", "autowidth": true, "visible": false, "className": "align-middle" },
+                         { "data": "GrupAdi", "autowidth": true, "className": "align-middle" },
+                         {
+                             "data": null,
+                             "autowidth": true,
+                             "className": "align-middle",
+                             "render": function (data, type, row) {
+                                 if (row.FirmaAdi == "" || row.FirmaAdi == null) {
+                                     return row.AdSoyad
+                                 }
+                                 else {
+                                     return "Firma: " + row.FirmaAdi + "<br />Yetkili: " + row.AdSoyad
+                                 }
+                             }
+                         }, // Ad-Soyad , Firma Adı
+                         {
+                             "data": null,
+                             "autowidth": true,
+                             "className": "align-middle",
+                             "render": function (data, type, row) {
+                                 if ((row.CepTel1 == "" || row.CepTel1 == null) && (row.CepTel2 == "" || row.CepTel2 == null)) {
+                                     return ""
+                                 }
+                                 else {
+                                     return row.CepTel1.replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3") + "<br />" + row.CepTel2.replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3")
+                                 }
+                             }
+                         }, // Cep Tel
+                         {
+                             "data": null,
+                             "autowidth": true,
+                             "className": "align-middle",
+                             "render": function (data, type, row) {
+                                 if ((row.SabitTel1 == "" || row.SabitTel1 == null) && (row.SabitTel2 == "" || row.SabitTel2 == null)) {
+                                     return ""
+                                 }
+                                 else {
+                                     return row.SabitTel1.replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3") + "<br />" + row.SabitTel2.replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3")
+                                 }
+                             }
+                         }, // Sabit Tel
+                         {
+                             "data": null,
+                             "autowidth": true,
+                             "className": "align-middle",
+                             "render": function (data, type, row) {
+                                 if ((row.Fax == "" || row.Fax == null)) {
+                                     return ""
+                                 }
+                                 else {
+                                     return row.Fax.replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3")
+                                 }
+                             }
+                         }, // Fax
+                         { "data": "Email", "autowidth": true, "className": "align-middle" },
+                         {
+                             "data": null,
+                             "className": "align-middle text-center",
+                             "render": function (data, type, row) {
+                                 islem = "";
+                                 if (row.KilitBit == false) {
+                                     if (DuzenleYetki == "True") {
+                                         if (row.EmailKabul == true) {
+                                             islem = islem + "<div class='custom-control custom-checkbox custom-checkbox-circle'>" +
+                                                 "<input type='checkbox' class='custom-control-input emaildurumdegistir' id='EmailKabul-" + row.Id + "' data-rehbergrup='" + row.GrupAdi +"' data-rehberid='" + row.Id + "' data-emailkabuldurum='" + row.EmailKabul + "' data-adsoyad='" + row.AdSoyad+"' checked=''>" +
+                                                 "<label class='custom-control-label' for='EmailKabul-" + row.Id + "'></label>" +
+                                                 "</div>"
+                                         }
+                                         else {
+                                             islem = islem + "<div class='custom-control custom-checkbox custom-checkbox-circle'>" +
+                                                 "<input type='checkbox' class='custom-control-input emaildurumdegistir' id='EmailKabul-" + row.Id + "' data-rehbergrup='" + row.GrupAdi +"' data-rehberid='" + row.Id + "' data-emailkabuldurum='" + row.EmailKabul + "' data-adsoyad='" + row.AdSoyad +"'>" +
+                                                 "<label class='custom-control-label' for='EmailKabul-" + row.Id + "'></label>" +
+                                                 "</div>"
+                                         }
+                                     }
+                                     else {
+                                         if (row.EmailKabul == true) {
+                                             islem = islem + "<div class='custom-control custom-checkbox custom-checkbox-circle'>" +
+                                                 "<input type='checkbox' class='custom-control-input' id='EmailKabul-" + row.Id + "' checked='' disabled>" +
+                                                 "<label class='custom-control-label' for='EmailKabul-" + row.Id + "'></label>" +
+                                                 "</div>"
+                                         }
+                                         else {
+                                             islem = islem + "<div class='custom-control custom-checkbox custom-checkbox-circle'>" +
+                                                 "<input type='checkbox' class='custom-control-input' id='EmailKabul-" + row.Id + "' disabled>" +
+                                                 "<label class='custom-control-label' for='EmailKabul-" + row.Id + "'></label>" +
+                                                 "</div>"
+                                         }
+                                     }
+                                 }
+                                 return islem
+                             }
+                         }, // Email Kabul
+                         {
+                             "data": null,
+                             "className": "align-middle text-center",
+                             "render": function (data, type, row) {
+                                 islem = "";
+                                 if (row.KilitBit == false) {
+                                     if (DuzenleYetki == "True") {
+                                         if (row.SmsKabul == true) {
+                                             islem = islem + "<div class='custom-control custom-checkbox custom-checkbox-circle'>" +
+                                                 "<input type='checkbox' class='custom-control-input smsdurumdegistir' id='SmsKabul-" + row.Id + "' data-rehbergrup='" + row.GrupAdi +"' data-rehberid='" + row.Id + "' data-smskabuldurum='" + row.SmsKabul + "' data-adsoyad='" + row.AdSoyad +"' checked=''>" +
+                                                 "<label class='custom-control-label' for='SmsKabul-" + row.Id + "'></label>" +
+                                                 "</div>"
+                                         }
+                                         else {
+                                             islem = islem + "<div class='custom-control custom-checkbox custom-checkbox-circle'>" +
+                                                 "<input type='checkbox' class='custom-control-input smsdurumdegistir' id='SmsKabul-" + row.Id + "' data-rehbergrup='" + row.GrupAdi +"' data-rehberid='" + row.Id + "' data-smskabuldurum='" + row.SmsKabul + "' data-adsoyad='" + row.AdSoyad +"'>" +
+                                                 "<label class='custom-control-label' for='SmsKabul-" + row.Id + "'></label>" +
+                                                 "</div>"
+                                         }
+                                     }
+                                     else {
+                                         if (row.SmsKabul == true) {
+                                             islem = islem + "<div class='custom-control custom-checkbox custom-checkbox-circle'>" +
+                                                 "<input type='checkbox' class='custom-control-input' id='SmsKabul-" + row.Id + "' checked='' disabled>" +
+                                                 "<label class='custom-control-label' for='SmsKabul-" + row.Id + "'></label>" +
+                                                 "</div>"
+                                         }
+                                         else {
+                                             islem = islem + "<div class='custom-control custom-checkbox custom-checkbox-circle'>" +
+                                                 "<input type='checkbox' class='custom-control-input' id='SmsKabul-" + row.Id + "' disabled>" +
+                                                 "<label class='custom-control-label' for='SmsKabul-" + row.Id + "'></label>" +
+                                                 "</div>"
+                                         }
+                                     }
+                                 }
+                                 return islem
+                             }
+                         }, // SMS Kabul
+                         { "data": "Notlar", "autowidth": true, "className": "align-middle" },
+                         {
+                             "data": null,
+                             "className": "align-middle",
+                             "render": function (data, type, row) {
+                                 islem = "";
+                                 if (DuzenleYetki == "True") {
+                                     islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle' data-id='" + row.Id + "' data-adsoyad='" + row.AdSoyad + "' data-firmaadi='" + row.FirmaAdi + "'" +
+                                                        "data-cep1='" + row.CepTel1 + "' data-cep2='" + row.CepTel2 + "' data-sabit1='" + row.SabitTel1 + "' data-grupid='" + row.RehberGrupId + "'" +
+                                                        "data-sabit2='" + row.SabitTel2 + "' data-email='" + row.Email + "' data-notlar='" + row.Notlar + "' data-toggle='modal' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                                        "<i class='fal fa-edit'></i>" +
+                                                    "</a>"
+                                 }
+                                 if (SilYetki == "True") {
+                                     islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon Sil' data-id='" + row.Id + "' data-adsoyad='" + row.AdSoyad + "' data-firmaadi='" + row.FirmaAdi + "' style='background-color:crimson;margin-left:5px'>" +
+                                                        "<i class='fal fa-trash-alt'></i>" +
+                                                    "</a>"
+                                 }
+                                 return islem
+                             }
+                         } // İşlem
+                     ],
+                     "processing": true,
+                     "ajax": {
+                         "url": "/Otomasyon/TelefonRehberi/RehberListele/",
+                         "contentType": 'application/json; charset=utf-8',
+                         'data': function (data) { return data = JSON.stringify(data); }
+                     },
+                     "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                     "oLanguage": {
+                         "sSearchPlaceholder": "Tabloda Ara",
+                         "sZeroRecords": "Kayıt yok.",
+                         "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                         "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                         "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                         "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                         "processing": "Yükleniyor... Lütfen Bekleyin",
+                         "oPaginate": {
+                             "sPrevious": "Önceki",
+                             "sNext": "Sonraki",
+                             "sFirst": "İlk",
+                             "sLast": "Son"
+                         }
+                     }
+                 });
+        });
+
+    </script>
+}
+

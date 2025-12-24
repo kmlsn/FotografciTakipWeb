@@ -1,0 +1,515 @@
+﻿
+@{
+    ViewBag.Title = "Tanımlar - Unvanlar";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    KullaniciYetki yetki = ViewBag.Yetki;
+    KullaniciYetki yetkilendir = ViewBag.Yetkilendir;
+}
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Unvan Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="unvanhata">
+                                <label class="form-label" for="unvan">Unvan <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control" id="unvan" placeholder="Unvan" name="Unvan" maxlength="50" required>
+                                <div class="invalid-feedback">
+                                    Unvan giriniz!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="UnvanKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="unvanduzenlehata">
+                                <label class="form-label" for="unvanduzenle">Unvan <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control" id="unvanduzenle" placeholder="Unvan" maxlength="50" name="Unvan" required>
+                                <div class="invalid-feedback">
+                                    Unvan giriniz!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="UnvanGuncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                @if (yetki.KayitEkle == true)
+                {
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle">Yeni Unvan Ekle</button>
+                    <div class="" id="unvanlardisable">
+                        <button class="btn btn-sm btn-default mr-auto waves-effect waves-themed" id="unvanlarvarsayilan">Varsayılan Değerleri Yükle</button>
+                    </div>
+                }
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <input type="text" id="Yetkiler" style="display:none" data-yetkilendir="@yetkilendir.KayitDuzenle" data-duzenle="@yetki.KayitDuzenle" data-sil="@yetki.KayitSil">
+                    <input type="text" id="RolId" style="display:none" data-rolid="@ViewBag.RolId">
+                    <!-- datatable start -->
+                    <table id="dtUnvanlar" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            @if (ViewBag.RolId == 1)
+                            {
+                                <tr>
+                                    <th class="w-5">ID</th>
+                                    <th>Firma</th>
+                                    <th>Unvan</th>
+                                    <th class="w-5">Aktif</th>
+                                    <th class="w-5">Sil</th>
+                                    <th class="w-10">İşlem</th>
+                                </tr>
+                            }
+                            else
+                            {
+                                <tr>
+                                    <th>Unvan</th>
+                                    <th class="w-10">İşlem</th>
+                                </tr>
+                            }
+                        </thead>
+                        <tbody id="unvanlarsatir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+
+        $(document).ready(function () {
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $("#unvan").val("");
+            });
+            $("#UnvanKaydet").click(function () {
+                if ($("#unvan").val() == "") {
+                    $("#unvan").focus();
+                    $("#unvanhata").append("<div class='hata' style='color:red'>Unvanı Giriniz.</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var unvan = $("#unvan").val();
+                    var UnvanData = new FormData();
+                    UnvanData.append("Unvan", $("#unvan").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: UnvanData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/UnvanVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: UnvanData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Tanimlar/UnvanEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            Swal.fire(
+                                            {
+                                                title: "HATA",
+                                                html: "<p><h3 style='color:red'>&laquo; " + unvan + " &raquo;<h3/></p> <p><h3>" + data.mesaj + "<h3/></p>",
+                                                type: "warning",
+                                                confirmButtonText: "Tamam"
+                                            });
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                            {
+                                Swal.fire(
+                                {
+                                    title: "Varolan Kayıt",
+                                    //text: "<< " + unvan + " >> adlı bir Unvan zaten var!",
+                                    html: "<p style='color:red'>&laquo; " + unvan + " &raquo;</p> <h2>Unvan zaten var!</h2>",
+                                    type: "warning",
+                                    //showCancelButton: true,
+                                    //confirmButtonText: "Güncelle"
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtUnvanlar").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#UnvanGuncelle").val($(this).data("uid"))
+                $("#unvanduzenle").val($(this).data("unvan"));
+            });
+            $("#UnvanGuncelle").click(function () {
+                if ($("#unvanduzenle").val() == "") {
+                    $("#unvanduzenle").focus();
+                    $("#unvanduzenlehata").append("<div class='hata' style='color:red'>Unvanı Giriniz.</div>");
+                }
+                else {
+                    $('#KayitDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    var UnvanData = new FormData();
+                    UnvanData.append("Unvan", $("#unvanduzenle").val());
+
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: UnvanData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/UnvanGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                Swal.fire(
+                                {
+                                    title: "HATA",
+                                    html: "<p><h3 style='color:red'>&laquo; " + unvan + " &raquo;<h3/></p> <p><h3>" + data.mesaj + "<h3/></p>",
+                                    type: "warning",
+                                    confirmButtonText: "Tamam"
+                                });
+                            }
+                            else if (data.Sonuc == true) {
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+
+            });
+            $("#dtUnvanlar").on('click', '.Sil', function () {
+                var id = $(this).data("uid");
+                var unvan = $(this).data("unvan");
+                Swal.fire(
+                {
+                    title: "Kayıt Silinecek",
+                    //text: "< " + unvan + " > adlı Unvan silinsin mi?",
+                    html: "<p style='color:red'>&laquo; " + unvan + " &raquo;</p> <h2> Unvan silinsin mi?</h2>",
+                    type: "warning",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Silinsin!",
+                    cancelButtonText: "İptal"
+                }).then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Tanimlar/UnvanSil/" + id,
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    Swal.fire(
+                                    {
+                                        title: "HATA",
+                                        html: "<p><h3 style='color:red'>&laquo; " + unvan + " &raquo;<h3/></p> <p><h3>" + data.mesaj + "<h3/></p>",
+                                        type: "warning",
+                                        confirmButtonText: "Tamam"
+                                    });
+                                }
+                                else if (data.Sonuc == true) {
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            });
+            $("#unvanlarvarsayilan").click(function () {
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        Swal.fire(
+                        {
+                            title: "Kayıtlar Ekleniyor!",
+                            html: "<strong>Lütfen Bekleyin.</strong>",
+                            onBeforeOpen: function onBeforeOpen() {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    url: "/Otomasyon/Tanimlar/UnvanVarsayilanlariEkle/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            Swal.fire(
+                            {
+                                title: "HATA",
+                                html: "<p><h3 style='color:red'>&laquo; " + unvan + " &raquo;<h3/></p> <p><h3>" + data.mesaj + "<h3/></p>",
+                                type: "warning",
+                                confirmButtonText: "Tamam"
+                            });
+                        }
+                        else if (data.Sonuc == true) {
+                            swal.close();
+                            $("#unvanlardisable").addClass("disabled");
+                            document.getElementById("unvanlarvarsayilan").setAttribute("disabled", "");
+                            dt.api().ajax.reload();
+                        }
+
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#dtUnvanlar").on('click', '.durumdegistir', function () {
+                var id = $(this).data("uid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/UnvanDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#dtUnvanlar").on('click', '.sildegistir', function () {
+                var id = $(this).data("uid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/UnvanSilDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            var dt;
+            var islem;
+            var rolid = $('#RolId').data("rolid");
+            if (rolid == "1") { // Giriş yapan kullanıcı Yazılımcı ise tüm kayıtlar detaylı olarak listelenecek
+                dt = $('#dtUnvanlar').dataTable(
+                {
+                    responsive: true,
+                    "destroy": true,
+                    //"searching": false, // arama kaldır
+                    //"lengthChange": false, // sayfa başına göster kaldır
+                    "columns": [
+                               { "data": "Unvan", "autowidth": true },
+                               {
+                                   "data": null,
+                                   "autowidth": true,
+                                   "render": function (data, type, row) {
+                                       islem = "";
+                                       if (row.Aktif == true) {
+                                           islem = "<a href='#' class='btn btn-success btn-sm btn-icon waves-effect waves-themed durumdegistir' data-uid='" + row.Id + "'>" +
+                                                       "<i class='fal fa-check'></i>" +
+                                                   "</a>"
+                                       }
+                                       else {
+                                           islem = "<a href='#' class='btn btn-danger btn-sm btn-icon waves-effect waves-themed durumdegistir' data-uid='" + row.Id + "'>" +
+                                                       "<i class='fal fa-times'></i>" +
+                                                   "</a>"
+                                       }
+                                       return islem
+                                   }
+                               },
+                                {
+                                    "data": null,
+                                    "autowidth": true,
+                                    "render": function (data, type, row) {
+                                        islem = "";
+                                        if (row.Sil == true) {
+                                            islem = "<a href='#' class='btn btn-success btn-sm btn-icon waves-effect waves-themed sildegistir' data-uid='" + row.Id + "'>" +
+                                                        "<i class='fal fa-check'></i>" +
+                                                    "</a>"
+                                        }
+                                        else {
+                                            islem = "<a href='#' class='btn btn-danger btn-sm btn-icon waves-effect waves-themed sildegistir' data-uid='" + row.Id + "'>" +
+                                                        "<i class='fal fa-times'></i>" +
+                                                    "</a>"
+                                        }
+                                        return islem
+                                    }
+                                },
+                               {
+                                   "data": null,
+                                   "render": function (data, type, row) {
+                                       var baslangic = row.Baslangic;
+                                       var bitis = row.Bitis;
+                                       var baslangictarih = dateFormat(new Date(parseInt(baslangic.match(/\d+/)[0])));
+                                       var bitistarih = dateFormat(new Date(parseInt(bitis.match(/\d+/)[0])));
+                                       islem = "";
+                                       if ($("#Yetkiler").data("duzenle") == "True") {
+                                           islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle' data-uid='" + row.Id + "' data-unvan='" + row.Unvan + "' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                            "<i class='fal fa-edit'></i>" +
+                                            "</a>"
+                                       }
+                                       if ($("#Yetkiler").data("sil") == "True") {
+                                           islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon Sil' data-uid='" + row.Id + "' data-unvan='" + row.Unvan + "' style='background-color:crimson;margin-left:5px'>" +
+                                            "<i class='fal fa-trash-alt'></i>" +
+                                            "</a>"
+                                       }
+                                       return islem
+                                   }
+                               }
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Otomasyon/Tanimlar/UnvanlarListesi/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+            }
+            else {
+                dt = $('#dtUnvanlar').dataTable(
+                {
+                    responsive: true,
+                    "destroy": true,
+                    "columns": [
+                                { "data": "Unvan", "autowidth": true },
+                                {
+                                    "data": null,
+                                    "render": function (data, type, row) {
+                                        return "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle' data-uid='" + row.Id + "' data-unvan='" + row.Unvan + "' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                            "<i class='fal fa-edit'></i>" +
+                                            "</a>" +
+                                            "<a href='#' class='btn btn-xs btn-danger btn-icon Sil' data-uid='" + row.Id + "' data-unvan='" + row.Unvan + "' style='background-color:crimson;margin-left:5px'>" +
+                                            "<i class='fal fa-trash-alt'></i>" +
+                                            "</a>"
+                                    }
+                                }
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Otomasyon/Tanimlar/UnvanlarListesi/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

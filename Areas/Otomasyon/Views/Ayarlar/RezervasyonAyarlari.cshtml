@@ -1,0 +1,136 @@
+﻿
+@{
+    ViewBag.Title = "Rezervasyon Ayarları";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model AyarlarRezervasyon
+
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h3>Rezervasyon Ayarları</h3>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <form action="/Otomasyon/Ayarlar/RezervasyonAyarlari" method="post" enctype="multipart/form-data">
+                        @if (Model != null)
+                        {
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.PersonelIzinTakibi == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="PersonelIzinTakibi" name="PersonelIzinTakibi" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="PersonelIzinTakibi" name="PersonelIzinTakibi">
+                                    }
+                                    <label class="custom-control-label" for="PersonelIzinTakibi">Yeni Rezervasyon Ekleme işlemlerinde <span class="color-danger-500 fw-700">Personel İzin Takibi</span> yapılsın</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.TatilGunuTakibi == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="TatilGunuTakibi" name="TatilGunuTakibi" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="TatilGunuTakibi" name="TatilGunuTakibi">
+                                    }
+                                    <label class="custom-control-label" for="TatilGunuTakibi">Yeni Rezervasyon Ekleme işlemlerinde <span class="color-danger-500 fw-700">Tatil Günü Takibi</span> yapılsın</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-11 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.PersonelGorevliTakibi == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="PersonelGorevliTakibi" name="PersonelGorevliTakibi" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="PersonelGorevliTakibi" name="PersonelGorevliTakibi">
+                                    }
+                                    <label class="custom-control-label" for="PersonelGorevliTakibi">Yeni Rezervasyon Ekleme işlemlerinde <span class="color-danger-500 fw-700">Personelin başka bir randevuda görevli olup olmadığı takibi</span> yapılsın</label>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="form-group col-sm-11 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.GunuGecenTeklifOpsiyonIptal == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="GunuGecenTeklifOpsiyonIptal" name="GunuGecenTeklifOpsiyonIptal" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="GunuGecenTeklifOpsiyonIptal" name="GunuGecenTeklifOpsiyonIptal">
+                                    }
+                                    <label class="custom-control-label" for="GunuGecenTeklifOpsiyonIptal">Günü geçen Rezervasyon Tekliflerini / Opsiyonlu Rezervasyonları <span class="color-danger-500 fw-700">Otomatik İptal Et</span></label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <p>
+                                        <span class="text-warning">Alınmış bir ödeme (Kapora) var ise iadesi için müşteriye SMS bildirmi yapılacak. <br />Alınacak ödemeler iptal edilecek.<br />Oluşturuluş tüm randevular iptal edilecek.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <input type="text" id="Id" class="form-control" name="Id" maxlength="50" style="display:none" value="@Model.Id">
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="PersonelIzinTakibi" name="PersonelIzinTakibi" checked>
+                                    <label class="custom-control-label" for="PersonelIzinTakibi">Yeni Rezervasyon Ekleme işlemlerinde <span class="color-danger-500 fw-700">Personel İzin Takibi</span> yapılsın</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="TatilGunuTakibi" name="TatilGunuTakibi" checked>
+                                    <label class="custom-control-label" for="TatilGunuTakibi">Yeni Rezervasyon Ekleme işlemlerinde <span class="color-danger-500 fw-700">Tatil Günü Takibi</span> yapılsın</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-11 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="PersonelIzinTakibi" name="PersonelIzinTakibi" checked>
+                                    <label class="custom-control-label" for="PersonelGorevliTakibi">Yeni Rezervasyon Ekleme işlemlerinde <span class="color-danger-500 fw-700">Personelin başka bir randevuda görevli olup olmadığı takibi</span> yapılsın</label>
+                                </div>
+                            </div>
+                            <hr />
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="GunuGecenTeklifOpsiyonIptal" name="GunuGecenTeklifOpsiyonIptal" checked>
+                                    <label class="custom-control-label" for="GunuGecenTeklifOpsiyonIptal">Günü geçen Rezervasyon Tekliflerini / Opsiyonlu Rezervasyonları <span class="color-danger-500 fw-700">Otomatik İptal Et</span></label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <p>
+                                        <span class="text-warning"> Alınmış bir ödeme (Kapora) var ise iadesi için müşteriye SMS bildirmi yapılacak. <br /> Alınacak ödemeler iptal edilecek.<br /> Oluşturuluş tüm randevular iptal edilecek.</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <input type="text" id="Id" class="form-control" name="Id" maxlength="50" style="display:none" value="0">
+                        }
+                        @if (ViewBag.KullaniciYetki)
+                        {
+                            <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                                <button type="submit" class="btn btn-primary ml-auto waves-effect waves-themed"><i class="fal fa-save mr-2"></i> Kaydet</button>
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            $(":input").inputmask();
+        });
+    </script>
+}
+

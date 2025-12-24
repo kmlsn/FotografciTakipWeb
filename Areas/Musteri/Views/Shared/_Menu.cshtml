@@ -1,0 +1,167 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    AyarlarMusteri musteriyetki = ViewBag.MusteriYetkileri;
+}
+<aside class="page-sidebar">
+    <div class="page-logo">
+        <a href="#" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
+            <img src="~/Areas/Otomasyon/Dosyalar/FirmaLogolar/Fotografci_Takip_Logo_1.png" alt="Fotoğrafçı Takip" aria-roledescription="logo">
+            <span class="position-absolute text-white opacity-50 small pos-top pos-right mr-2 mt-n2"></span>
+            <i class="fal fa-angle-down d-inline-block ml-1 fs-lg color-primary-300"></i>
+        </a>
+    </div>
+    <!-- BEGIN PRIMARY NAVIGATION -->
+    <nav id="js-primary-nav" class="primary-nav" role="navigation">
+        <div class="nav-filter">
+            <div class="position-relative">
+                <input type="text" id="nav_filter_input" placeholder="Menüde ara" class="form-control" tabindex="0">
+                <a href="#" onclick="return false;" class="btn-primary btn-search-close js-waves-off" data-action="toggle" data-class="list-filter-active" data-target=".page-sidebar">
+                    <i class="fal fa-chevron-up"></i>
+                </a>
+            </div>
+        </div>
+        <div class="info-card">
+            <img src="~/Areas/Musteri/Dosyalar/MusteriResim/Default_User.png" class="profile-image rounded-circle" alt="@ViewBag.AdSoyad">
+            <div class="info-card-text">
+                <a href="~/Musteri/Profil" class="d-flex align-items-center text-white">
+                    <!-- Kullanıcı Profil Sayfasına Gidecek -->
+                    <span class="text-truncate text-truncate-sm d-inline-block">
+                        @ViewBag.AdSoyad
+                    </span>
+                </a>
+            </div>
+            <img src="~/Areas/Musteri/Content/img/card-backgrounds/cover-1.png" class="cover" alt="cover">
+            <a href="#" onclick="return false;" class="pull-trigger-btn" data-action="toggle" data-class="list-filter-active" data-target=".page-sidebar" data-focus="nav_filter_input">
+                <i class="fal fa-angle-down"></i>
+            </a>
+        </div>
+
+        <ul id="js-nav-menu" class="nav-menu">
+            @if (ViewBag.AltMenu == "Dashboard")
+            {
+                <li class="active">
+                    <a href="~/Musteri/Dashboard" title="Dashboard" data-filter-tags="dashboard">
+                        <i class="fal fa-home"></i>
+                        <span class="nav-link-text" data-i18n="nav.dashboard">Dashboard</span>
+                    </a>
+                </li>
+            }
+            else
+            {
+                <li>
+                    <a href="~/Musteri/Dashboard" title="Dashboard" data-filter-tags="dashboard">
+                        <i class="fal fa-home"></i>
+                        <span class="nav-link-text" data-i18n="nav.dashboard">Dashboard</span>
+                    </a>
+                </li>
+            }
+            @if (musteriyetki.RezervasyonGor)
+            {
+                if (ViewBag.AltMenu == "Rezervasyonlarım")
+                {
+                    <li class="active">
+                        <a href="~/Musteri/Rezervasyonlarim" title="Rezervasyonlarım" data-filter-tags="rezervasyonlarım">
+                            <i class="fal fa-calendar-check"></i>
+                            <span class="nav-link-text" data-i18n="nav.rezervasyonlarım">Rezervasyonlarım</span>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a href="~/Musteri/Rezervasyonlarim" title="Rezervasyonlarım" data-filter-tags="rezervasyonlarım">
+                            <i class="fal fa-calendar-check"></i>
+                            <span class="nav-link-text" data-i18n="nav.rezervasyonlarım">Rezervasyonlarım</span>
+                        </a>
+                    </li>
+                }
+            }
+            
+            @if (musteriyetki.TeklifleriGor)
+            {
+                if (ViewBag.AltMenu == "Rezervasyon Tekliflerim")
+                {
+                    <li class="active">
+                        <a href="~/Musteri/RezervasyonTekliflerim" title="Rezervasyon Tekliflerim" data-filter-tags="rezervasyon tekliflerim">
+                            <i class="fal fa-calendar"></i>
+                            <span class="nav-link-text" data-i18n="nav.rezervasyon_tekliflerim">Rezervasyon Tekliflerim</span>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a href="~/Musteri/RezervasyonTekliflerim" title="Rezervasyon Tekliflerim" data-filter-tags="rezervasyon tekliflerim">
+                            <i class="fal fa-calendar"></i>
+                            <span class="nav-link-text" data-i18n="nav.rezervasyon_tekliflerim">Rezervasyon Tekliflerim</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (musteriyetki.OdemeleriGor)
+            {
+                if (ViewBag.AltMenu == "Ödemelerim")
+                {
+                    <li class="active">
+                        <a href="~/Musteri/Odemeler" title="Ödemelerim" data-filter-tags="odemelerim">
+                            <i class="fal fa-credit-card"></i>
+                            <span class="nav-link-text" data-i18n="nav.odemelerim">Ödemelerim</span>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a href="~/Musteri/Odemeler" title="Ödemelerim" data-filter-tags="odemelerim">
+                            <i class="fal fa-credit-card"></i>
+                            <span class="nav-link-text" data-i18n="nav.odemelerim">Ödemelerim</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (musteriyetki.FotografSecim)
+            {
+                if (ViewBag.AltMenu == "Fotoğraf Seç")
+                {
+                    <li class="active">
+                        <a href="~/Musteri/FotografSec" title="Fotoğraf Seç" data-filter-tags="fotograf sec">
+                            <i class="fal fa-images"></i>
+                            <span class="nav-link-text" data-i18n="nav.fotograf_sec">Fotoğraf Seç</span>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a href="~/Musteri/FotografSec" title="Fotoğraf Seç" data-filter-tags="fotograf sec">
+                            <i class="fal fa-images"></i>
+                            <span class="nav-link-text" data-i18n="nav.fotograf_sec">Fotoğraf Seç</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (musteriyetki.MesajGonder)
+            {
+                if (ViewBag.AltMenu == "Mesajlar")
+                {
+                    <li class="active">
+                        <a href="~/Musteri/Mesajlar" title="Mesajlar" data-filter-tags="odemelerim">
+                            <i class="fal fa-comment-alt"></i>
+                            <span class="nav-link-text" data-i18n="nav.odemelerim">Mesajlar</span>
+                        </a>
+                    </li>
+                }
+                else
+                {
+                    <li>
+                        <a href="~/Musteri/Mesajlar" title="Mesajlar" data-filter-tags="mesajlar">
+                            <i class="fal fa-comment-alt"></i>
+                            <span class="nav-link-text" data-i18n="nav.mesajlar">Mesajlar</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+        <div class="filter-message js-filter-message bg-success-600"></div>
+    </nav>
+</aside>

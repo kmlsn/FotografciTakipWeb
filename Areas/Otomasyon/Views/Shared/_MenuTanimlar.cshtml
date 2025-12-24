@@ -1,0 +1,189 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool tanimlaryetki = ky.FirstOrDefault(x => x.SayfaId == 9 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 9 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool cekimpaketleriyetki = ky.FirstOrDefault(x => x.SayfaId == 74 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 74 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool gelirgiderturleriyetki = ky.FirstOrDefault(x => x.SayfaId == 75 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 75 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool gunlukiskategorileriyetki = ky.FirstOrDefault(x => x.SayfaId == 76 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 76 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool personelgorevleriyetki = ky.FirstOrDefault(x => x.SayfaId == 77 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 77 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rehbergruplariyetki = ky.FirstOrDefault(x => x.SayfaId == 78 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 78 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rezervasyonekhizmetleriyetki = ky.FirstOrDefault(x => x.SayfaId == 79 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 79 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rezervasyonturleriyetki = ky.FirstOrDefault(x => x.SayfaId == 80 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 80 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool emailmetinleriyetki = ky.FirstOrDefault(x => x.SayfaId == 81 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 81 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool smsmetinleriyetki = ky.FirstOrDefault(x => x.SayfaId == 82 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 82 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool sozlesmesartlariyetki = ky.FirstOrDefault(x => x.SayfaId == 83 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 83 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool surecleryetki = ky.FirstOrDefault(x => x.SayfaId == 84 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 84 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool tatilgunleriyetki = ky.FirstOrDefault(x => x.SayfaId == 85 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 85 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool zamandilimleriyetki = ky.FirstOrDefault(x => x.SayfaId == 86 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 86 && x.Sil == false && x.Aktif == true).SayfaYetki;
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Tanımlar" ? "active open" : "";
+    string altmenucekimpaketleri = ViewBag.AltMenu == "Çekim Paketleri" ? "active" : "";
+    string altmenugelirgiderturleri = ViewBag.AltMenu == "Gelir Gider Türleri" ? "active" : "";
+    string altmenugunlukiskategorileri = ViewBag.AltMenu == "Günlük İş Kategorileri" ? "active" : "";
+    string altmenupersonelgorevleri = ViewBag.AltMenu == "Personel Görevleri" ? "active" : "";
+    string altmenurehbergruplari = ViewBag.AltMenu == "Rehber Grupları" ? "active" : "";
+    string altmenurezervasyonekhizmetleri = ViewBag.AltMenu == "Rezervasyon Ek Hizmetleri" ? "active" : "";
+    string altmenurezervasyonturleri = ViewBag.AltMenu == "Rezervasyon Türleri" ? "active" : "";
+    string altmenuemailmetinleri = ViewBag.AltMenu == "Email Metinleri" ? "active" : "";
+    string altmenusmsturleri = ViewBag.AltMenu == "SMS Metinleri" ? "active" : "";
+    string altmenusozlesmesartlari = ViewBag.AltMenu == "Sözleşme Şartları" ? "active" : "";
+    string altmenusurecler = ViewBag.AltMenu == "Süreçler" ? "active" : "";
+    string altmenutatilgunleri = ViewBag.AltMenu == "Tatil Günleri" ? "active" : "";
+    string altmenuzamandilimleri = ViewBag.AltMenu == "Zaman Dilimleri" ? "active" : "";
+}
+@if (tanimlaryetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Tanımlar" data-filter-tags="tanımlar">
+            <i class="fal fa-info-circle"></i>
+            <span class="nav-link-text" data-i18n="nav.tanimlar">Tanımlar</span>
+        </a>
+        <ul>
+            @if (lisans.Tanimlar_CekimPaketleri)
+            {
+                if (cekimpaketleriyetki)
+                {
+                    <li class=@altmenucekimpaketleri>
+                        <a href="~/Otomasyon/Tanimlar/CekimPaketleri" title="Çekim Paketleri" data-filter-tags="tanımlar çekim paketleri">
+                            <span class="nav-link-text" data-i18n="nav.tanimlar_cekim_paketleri">Çekim Paketleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Tanimlar_GelirGiderTurleri)
+            {
+                if (gelirgiderturleriyetki)
+                {
+                    <li class=@altmenugelirgiderturleri>
+                        <a href="~/Otomasyon/Tanimlar/GelirGiderTurleri" title="Gelir/Gider Türleri" data-filter-tags="tanımlar gelir gider türleri">
+                            <span class="nav-link-text" data-i18n="nav.tanimlar_gelir_gider_turleri">Gelir/Gider Türleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Tanimlar_GunlukIsKategorileri)
+            {
+                if (gunlukiskategorileriyetki)
+                {
+                    <li class=@altmenugunlukiskategorileri>
+                        <a href="~/Otomasyon/Tanimlar/GunlukIsKategorileri" title="Günlük İş Kategorileri" data-filter-tags="tanımlar günlük iş kategorileri">
+                            <span class="nav-link-text" data-i18n="nav.tanimlar_gunluk_is_kategorileri">Günlük İş Kategorileri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Tanimlar_PersonelGorevleri)
+            {
+                if (personelgorevleriyetki)
+                {
+                    <li class=@altmenupersonelgorevleri>
+                        <a href="~/Otomasyon/Tanimlar/PersonelGorevleri" title="Personel Görevleri" data-filter-tags="tanımlar personel görevleri">
+                            <span class="nav-link-text" data-i18n="nav.tanimlar_personel_gorevleri">Personel Görevleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Tanimlar_RehberGruplari)
+            {
+                if (rehbergruplariyetki)
+                {
+                    <li class=@altmenurehbergruplari>
+                        <a href="~/Otomasyon/Tanimlar/RehberGruplari" title="Rehber Grupları" data-filter-tags="tanımlar rehber grupları">
+                            <span class="nav-link-text" data-i18n="nav.tanimlar_rehber_gruplari">Rehber Grupları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Tanimlar_RezervasyonEkHizmetleri)
+            {
+                if (rezervasyonekhizmetleriyetki)
+                {
+                    <li class=@altmenurezervasyonekhizmetleri>
+                        <a href="~/Otomasyon/Tanimlar/RezervasyonEkHizmetleri" title="Rezervasyon Ek Hizmetleri" data-filter-tags="tanımlar rezervasyon ek hizmetleri">
+                            <span class="nav-link-text" data-i18n="nav.tanimlar_rezervasyon_ek_hizmetleri">Rezervayon Ek Hizmetleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Tanimlar_RezervasyonTurleri)
+            {
+                if (rezervasyonturleriyetki)
+                {
+                    <li class=@altmenurezervasyonturleri>
+                        <a href="~/Otomasyon/Tanimlar/RezervasyonTurleri" title="Rezervasyon Türleri" data-filter-tags="tanımlar rezervasyon türleri">
+                            <span class="nav-link-text" data-i18n="nav.tanimlar_rezervasyon_turleri">Rezervasyon Türleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Tanimlar_EmailMetinleri)
+            {
+                if (emailmetinleriyetki)
+                {
+                    <li class=@altmenuemailmetinleri>
+                        <a href="~/Otomasyon/Tanimlar/EmailMetinleri" title="Email Metinleri" data-filter-tags="tanımlar email metinleri">
+                            <span class="nav-link-text" data-i18n="nav.tanımlar_email_metinleri">Email Metinleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Tanimlar_SmsMetinleri)
+            {
+                if (smsmetinleriyetki)
+                {
+                    <li class=@altmenusmsturleri>
+                        <a href="~/Otomasyon/Tanimlar/SMSMetinleri" title="SMS Metinleri" data-filter-tags="tanımlar sms metinleri">
+                            <span class="nav-link-text" data-i18n="nav.tanımlar_sms_metinleri">SMS Metinleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Tanimlar_SozlesmeSartlari)
+            {
+                if (sozlesmesartlariyetki)
+                {
+                    <li class=@altmenusozlesmesartlari>
+                        <a href="~/Otomasyon/Tanimlar/SozlesmeSartlari" title="Sözleşme Şartları" data-filter-tags="tanımlar sözleşme şartları">
+                            <span class="nav-link-text" data-i18n="nav.tanimlar_sozlesme_sartlari">Sözleşme Şartları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Tanimlar_Sureler)
+            {
+                if (surecleryetki)
+                {
+                    <li class=@altmenusurecler>
+                        <a href="~/Otomasyon/Tanimlar/Surecler" title="Süreçler" data-filter-tags="tanımlar süreçler">
+                            <span class="nav-link-text" data-i18n="nav.tanimlar_surecler">Süreçler</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Tanimlar_TatilGunleri)
+            {
+                if (tatilgunleriyetki)
+                {
+                    <li class=@altmenutatilgunleri>
+                        <a href="~/Otomasyon/Tanimlar/TatilGunleri" title="Tatil Günleri" data-filter-tags="tanımlar tatil günleri">
+                            <span class="nav-link-text" data-i18n="nav.tanimlar_tatil_gunleri">Tatil Günleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Tanimlar_ZamanDilimleri)
+            {
+                if (zamandilimleriyetki)
+                {
+                    <li class=@altmenuzamandilimleri>
+                        <a href="~/Otomasyon/Tanimlar/ZamanDilimleri" title="Zaman Dilimleri" data-filter-tags="tanımlar zaman dilimleri">
+                            <span class="nav-link-text" data-i18n="nav.tanimlar_zaman_dilimleri">Zaman Dilimleri</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}

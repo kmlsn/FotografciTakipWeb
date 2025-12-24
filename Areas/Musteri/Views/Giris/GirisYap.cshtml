@@ -1,0 +1,142 @@
+﻿
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<!--
+Template Name:  SmartAdmin Responsive WebApp - Template build with Twitter Bootstrap 4
+Version: 4.0.0
+Author: Sunnyat Ahmmed
+Website: http://gootbootstrap.com
+Purchase: https://wrapbootstrap.com/theme/smartadmin-responsive-webapp-WB0573SK0
+License: You must have a valid license purchased only from wrapbootstrap.com (link above) in order to legally use this theme for your project.
+-->
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <title>
+       Müşteri Girişi
+    </title>
+    <meta name="description" content="Login">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+    <!-- Call App Mode on ios devices -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Remove Tap Highlight on Windows Phone IE -->
+    <meta name="msapplication-tap-highlight" content="no">
+    <!-- base css -->
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Musteri/Content/css/vendors.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Musteri/Content/css/app.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Musteri/Content/css/notifications/sweetalert2/sweetalert2.bundle.css">
+    <!-- Place favicon.ico in the root directory -->
+    @*<link rel="apple-touch-icon" sizes="180x180" href="~/Areas/Otomasyon/Content/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/Areas/Otomasyon/Content/img/favicon/favicon-32x32.png">
+    <link rel="mask-icon" href="~/Areas/Otomasyon/Content/img/favicon/safari-pinned-tab.svg" color="#5bbad5">*@
+    <link rel="apple-touch-icon" sizes="180x180" href="~/Areas/Musteri/Content/img/Tetra_Logo_apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/Areas/Musteri/Content/img/Tetra_Logo_Favico.ico">
+    <!-- Optional: page related CSS-->
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Musteri/Content/css/page-login.css">
+    <script src="~/Areas/Otomasyon/Content/js/notifications/sweetalert2/sweetalert2.bundle.js"></script>
+</head>
+@*<body style="background-image:url('/Areas/Otomasyon/Content/img/backgrounds/clouds.png')">*@
+<body>
+    @if (ViewBag.hata != null)
+    {
+        if (ViewBag.hata == "Musteri Kodu veya Sifre Hatali")
+        {
+            <script type="text/javascript">
+                Swal.fire(
+                    {
+                        title: "HATA",
+                        //text: "Kullanıcı Adı veya Şifre Hatalı",
+                        html: "<b>Müteri Kodu veya Şifre Hatalı</b>",
+                        type: "error",
+                        showCancelButton: false,
+                        confirmButtonText: "Tekrar Dene"
+                    });
+            </script>
+        }
+        else if (ViewBag.hata == "Müşteri Pasif")
+        {
+            <script type="text/javascript">
+                Swal.fire(
+                    {
+                        title: "HATA",
+                        //text: "Kullanıcı Adı veya Şifre Hatalı",
+                        html: "<b>Giriş yapmaya çalıştığınız Müşteri pasif. <br/>Lütfen Firmanız ile iletişime geçiniz.</b>",
+                        type: "warning",
+                        showCancelButton: false,
+                        confirmButtonText: "Tekrar Dene"
+                    });
+            </script>
+        }
+        else if (ViewBag.hata == "Panele Giriş Yetkiniz Yok")
+        {
+            <script type="text/javascript">
+                Swal.fire(
+                    {
+                        title: "HATA",
+                        //text: "Kullanıcı Adı veya Şifre Hatalı",
+                        html: "<b>Giriş yapmaya çalıştığınız Müşteri, Panele giriş için yetkili değildir.. <br/>Lütfen Firmanız ile iletişime geçiniz.</b>",
+                        type: "warning",
+                        showCancelButton: false,
+                        confirmButtonText: "Tekrar Dene"
+                    });
+            </script>
+        }
+    }
+    <div class="blankpage-form-field">
+        <div class="page-logo-giris m-0 w-100 align-items-center justify-content-center rounded border-bottom-left-radius-0 border-bottom-right-radius-0 px-4">
+            <a href="javascript:void(0)" class="page-logo-link press-scale-down d-flex align-items-center">
+                <img src="~/Areas/Musteri/Content/img/TetraBilisim_FotografciTakipUygulamasi.png" alt="TeTRa Bilişim" aria-roledescription="logo">
+                @*<span class="page-logo-text mr-1">SmartAdmin WebApp</span>*@
+                @*<span class="page-logo-text mr-1">TeTRa Yazılım <br /> Fotoğrafçı Takip Uygulaması</span>*@
+            </a>
+        </div>
+        <div class="card p-4 border-top-left-radius-0 border-top-right-radius-0">
+            @*<form id="frm-giris">*@
+            <form action="~/Musteri/Giris/GirisYap" method="post" id="frm-giris">
+                <div class="form-group">
+                    <label class="form-label" for="musterikodu">Müşteri Kodu</label>
+                    <input type="text" id="musterikodu" class="form-control" placeholder="Müşteri Kodu" required name="MusteriKodu">
+                    <div class="invalid-feedback">Müşteri kodunuzu giriniz.</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="sifre">Şifre</label>
+                    <input type="password" id="sifre" class="form-control" placeholder="Şifre" required name="Sifre">
+                    <div class="invalid-feedback">Şifrenizi giriniz.</div>
+                </div>
+                <div class="form-group text-left">
+                    <div class="custom-control custom-checkbox">
+                        <input type="checkbox" class="custom-control-input" id="BeniHatirla">
+                        <label class="custom-control-label" for="BeniHatirla">Beni Hatırla</label>
+                    </div>
+                </div>
+                <button type="submit" id="GirisYap" class="btn btn-outline-default float-right">Giriş</button>
+            </form>
+        </div>
+        @*<div class="blankpage-footer text-center">
+            <a href="#"><strong>Şifremi Unuttum</strong></a> | <a href="~/Home/UyeOl"><strong>Kayıt Ol</strong></a>
+        </div>*@
+    </div>
+    <script src="~/Areas/Musteri/Content/js/vendors.bundle.js"></script>
+    <script src="~/Areas/Musteri/Content/js/app.bundle.js"></script>
+    <script src="~/Areas/Musteri/Content/js/notifications/sweetalert2/sweetalert2.bundle.js"></script>
+    <!-- Page related scripts -->
+    <script>
+        $("#GirisYap").click(function (event) {
+
+            // Fetch form to apply custom Bootstrap validation
+            var form = $("#frm-giris")
+            if (form[0].checkValidity() === false) {
+                event.preventDefault()
+                event.stopPropagation()
+            }
+            form.addClass('was-validated');
+            // Perform ajax submit here...
+        });
+
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,511 @@
+﻿
+@{
+    Layout = null;
+}
+@using FotografciTakipWeb.Models
+@model Sozlesme
+@{
+    List<Randevu> cekimrnd = ViewBag.CekimRandevulari;
+    List<Odemeler> alinanodemeler = ViewBag.alinanodemeler;
+    List<Odemeler> kalanodemeler = ViewBag.kalanodemeler;
+    Firma frm = ViewBag.Firma;
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Sözleşme Önizleme</title>
+    @*<link href="~/Areas/Otomasyon/Content/css/bootstrap.min.css" rel="stylesheet" />*@
+    <link href="~/Areas/Otomasyon/Content/css/bootstrap.css" rel="stylesheet" />
+    <script src="~/Areas/Otomasyon/Content/js/jquery-3.2.1.min.js"></script>
+    <script src="~/Areas/Otomasyon/Content/js/bootstrap.min.js"></script>
+    <script src="~/Areas/Otomasyon/Content/js/accounting.js"></script>
+    <STYLE TYPE="text/css">
+        .breakhere {
+            page-break-after: always;
+        }
+
+        .table.table-striped2:not(.table-bordered) th,
+        .table.table-striped2:not(.table-bordered) tbody th,
+        .table.table-striped2:not(.table-bordered) tbody td {
+            border: 0;
+        }
+    </STYLE>
+</head>
+<body>
+    <div class="row">
+        <div class="container breakhere">
+            <!-- ---------------- Form Başlık Bölümü --------------------------------- -->
+            <table class="w-100">
+                <tr>
+                    <td class="w-50">
+                        @if (ViewBag.SozlesmeAyar.LogoGoster == true)
+                        {
+                        <img src="@frm.Resim.ResimAdres" class="pos-top pos-right height-6 mt-1 hidden-md-down" height="80" alt="@frm.FirmaAdi">
+                        <h6 class="keep-print-font fw-500 mb-0 text-primary flex-1 position-relative">
+                            @frm.FirmaAdi <br />
+                            <small class="text-muted mb-0 fs-xs">
+                                @frm.Adres @frm.Il.Il1 / @frm.Ilce.Ilce1
+                            </small>
+                        </h6>
+                        }
+                        else
+                        {
+                        <h3 class="keep-print-font fw-500 mb-0 text-primary flex-1 position-relative">
+                            @frm.FirmaAdi <br />
+                            <small class="text-muted mb-0 fs-xs">
+                                @frm.Adres @frm.Il.Il1 / @frm.Ilce.Ilce1
+                            </small>
+                        </h3>
+                        }
+                    </td>
+                    <td class="w-50">
+                        <h6 style="text-align: right">@DateTime.Now.ToShortDateString() - @DateTime.Now.ToShortTimeString()</h6>
+                        <h5 style="text-align: right; font-size:18px">Şözleşme No: @Model.SozlesmeNo</h5>
+                    </td>
+                </tr>
+            </table>
+            <!-- ---------------- Firma Bilgileri & Müşteri Bilgileri ---------------- -->
+            <div class="row col col-xs-12 pt-5">
+                <div class="col-xs-12 d-flex">
+                    <div class="table-responsive">
+                        <table class="table table-striped2 table-clean table-sm align-self-end">
+                            <tbody>
+                                <tr class="border-bottom">
+                                    <td colspan="2">
+                                        <div class="text-dark h5">
+                                            Firma Bilgileri
+                                        </div>
+                                    </td>
+                                    <td colspan="2">
+                                        <div class="text-dark h5">
+                                            Müşteri Bilgileri
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr class="border-bottom h6">
+                                    <td class="w-15">
+                                        <strong>Firma Adı:</strong>
+                                    </td>
+                                    <td class="w-35">@Model.Firma.FirmaAdi</td>
+                                    <td class="w-15 border-left mr-1">
+                                        <strong>Müşteri Kodu:</strong>
+                                    </td>
+                                    <td class="w-35">@Model.Musteri.MusteriKodu</td>
+                                </tr>
+                                <tr class="border-bottom h6">
+                                    <td class="w-15">
+                                        <strong>Yetkili:</strong>
+                                    </td>
+                                    <td class="w-35">@Model.Firma.Yetkili</td>
+                                    <td class="w-15 border-left pl-1">
+                                        <strong>Adı Soyadı:</strong>
+                                    </td>
+                                    <td class="w-35">@Model.Musteri.AdiSoyadi</td>
+                                </tr>
+                                <tr class="border-bottom h6">
+                                    <td class="w-15">
+                                        <strong>Adres:</strong>
+                                    </td>
+                                    @if (frm.Adres == "")
+                                    {
+                                    <td class="w-35">@frm.Il.Il1 / @frm.Ilce.Ilce1</td>
+                                    }
+                                    else
+                                    {
+                                    <td class="w-35">@frm.Adres <br /> @frm.Il.Il1 / @frm.Ilce.Ilce1</td>
+                                    }
+                                    <td class="w-15 border-left pl-1">
+                                        <strong>Adres:</strong>
+                                    </td>
+                                    <td class="w-35">@Model.Musteri.Adres</td>
+                                </tr>
+                                <tr class="border-bottom h6">
+                                    <td class="w-15">
+                                        <strong>Telefon:</strong>
+                                    </td>
+                                    @if ((Model.Firma.SabitTel == "" && Model.Firma.CepTel != "") || (Model.Firma.SabitTel == null && Model.Firma.CepTel != null))
+                                    {
+                                    <td class="w-35">@Model.Firma.CepTel</td>
+                                    }
+                                    else if ((Model.Firma.SabitTel != "" && Model.Firma.CepTel == "") || (Model.Firma.SabitTel != null && Model.Firma.CepTel == null))
+                                    {
+                                    <td class="w-35">@Model.Firma.SabitTel</td>
+                                    }
+                                    else if ((Model.Firma.SabitTel != "" && Model.Firma.CepTel != "") || (Model.Firma.SabitTel != null && Model.Firma.CepTel != null))
+                                    {
+                                    <td class="w-35">@Model.Firma.SabitTel / @Model.Firma.CepTel</td>
+                                    }
+                                    else
+                                    {
+                                    <td class="w-35"></td>
+                                    }
+                                    <td class="w-15 border-left pl-1">
+                                        <strong>Telefon:</strong>
+                                    </td>
+                                    @if ((Model.Musteri.SabitTel == "" && Model.Musteri.CepTel != "") || (Model.Musteri.SabitTel == null && Model.Musteri.CepTel != null))
+                                    {
+                                    <td class="w-35">@Model.Musteri.CepTel</td>
+                                    }
+                                    else if ((Model.Musteri.SabitTel != "" && Model.Musteri.CepTel == "") || (Model.Musteri.SabitTel != null && Model.Musteri.CepTel == null))
+                                    {
+                                    <td class="w-35">@Model.Musteri.SabitTel</td>
+                                    }
+                                    else if ((Model.Musteri.SabitTel != "" && Model.Musteri.CepTel != "") || (Model.Musteri.SabitTel != null && Model.Musteri.CepTel != null))
+                                    {
+                                    <td class="w-35">@Model.Musteri.SabitTel / @Model.Musteri.CepTel</td>
+                                    }
+                                    else
+                                    {
+                                    <td class="w-35"></td>
+                                    }
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="text-dark fw-700 h3 mb-g keep-print-font text-center pt-4">
+                SÖZLEŞME ŞARTLARI
+            </div>
+            <!-- ---------------- Sözleşme Metni --------------------------------- -->
+            <div class="row col-xs-11 mb-5 text-wrap" id="SozlesmeMetni">
+                @Html.Raw(ViewBag.SozlesmeMetni);
+            </div>
+        </div>
+        <div class="container">
+            <!-- ---------------- Form Başlık Bölümü --------------------------------- -->
+            <table class="w-100">
+                <tr>
+                    <td class="w-50">
+                        @if (ViewBag.SozlesmeAyar.LogoGoster == true)
+                        {
+                            <img src="@frm.Resim.ResimAdres" class="pos-top pos-right height-6 mt-1 hidden-md-down" height="80" alt="@frm.FirmaAdi">
+                            <h6 class="keep-print-font fw-500 mb-0 text-primary flex-1 position-relative">
+                                @frm.FirmaAdi <br />
+                                <small class="text-muted mb-0 fs-xs">
+                                    @frm.Adres @frm.Il.Il1 / @frm.Ilce.Ilce1
+                                </small>
+                            </h6>
+                        }
+                        else
+                        {
+                            <h3 class="keep-print-font fw-500 mb-0 text-primary flex-1 position-relative">
+                                @frm.FirmaAdi <br />
+                                <small class="text-muted mb-0 fs-xs">
+                                    @frm.Adres @frm.Il.Il1 / @frm.Ilce.Ilce1
+                                </small>
+                            </h3>
+                        }
+                    </td>
+                    <td class="w-50">
+                        <h6 style="text-align: right">@DateTime.Now.ToShortDateString() - @DateTime.Now.ToShortTimeString()</h6>
+                        <h5 style="text-align: right; font-size:18px">Şözleşme No: @Model.SozlesmeNo</h5>
+                    </td>
+                </tr>
+            </table>
+            <!-- ---------------- Rezervasyon Bilgileri ------------------------------ -->
+            <div class="row pt-5">
+                <div class="col-sm-12 d-flex">
+                    <div class="table-responsive">
+                        <div class="text-dark h5">
+                            Rezervasyon Bilgileri
+                        </div>
+                        <table class="table table-clean table-sm align-self-end">
+                            <tbody>
+                                <tr>
+                                    <td class="w-30">
+                                        <strong>Rezervasyon Şekli:</strong>
+                                    </td>
+                                    @if (Model.Durum == "Kesin Rezervasyon")
+                                    {
+                                    <td id="RezervasyonBilgiRezervasyonTuru">@Model.Durum</td>
+                                    }
+                                    else
+                                    {
+                                    <td id="RezervasyonBilgiRezervasyonTuru">@Model.Durum / @Convert.ToDateTime(Model.OpsiyonTarihi).ToShortDateString()</td>
+                                    }
+                                </tr>
+                                <tr>
+                                    <td class="w-30">
+                                        <strong>Rezervasyon Türü:</strong>
+                                    </td>
+                                    <td id="RezervasyonBilgiRezervasyonTuru">@Model.RezervasyonTurleri.RezervasyonTuru</td>
+                                </tr>
+                                <tr>
+                                    <td class="w-30">
+                                        <strong>Sözleşme Tarihi:</strong>
+                                    </td>
+                                    <td id="RezervasyonBilgiRezervasyonTarihi">@Model.SozlesmeTarihi.ToShortDateString() - @Model.SozlesmeTarihi.ToShortTimeString()</td>
+                                </tr>
+                                <tr>
+                                    <td class="w-30">
+                                        <strong>Organizasyon Tarihi:</strong>
+                                    </td>
+                                    <td id="RezervasyonBilgiRezervasyonTarihi">@Model.RezervasyonTarihi.ToShortDateString()</td>
+                                </tr>
+                                <tr>
+                                    <td class="w-30">
+                                        <strong>Rezervasyon Saati:</strong>
+                                    </td>
+                                    @*<td id="RezervasyonBilgiRezervasyonSaati">@Model.BaslangicSaat.Hours:@Model.BaslangicSaat.Minutes - @Model.BitisSaat.Hours:@Model.BitisSaat.Minutes</td>*@
+                                    <td id="RezervasyonBilgiRezervasyonSaati">@Model.BaslangicSaat.ToString(@"hh\:mm") - @Model.BitisSaat.ToString(@"hh\:mm")</td>
+                                </tr>
+                                <tr>
+                                    <td class="w-30">
+                                        <strong>Organizasyon/Çekim Yeri:</strong>
+                                    </td>
+                                    <td id="RezervasyonBilgiOrganizasyonYeri">@Model.OrganizasyonYeri</td>
+                                </tr>
+                                <tr>
+                                    <td class="w-30">
+                                        <strong>Sözleşme Tutarı:</strong>
+                                    </td>
+                                    <td id="RezervasyonBilgiSozlesmeTutari">@Convert.ToDecimal(Model.ToplamFiyat).ToString("C").Replace("₺", "") TL</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <!-- ---------------- Paket ve Ek Hizemt Bilgileri ----------------------- -->
+            @if (ViewBag.SozlesmeAyar.PaketlerGoster == true || ViewBag.SozlesmeAyar.EkHizmetlerGoster == true)
+            {
+                <div class="row col col-xs-12 pt-5">
+                    <div class="col-xs-12 d-flex">
+                        <div class="table-responsive">
+                            <input type="text" id="Paketler" class="form-control form-control-sm" name="Paketler" style="display:none" value="@Model.Paketler">
+                            <input type="text" id="EkHizmetler" class="form-control form-control-sm" name="EkHizmetler" style="display:none" value="@Model.EkHizmetler">
+                            <table class="table table-striped2 table-clean table-sm align-self-end" id="PaketlerTablosu">
+                                <tbody>
+                                    <tr class="border-bottom">
+                                        <td>
+                                            <div class="text-dark h5">
+                                                Paketler
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table>
+                                                <tbody><tr id="tablopaketler"></tr></tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <table class="table table-striped2 table-clean table-sm align-self-end pt-2" id="EkHizmetlerTablosu">
+                                <tbody>
+                                    <tr class="border-bottom">
+                                        <td>
+                                            <div class="text-dark h5">
+                                                Ek Hizmetler
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table>
+                                                <tbody><tr id="tabloekhizmetler"></tr></tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            }
+            <!-- ---------------- Cekim Randevulari --------------------------------- -->
+            @if (ViewBag.SozlesmeAyar.CekimRandevulariGoster == true)
+            {
+                if (cekimrnd.Count > 0)
+                {
+                    <div class="row">
+                        <div class="col-sm-12 d-flex">
+                            <div class="table-responsive">
+                                <div class="text-dark h5">
+                                    Çekim Randevulari
+                                </div>
+                                <table class="table table-bordered table-sm align-self-end">
+                                    <thead>
+                                        <tr>
+                                            <th class="w-15">Çekim Tarihi</th>
+                                            <th class="w-15">Saat Aralığı</th>
+                                            <th class="w-25">Personel</th>
+                                            <th class="w-45">Çekim Yeri</th>
+                                            <th class="w-45">Randevu Tür</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="SozlesmeCekimRandevulari">
+                                        @foreach (var item in cekimrnd)
+                                    {
+                                        <tr>
+                                            <td>@item.Baslangic.ToShortDateString()</td>
+                                            <td>@item.Baslangic.ToShortTimeString() - @item.Bitis.ToShortTimeString()</td>
+                                            <td>
+                                                @{
+                                                    List<RandevuToPersonel> personeller = item.RandevuToPersonels.Where(x => x.RandevuId == item.Id).ToList();
+                                                    string pers = "";
+                                                    foreach (var personel in personeller)
+                                                    {
+                                                        pers = pers + personel.Personel.AdiSoyadi + " - " + personel.Personel.PersonelGorevleri.Gorev + "<br />";
+                                                    }
+                                                }
+                                                @Html.Raw(pers)
+                                            </td>
+                                            <td>@Html.Raw(item.Aciklama)</td>
+                                            <td>
+                                                @{
+                                                    string randevutur = "";
+                                                    randevutur = item.CekimRandevu == true ? "ÇEKİM" : "ORGANİZASYON";
+                                                }
+                                                @randevutur
+                                            </td>
+                                        </tr>
+                                    }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row border-bottom-0 table-scale-border-bottom fw-700 mb-3"></div>
+                }
+            }
+            <!-- ---------------- Yapılan Ödemeler --------------------------------- -->
+            @if (ViewBag.SozlesmeAyar.YapilanOdemelerGoster == true)
+            {
+                if (alinanodemeler.Count > 0)
+                {
+                    <div class="row">
+                        <div class="col-sm-12 d-flex">
+                            <div class="table-responsive">
+                                <div class="text-dark h5">
+                                    Yapılan Ödemeler
+                                </div>
+                                <table class="table table-bordered table-sm align-self-end">
+                                    <thead>
+                                        <tr>
+                                            <th class="w-25">Ödeme Tarihi</th>
+                                            <th class="w-25">Tutar</th>
+                                            <th class="w-50">Açıklama</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="SozlesmeYapilanOdemeler">
+                                        @foreach (var item in alinanodemeler)
+                                        {
+                                            <tr>
+                                                <td>@item.Tarih.ToShortDateString() - @item.Tarih.ToShortTimeString()</td>
+                                                <td>@item.Tutar.ToString("C").Replace("₺", "") TL</td>
+                                                <td>@item.Notlar</td>
+                                            </tr>
+                                        }
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="row border-bottom-0 table-scale-border-bottom fw-700 mb-3"></div>
+                }
+            }
+            <!-- ---------------- Kalan Ödemeler --------------------------------- -->
+            @if (ViewBag.SozlesmeAyar.KalanOdemelerGoster == true)
+            {
+                if (kalanodemeler.Count > 0)
+                {
+                    <div class="row">
+                        <div class="col-sm-12 d-flex">
+                            <div class="table-responsive">
+                                <div class="text-dark fw-700 h4 keep-print-font">
+                                    Kalan Ödemeler
+                                </div>
+                                <table class="table table-bordered table-sm align-self-end">
+                                    <thead>
+                                        <tr>
+                                            <th class="w-25">Ödeme Tarihi</th>
+                                            <th class="w-25">Tutar</th>
+                                            <th class="w-50">Açıklama</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="SozlesmeKalanOdemeler">
+                                        @foreach (var item in kalanodemeler)
+                                        {
+                                            <tr>
+                                                <td>@item.OdemeTarihi.ToShortDateString()</td>
+                                                <td>@item.Tutar.ToString("C").Replace("₺", "") TL</td>
+                                                <td>@item.Notlar</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            <!-- ---------------- İmzalar --------------------------------- -->
+            <div class="row pt-5" id="SozlesmeImzalar">
+                <div class="col-sm-12 d-flex">
+                    <div class="table-responsive">
+                        <table class="table table-striped2 table-clean table-sm align-self-end">
+                            <tbody>
+                                <tr>
+                                    <td class="w-50 text-center">
+                                        Firma Yetkilisi
+                                    </td>
+                                    <td class="w-50 text-center">
+                                        Müşteri
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td id="SozlesmeImzalarFirmaYetkili" class="w-50 text-center">@Model.Firma.Yetkili</td>
+                                    <td id="SozlesmeImzalarMusteri" class="w-50 text-center">@Model.Musteri.AdiSoyadi</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            var paketler = $("#Paketler").val();
+            if (paketler === "" || paketler === " ") {
+                $("#PaketlerTablosu").css("display", "none");
+            }
+            var pkt = paketler.split("<div>");
+            var ekhizmetler = $("#EkHizmetler").val();
+            if (ekhizmetler === "" || ekhizmetler === " ") {
+                $("#EkHizmetlerTablosu").css("display", "none");
+            }
+            var hzmt = ekhizmetler.split("<div>");
+            $.each(pkt, function (i, value) {
+                if (value != "" && value != " ") {
+                    value = value.replace("</div>", "");
+                    value = value.replace("</div>", "");
+                    $("#tablopaketler").append("<td  class='w-auto border-left border-right' style='margin-right:15px'>" + value.replace("</div>", "") + "</td>")
+                }
+            });
+            $.each(hzmt, function (k, value2) {
+                if (value2 != " " && value2 != "") {
+                    $("#tabloekhizmetler").append("<td class='w-auto border-left border-right' style='margin-right:15px'>" + value2.replace("</div>", "") + "</td>")
+                }
+            });
+
+            //var ucret = $(".tutar").val();
+            //$.each(ucret, function (k, tutar) {
+            //    tutar = tutar.replace(".", "");
+            //    tutar = tutar.replace(",", ".");
+            //    $(".tablotutar").html(accounting.formatMoney(tutar, "TL", 2, ".", ",", "%v %s"));
+            //});
+    
+
+        });
+    </script>
+</body>
+</html>

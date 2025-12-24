@@ -1,0 +1,859 @@
+﻿
+@{
+    ViewBag.Title = "Tanımlar - Email Metinleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{ 
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+@section Head
+{
+    <style>
+        .modal {
+            overflow: auto !important; /*Açılan ikinci modal ekranda kaymadığı için eklendi*/
+        }
+        .swal2-container {
+				display: -webkit-box;
+				display: flex;
+				position:fixed;
+				z-index: 300000; /*Uyarı penceresini herşeyin önüne getimek için*/
+			}
+    </style>
+}
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Email Metni Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-danger" role="alert">
+                                    Lütfen metin içerisinde (!),(^),(+),(%),(#),($),(&),(/\),({}),([]),() karakterlerini kullanmayınız. Bu karakterler parametre ayarları için kullanılmaktadır.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-4" id="MetinAdikHata">
+                                <label class="form-label" for="MetinAdi">Metin Adı</label>
+                                <input type="text" id="MetinAdi" class="form-control form-control-sm" name="MetinAdi" maxlength="100">
+                            </div>
+                            <div class="form-group col-sm-4" id="EmailKonuHata">
+                                <label class="form-label" for="EmailKonu">Email Konusu</label>
+                                <input type="text" id="EmailKonu" class="form-control form-control-sm" name="EmailKonu" maxlength="200">
+                            </div>
+                            <div class="form-group col-sm-4" id="EmailBaslikHata">
+                                <label class="form-label" for="EmailBaslik">Email Başlığı</label>
+                                <input type="text" id="EmailBaslik" class="form-control form-control-sm" name="EmailBaslik" maxlength="100">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-12" id="EmailMetniHata">
+                                <label class="form-label" for="EmailMetni">Mail Metni</label>
+                                @*<textarea class="form-control form-control-sm" id="SMSMetni" rows="4" name="SMSMetni" style="overflow:auto;resize:none"></textarea>*@
+                                <textarea name="EmailMetni" id="EmailMetni" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-5">
+                                <label class="form-label">İçerik Resmi (Tavsiye edilen boyut: 540 x 175)</label>
+                                <div id="image-preview-kullanici" class="col-sm-12">
+                                    @* Resim tablosu Firma Tablosuna bağlandığında background-image olarak resim yolu verilecek *@
+                                    <label for="IcerikResim" id="image-label-kullanici">Resim Seç</label>
+                                    <input type="file" name="IcerikResim" id="IcerikResim" accept=".jpg, .jpeg, .png, .bmp, .tiff, .tif,|images/*" />
+                                </div>
+                            </div>
+                            <div class="row col-sm-7">
+                                <div class="row col-sm-12 mb-2">
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="Tema-Yok" data-id="Tema-Yok" name="MailTema" checked="">
+                                        <label class="custom-control-label" for="Tema-Yok">Tema Yok</label>
+                                    </div>
+                                </div>
+                                <div class="row col-sm-12 mb-2">
+                                    <div class="row col-sm-6">
+                                        <div class="custom-control custom-radio mb-2">
+                                            <input type="radio" class="custom-control-input" id="Tema-1" data-id="Tema-1" name="MailTema">
+                                            <label class="custom-control-label" for="Tema-1">Tema 1</label>
+                                        </div>
+                                        <a href="~/Areas/Otomasyon/Dosyalar/EmailSablonlari/Tema-1.PNG" data-toggle="lightbox">
+                                            <img src="~/Areas/Otomasyon/Dosyalar/EmailSablonlari/Tema-1.PNG" height="150"/>
+                                        </a>
+                                    </div>
+                                    @*<div class="row col-sm-6">
+                                            <div class="custom-control custom-radio mb-2">
+                                                <input type="radio" class="custom-control-input" id="Tema2" name="MailTema">
+                                                <label class="custom-control-label" for="Tema2">Tema 1</label>
+                                            </div>
+                                            <a href="~/Areas/Otomasyon/Dosyalar/EmailSablonlari/Tema_Ornek.PNG" data-toggle="lightbox">
+                                                <img src="~/Areas/Otomasyon/Dosyalar/EmailSablonlari/Tema_Ornek.PNG" height="150" />
+                                            </a>
+                                        </div>*@
+                                </div>
+
+                                @*<label class="form-label" for="EmailTemaAdres">Email Teması</label>
+                                    <select class="select2 custom-select form-control custom-select-sm" id="EmailTemaAdres" name="EmailTemaAdres" title="Email için bir tema seçebilirsiniz.">
+                                        <option selected="" value="0" disabled="">Tema Seçiniz</option>
+                                        <option value="1">Tema Kullanma</option>
+                                        <option value="2">
+                                            <img src="~/Areas/Otomasyon/Dosyalar/EmailSablonlari/image/odeme-1.jpg" />
+                                        </option>
+                                    </select>*@
+                            </div>
+
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="Durum">Durum</label>
+                                <div class="frame-wrap">
+                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                        <input type="checkbox" class="custom-control-input" id="Durum" checked>
+                                        <label class="custom-control-label" for="Durum">Aktif</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion accordion-outline" id="js_demo_accordion-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <a href="javascript:void(0);" class="card-title" data-toggle="collapse" data-target="#js_demo_accordion-3a" aria-expanded="false">
+                                        <i class="fal fa-random width-2 fs-xl"></i>
+                                        Parametreler
+                                        <span class="ml-auto">
+                                            <span class="collapsed-reveal">
+                                                <i class="fal fa-minus fs-xl"></i>
+                                            </span>
+                                            <span class="collapsed-hidden">
+                                                <i class="fal fa-plus fs-xl"></i>
+                                            </span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="js_demo_accordion-3a" class="collapse" data-parent="#js_demo_accordion-3">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <span class="text-primary">Firma Adı: </span> <span class="text-danger">{FirmaAdi}</span><br />
+                                                <span class="text-primary">Gelin Ad Soyad: </span> <span class="text-danger">{GelinAdSoyad}</span><br />
+                                                <span class="text-primary">Damat Ad Soyad:</span> <span class="text-danger">{DamatAdSoyad}</span><br />
+                                                <span class="text-primary">Yetkili Ad Soyad:</span> <span class="text-danger">{YetkiliAdSoyad}</span><br />
+                                                <span class="text-primary">Ad Soyad(Cari/Müşteri):</span> <span class="text-danger">{AdSoyad}</span><br />
+                                                <span class="text-primary">Müşteri Kodu:</span> <span class="text-danger">{MusteriKodu}</span><br />
+                                                <span class="text-primary">Personel Ad-Soyad:</span> <span class="text-danger">{Personel}</span><br />
+                                                <span class="text-primary">Randevu Tarihi:</span> <span class="text-danger">{RandevuTarihi}</span><br />
+                                                <span class="text-primary">Süreç Adı:</span> <span class="text-danger">{Surec}</span><br />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <span class="text-primary">Ödeme Tarihi:</span> <span class="text-danger">{OdemeTarihi}</span><br />
+                                                <span class="text-primary">Tarih (İşlem Tarihi):</span> <span class="text-danger">{Tarih}</span><br />
+                                                <span class="text-primary">Tutar:</span> <span class="text-danger">{Tutar}</span><br />
+                                                <span class="text-primary">Sözleşme No:</span> <span class="text-danger">{SozlesmeNo}</span><br />
+                                                <span class="text-primary">Makbuz No:</span> <span class="text-danger">{MakbuzNo}</span><br />
+                                                <span class="text-primary">Opsiyon Tarihi:</span> <span class="text-danger">{OpsiyonTarihi}</span><br />
+                                                <span class="text-primary">Rezervasyon Türü:</span> <span class="text-danger">{RezervasyonTuru}</span><br />
+                                                <span class="text-primary">Çekim Randevusu Bilgileri:</span> <span class="text-danger">{CekimRandevuBilgileri}</span><br />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Kaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="KayitGuncelleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Email Metni Düzenle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-danger" role="alert">
+                                    Lütfen metin içerisinde (!),(^),(+),(%),(#),($),(&),(/\),({}),([]),() karakterlerini kullanmayınız. Bu karakterler parametre ayarları için kullanılmaktadır.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-4" id="MetinAdiDuzenlekHata">
+                                <label class="form-label" for="MetinAdiDuzenle">Metin Adı</label>
+                                <input type="text" id="MetinAdiDuzenle" class="form-control form-control-sm" name="MetinAdiDuzenle" maxlength="100">
+                            </div>
+                            <div class="form-group col-sm-4" id="EmailKonuDuzenleHata">
+                                <label class="form-label" for="EmailKonuDuzenle">Email Konusu</label>
+                                <input type="text" id="EmailKonuDuzenle" class="form-control form-control-sm" name="EmailKonuDuzenle" maxlength="200">
+                            </div>
+                            <div class="form-group col-sm-4" id="EmailBaslikDuzenleHata">
+                                <label class="form-label" for="EmailBaslikDuzenle">Email Başlığı</label>
+                                <input type="text" id="EmailBaslikDuzenle" class="form-control form-control-sm" name="EmailBaslikDuzenle" maxlength="100">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-12" id="EmailMetniDuzenleHata">
+                                <label class="form-label" for="EmailMetniDuzenle">Mail Metni</label>
+                                @*<textarea class="form-control form-control-sm" id="SMSMetni" rows="4" name="SMSMetni" style="overflow:auto;resize:none"></textarea>*@
+                                <textarea name="EmailMetniDuzenle" id="EmailMetniDuzenle" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-4">
+                                <label class="form-label">İçerik Resmi (Tavsiye edilen boyut: 540 x 175)</label>
+                                <div id="image-preview-kullanici-duzenle" class="col-sm-12">
+                                    @* Resim tablosu Firma Tablosuna bağlandığında background-image olarak resim yolu verilecek *@
+                                    <label for="IcerikResimDuzenle" id="image-label-kullanici-duzenle">Resim Seç</label>
+                                    <input type="file" name="IcerikResimDuzenle" id="IcerikResimDuzenle" accept=".jpg, .jpeg, .png, .bmp, .tiff, .tif,|images/*" />
+                                </div>
+                            </div>
+                            <div class="col-sm-4" id="IcerikResimGoseter">
+                                <label class="form-label">İçerik Resmi</label>
+                            </div>
+                            <div class="row col-sm-4">
+                                <div class="row col-sm-12 mb-2">
+                                    <div class="custom-control custom-radio">
+                                        <input type="radio" class="custom-control-input" id="Tema-Yok-Duzenle" data-id="Tema-Yok-Duzenle" name="MailTemaDuzenle" checked="">
+                                        <label class="custom-control-label" for="Tema-Yok-Duzenle">Tema Yok</label>
+                                    </div>
+                                </div>
+                                <div class="row col-sm-12 mb-2">
+                                    <div class="row col-sm-6">
+                                        <div class="custom-control custom-radio mb-2">
+                                            <input type="radio" class="custom-control-input" id="Tema-1-Duzenle" data-id="Tema-1-Duzenle" name="MailTemaDuzenle">
+                                            <label class="custom-control-label" for="Tema-1-Duzenle">Tema 1</label>
+                                        </div>
+                                        <a href="/Areas/Otomasyon/Dosyalar/EmailSablonlari/Tema-1.PNG" data-toggle="lightbox">
+                                            <img src="/Areas/Otomasyon/Dosyalar/EmailSablonlari/Tema-1.PNG" height="150" />
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="DurumDuzenle">Durum</label>
+                                <div class="frame-wrap">
+                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                        <input type="checkbox" class="custom-control-input" id="DurumDuzenle" checked>
+                                        <label class="custom-control-label" for="DurumDuzenle">Aktif</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion accordion-outline" id="js_demo_accordion-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <a href="javascript:void(0);" class="card-title" data-toggle="collapse" data-target="#js_demo_accordion-3a" aria-expanded="false">
+                                        <i class="fal fa-random width-2 fs-xl"></i>
+                                        Parametreler
+                                        <span class="ml-auto">
+                                            <span class="collapsed-reveal">
+                                                <i class="fal fa-minus fs-xl"></i>
+                                            </span>
+                                            <span class="collapsed-hidden">
+                                                <i class="fal fa-plus fs-xl"></i>
+                                            </span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="js_demo_accordion-3a" class="collapse" data-parent="#js_demo_accordion-3">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <span class="text-primary">Firma Adı: </span> <span class="text-danger">{FirmaAdi}</span><br />
+                                                <span class="text-primary">Gelin Ad Soyad: </span> <span class="text-danger">{GelinAdSoyad}</span><br />
+                                                <span class="text-primary">Damat Ad Soyad:</span> <span class="text-danger">{DamatAdSoyad}</span><br />
+                                                <span class="text-primary">Yetkili Ad Soyad:</span> <span class="text-danger">{YetkiliAdSoyad}</span><br />
+                                                <span class="text-primary">Ad Soyad(Cari/Müşteri):</span> <span class="text-danger">{AdSoyad}</span><br />
+                                                <span class="text-primary">Müşteri Kodu:</span> <span class="text-danger">{MusteriKodu}</span><br />
+                                                <span class="text-primary">Personel Ad-Soyad:</span> <span class="text-danger">{Personel}</span><br />
+                                                <span class="text-primary">Randevu Tarihi:</span> <span class="text-danger">{RandevuTarihi}</span><br />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <span class="text-primary">Ödeme Tarihi:</span> <span class="text-danger">{OdemeTarihi}</span><br />
+                                                <span class="text-primary">Tarih (İşlem Tarihi):</span> <span class="text-danger">{Tarih}</span><br />
+                                                <span class="text-primary">Tutar:</span> <span class="text-danger">{Tutar}</span><br />
+                                                <span class="text-primary">Sözleşme No:</span> <span class="text-danger">{SozlesmeNo}</span><br />
+                                                <span class="text-primary">Makbuz No:</span> <span class="text-danger">{MakbuzNo}</span><br />
+                                                <span class="text-primary">Opsiyon Tarihi:</span> <span class="text-danger">{OpsiyonTarihi}</span><br />
+                                                <span class="text-primary">Çekim Randevusu Bilgileri:</span> <span class="text-danger">{CekimRandevuBilgileri}</span><br />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Guncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                @if (KullaniciYetki.KayitEkle)
+                {
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle"> Yeni Email Metni Ekle </button>
+                }
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="tb-emailmetinler" class="table table-sm table-bordered table-hover table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th class="w-25">Metin Adı</th>
+                                <th class="w-25">Başlık</th>
+                                <th>Konu</th>
+                                <th class="w-15">İçerik Resmi</th>
+                                <th class="w-10">Durum</th>
+                                <th class="w-5">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="emailmetin-satir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script src="~/Areas/Otomasyon/Content/ckeditor/ckeditor.js"></script>
+    <script src="~/Areas/Otomasyon/Content/js/jquery.uploadPreview.min.js"></script>
+    <script src="~/Areas/Otomasyon/Content/light-box/ekko-lightbox.js"></script>
+    <script src="~/Areas/Otomasyon/Content/alertifyjs/alertify.min.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            var editor = CKEDITOR.replace('EmailMetni', {
+                height: '200px',
+                resize: 'none',
+
+                //filebrowserBrowseUrl: '../Content/ckfinder/ckfinder.html',
+                //filebrowserImageBrowseUrl: '../Content/ckfinder/ckfinder.html?type=Images',
+                //filebrowserUploadUrl: '../Content/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files',
+                //filebrowserImageUploadUrl: '../Content/ckfinder/3.4.5/core/connector/php/connector.php?command=QuickUpload&type=Images'
+                toolbarGroups: [
+	                { name: 'document', groups: ['document'] },
+	                { name: 'clipboard', groups: ['clipboard', 'undo'] },
+	                { name: 'editing', groups: ['find', 'selection', 'spellchecker'] },
+	                //{ name: 'forms' },
+	                '/',
+	                { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
+	               	{ name: 'paragraph', groups: ['list', 'indent', 'align'] },
+	                //{ name: 'links' },
+	                //{ name: 'insert' },
+	                '/',
+	                { name: 'styles' },
+	                { name: 'colors' },
+	                { name: 'tools' },
+	                { name: 'others' }
+                ]
+
+            });
+            editor.config.removePlugins = 'resize';
+            var editorduzenle = CKEDITOR.replace('EmailMetniDuzenle', {
+                height: '200px',
+                resize: 'none',
+
+                //filebrowserBrowseUrl: '../Content/ckfinder/ckfinder.html',
+                //filebrowserImageBrowseUrl: '../Content/ckfinder/ckfinder.html?type=Images',
+                //filebrowserUploadUrl: '../Content/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files',
+                //filebrowserImageUploadUrl: '../Content/ckfinder/3.4.5/core/connector/php/connector.php?command=QuickUpload&type=Images'
+                toolbarGroups: [
+	                { name: 'document', groups: ['document'] },
+	                { name: 'clipboard', groups: ['clipboard', 'undo'] },
+	                { name: 'editing', groups: ['find', 'selection', 'spellchecker'] },
+	                //{ name: 'forms' },
+	                '/',
+	                { name: 'basicstyles', groups: ['basicstyles', 'cleanup'] },
+	               	{ name: 'paragraph', groups: ['list', 'indent', 'align'] },
+	                //{ name: 'links' },
+	                //{ name: 'insert' },
+	                '/',
+	                { name: 'styles' },
+	                { name: 'colors' },
+	                { name: 'tools' },
+	                { name: 'others' }
+                ]
+
+            });
+            editorduzenle.config.removePlugins = 'resize';
+            $(document).on('click', '[data-toggle="lightbox"]', function (event) {
+                event.preventDefault();
+                $(this).ekkoLightbox();
+            });
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            $.uploadPreview({ // Resim Yükleme ile ilgili kodlar
+                input_field: "#IcerikResim",   // Default: .image-upload
+                preview_box: "#image-preview-kullanici",  // Default: .image-preview
+                label_field: "#image-label-kullanici",    // Default: .image-label
+                label_default: "Icerik Resimi Seç",   // Default: Choose File
+                label_selected: "Resim Değiştir",  // Default: Change File
+                no_label: false                 // Default: false
+            }); // Resim Yükleme ile ilgili kodlar
+            $.uploadPreview({ // Resim Yükleme ile ilgili kodlar
+                input_field: "#IcerikResimDuzenle",   // Default: .image-upload
+                preview_box: "#image-preview-kullanici-duzenle",  // Default: .image-preview
+                label_field: "#image-label-kullanici-duzenle",    // Default: .image-label
+                label_default: "Icerik Resimi Seç",   // Default: Choose File
+                label_selected: "Resim Değiştir",  // Default: Change File
+                no_label: false                 // Default: false
+            }); // Resim Yükleme ile ilgili kodlar
+
+            var temaadres = "", durum = "Aktif", durumduzenle = "Aktif";
+            var icerikresim = document.getElementById('IcerikResim');
+            var icerikresimduzenle = document.getElementById('IcerikResimDuzenle');
+            $("#Durum").on('click', function () {
+                if ($(this).is(':checked')) {
+                    durum = "Aktif";
+                }
+                else {
+                    durum = "Pasif";
+                }
+            });
+            $("#DurumDuzenle").on('click', function () {
+                if ($(this).is(':checked')) {
+                    durum = "Aktif";
+                }
+                else {
+                    durum = "Pasif";
+                }
+            });
+            $("input[type=radio]").on("change", function () {
+                //var fotoid = $(this).data("fotoid");
+                if ($(this).data("id") == "Tema-Yok") {
+                    temaadres = "";
+                }
+                else if ($(this).data("id") == "Tema-1") {
+                    temaadres = "/Areas/Otomasyon/Dosyalar/EmailSablonlari/Tema-1.html";
+                }
+                else if ($(this).data("id") == "Tema-2") {
+                    temaadres = "/Areas/Otomasyon/Dosyalar/EmailSablonlari/Tema-2.html";
+                }
+                    // güncelleme penceresinden
+                else if ($(this).data("id") == "Tema-Yok-Duzenle") {
+                    temaadres = "";
+                }
+                else if ($(this).data("id") == "Tema-1-Duzenle") {
+                    temaadres = "/Areas/Otomasyon/Dosyalar/EmailSablonlari/Tema-1.html";
+                }
+                else if ($(this).data("id") == "Tema-2-Duzenle") {
+                    temaadres = "/Areas/Otomasyon/Dosyalar/EmailSablonlari/Tema-2.html";
+                }
+            });
+            $("#YeniEkle").click(function () {
+                $("#MetinAdi").val("");
+                $("#EmailKonu").val("");
+                $("#EmailBaslik").val("");
+                $("#MailMetni").val("");
+                $("#IcerikResim").val("");
+                $("#Tema-Yok").attr("checked", "checked");
+            });
+            $("#Kaydet").click(function () {
+                var metinicerik = CKEDITOR.instances['EmailMetni'].getData();
+                if (($("#MetinAdi").val() == "")) {
+                    $("#MetinAdi").focus();
+                    $("#MetinAdiHata").append("<div class='hata' style='color:red'>Email Metni için bir ad giriniz.</div>");
+                }
+                if (($("#EmailKonu").val() == "")) {
+                    $("#EmailKonu").focus();
+                    $("#EmailKonuHata").append("<div class='hata' style='color:red'>Email için bir konu giriniz.</div>");
+                }
+                else {
+                    var MailMetinData = new FormData();
+                    MailMetinData.append("MetinAdi", $("#MetinAdi").val());
+                    MailMetinData.append("EmailKonu", $("#EmailKonu").val());
+                    MailMetinData.append("EmailBaslik", $("#EmailBaslik").val());
+                    MailMetinData.append("EmailMetni", metinicerik);
+                    MailMetinData.append("Durum", durum);
+                    MailMetinData.append("EmailTema", temaadres);
+                    // Resim verisini formdata ya eklemek için
+                    for (i = 0; i < icerikresim.files.length; i++) {
+                        //Appending each file to FormData object
+                        MailMetinData.append(icerikresim.files[i].name, icerikresim.files[i]);
+                    }
+                    // Resim verisini formdata ya eklemek için
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: MailMetinData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/MailMetinAdiVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: MailMetinData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Tanimlar/EmailMetinEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false && data.Mesaj != "") {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                            $('#YeniKayitEkleModal').modal('hide');
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                            $('#YeniKayitEkleModal').modal('hide');
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else {
+                                Swal.fire(
+                               {
+                                   title: "Varolan Kayıt",
+                                   html: "<p><h2 style='font-size:16px; color:red'><strong>Metin Adı : </strong>" + $("#MetinAdi").val() + "</h2></p><h2> Böyle bir Mail Metni zaten var! Bu kaydı güncellemek istermisiniz?</h2>",
+                                   type: "warning",
+                                   showCancelButton: true,
+                                   confirmButtonText: "Güncelle"
+                               }).then(function (result) {
+                                   if (result.value) {
+                                       $.ajax({
+                                           type: "POST",
+                                           datatype: 'json',
+                                           data: MailMetinData,
+                                           contentType: false,
+                                           processData: false,
+                                           url: "/Otomasyon/Tanimlar/EmailMetinGuncelle/" + data, // data: controller dan dönen varolan kaydın ID si
+                                           success: function (data) {
+                                               if (data.Sonuc == false) {
+                                                   alertify.set('notifier', 'delay', 5);
+                                                   alertify.set('notifier', 'position', 'top-center');
+                                                   alertify.error(data.Mesaj);
+                                               }
+                                               else if (data.Sonuc == true) {
+                                                   alertify.set('notifier', 'delay', 3);
+                                                   alertify.set('notifier', 'position', 'top-center');
+                                                   alertify.success(data.Mesaj);
+                                                   dt.api().ajax.reload();
+                                               }
+                                           },
+                                           error: function (err) {
+                                               alert("HATA");
+                                           }
+                                       });
+                                   }
+                               });
+                            }
+
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#tb-emailmetinler").on('click', '.durumdegistir', function () {
+                var id = $(this).data("mailmetinid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/EmailMetinDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#tb-emailmetinler").on('click', '.sil', function () {
+                var id = $(this).data("mailmetinid");
+                var MetinAdi = $(this).data("metinadi");
+                Swal.fire(
+                {
+                    title: "Kayıt Silinecek",
+                    html: "<p><h2 style='font-size:16px; color:red'><strong>Başlık : </strong>" + MetinAdi + " </br></h2></p><h2> Email Metni silinsin mi?</h2>",
+                    type: "error",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Silinsin!",
+                    cancelButtonText: "İptal"
+                }).then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Tanimlar/EmailMetinSil/" + id,
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            });
+            $("#tb-emailmetinler").on('click', '.duzenle', function () {
+                $("#MetinAdiDuzenle").val($(this).data("metinadi"));
+                $("#EmailKonuDuzenle").val($(this).data("mailkonu"));
+                $("#EmailBaslikDuzenle").val($(this).data("mailbaslik"));
+                //console.log($(this).data("mailmetin"));
+                //$("#EmailMetniDuzenle").val($(this).data("mailmetin"));
+                $("#IcerikResimGoseter").append("<img src='" + $(this).data("icerikresim") + "' width='200px'/>");
+                var metinicerik = CKEDITOR.instances['EmailMetniDuzenle'].setData($(this).data("mailmetin"));
+                $("#Guncelle").val($(this).data("mailmetinid"));
+                if ($(this).data("durum")) {
+                    $("#DurumDuzenle").attr("checked", "checked");
+                    durumduzenle = "Aktif";
+                }
+                else {
+                    $("#DurumDuzenle").removeAttr("checked");
+                    durumduzenle = "Pasif";
+                }
+
+                if ($(this).data("tema") == "") {
+                    //$("#Tema-Yok-Duzenle").attr("checked", "checked");
+                    $("#Tema-Yok-Duzenle").prop("checked", true);
+                    $("#Tema-1-Duzenle").prop("checked", false);
+                    temaadres = ""
+                }
+                else if ($(this).data("tema") == "~/Areas/Otomasyon/Dosyalar/EmailSablonlari/Tema-1.png") {
+                    //$("#Tema-1-Duzenle").attr("checked", "checked");
+                    $("#Tema-Yok-Duzenle").prop("checked", false);
+                    $("#Tema-1-Duzenle").prop("checked", true);
+                    temaadres = "~/Areas/Otomasyon/Dosyalar/EmailSablonlari/Tema-1.PNG"
+                }
+            }); // Düzenle butonuna basılınca Düzenleme Penceresi açılarak bilgiler dolduruluyor.
+            $("#Guncelle").click(function () {
+                var metinicerik = CKEDITOR.instances['EmailMetniDuzenle'].getData();
+                if (($("#MetinAdiDuzenle").val() == "")) {
+                    $("#MetinAdiDuzenle").focus();
+                    $("#MetinAdiDuzenleHata").append("<div class='hata' style='color:red'>Email Metni için bir ad giriniz.</div>");
+                }
+                if (($("#EmailKonuDuzenle").val() == "")) {
+                    $("#EmailKonuDuzenle").focus();
+                    $("#EmailKonuDuzenleHata").append("<div class='hata' style='color:red'>Email için bir konu giriniz.</div>");
+                }
+                else {
+                    var id = $(this).val();
+                    var MailMetinData = new FormData();
+                    MailMetinData.append("MetinAdi", $("#MetinAdiDuzenle").val());
+                    MailMetinData.append("EmailKonu", $("#EmailKonuDuzenle").val());
+                    MailMetinData.append("EmailBaslik", $("#EmailBaslikDuzenle").val());
+                    MailMetinData.append("EmailMetni", metinicerik);
+                    MailMetinData.append("Durum", durum);
+                    MailMetinData.append("EmailTema", temaadres);
+                    // Resim verisini formdata ya eklemek için
+                    for (i = 0; i < icerikresimduzenle.files.length; i++) {
+                        //Appending each file to FormData object
+                        MailMetinData.append(icerikresimduzenle.files[i].name, icerikresimduzenle.files[i]);
+                    }
+                    // Resim verisini formdata ya eklemek için
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: MailMetinData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/EmailMetinGuncelle/" + id,
+                        success: function (data) {
+                            $('#KayitGuncelleModal').modal('hide');
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                dt.api().ajax.reload();
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            var dt;
+            var islem;
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+
+            dt = $('#tb-emailmetinler').dataTable(
+              {
+                  responsive: true,
+                  "destroy": true,
+                  "searching": false, // arama kaldır
+                  "lengthChange": false, // sayfa başına göster kaldır
+                  "columns": [
+                              { "data": "MetinAdi", "autowidth": true, "className": "align-middle" },
+                              { "data": "EmailBaslik", "autowidth": true, "className": "align-middle" },
+                              { "data": "EmailKonu", "autowidth": true, "className": "align-middle" },
+                              {
+                                  "data": null,
+                                  "className": "align-middle text-center ",
+                                  "render": function (data, type, row) {
+                                      islem = "";
+                                      islem = islem + "<a href='" + row.IcerikResim + "' data-toggle='lightbox'>" +
+                                            "<img src='" + row.IcerikResim + "' width='100' />" +
+                                        "</a>"
+                                      return islem
+                                  }
+                              },
+                              {
+                                  "data": null,
+                                  "className": "align-middle text-center ",
+                                  "render": function (data, type, row) {
+                                      islem = "";
+                                      if (DuzenleYetki == "True") {
+                                          if (row.Aktif == true) {
+                                              //islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                              islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-mailmetinid='" + row.Id + "'>Aktif</button>"
+                                          }
+                                          else {
+                                              //islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                              islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-mailmetinid='" + row.Id + "'>Pasif</button>"
+                                          }
+                                      }
+                                      else
+                                      {
+                                          if (row.Aktif == true) {
+                                              islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                              //islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-mailmetinid='" + row.Id + "'>Aktif</button>"
+                                          }
+                                          else {
+                                              islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                              //islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-mailmetinid='" + row.Id + "'>Pasif</button>"
+                                          }
+                                      }
+                                      return islem
+                                  }
+                              },
+                              {
+                                  "data": null,
+                                  "className": "align-middle text-center ",
+                                  "render": function (data, type, row) {
+                                      islem = "";
+                                      if (DuzenleYetki == "True") {
+                                          islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon mr-1 duzenle' title='Email Metnini Düzenle' data-mailmetinid='" + row.Id + "' data-metinadi='" + row.MetinAdi + "'" +
+                                                                "data-mailbaslik='" + row.EmailBaslik + "' data-mailkonu='" + row.EmailKonu + "' data-mailmetin='" + row.Metin + "' data-icerikresim='" + row.IcerikResim + "' data-tema='" + row.Tema + "'" +
+                                                                "data-durum='" + row.Aktif + "' data-toggle='modal' data-target='#KayitGuncelleModal'>" +
+                                                                "<i class='fal fa-edit'></i>" +
+                                                            "</a>"
+                                      }
+                                      if (SilYetki == "True") {
+                                          islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon mr-1 sil' title='Email Metnini Sil' data-mailmetinid='" + row.Id + "' data-metinadi='" + row.MetinAdi + "'>" +
+                                                                "<i class='fal fa-trash-alt'></i>" +
+                                                            "</a>"
+                                      }
+                                      return islem
+                                  }
+                              }
+                  ],
+                  "processing": true,
+                  "ajax": {
+                      "url": "/Otomasyon/Tanimlar/EmailMetinleriListesi/",
+                      "contentType": 'application/json; charset=utf-8',
+                      'type': 'POST',
+                      'data': function (data) { return data = JSON.stringify(data); }
+                  },
+                  "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                  "oLanguage": {
+                      "sSearchPlaceholder": "Tabloda Ara",
+                      "sZeroRecords": "Kayıt yok.",
+                      "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                      "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                      "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                      "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                      "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                      "oPaginate": {
+                          "sPrevious": "Önceki",
+                          "sNext": "Sonraki",
+                          "sFirst": "İlk",
+                          "sLast": "Son"
+                      }
+                  }
+              });
+        });
+    </script>
+}
+
+

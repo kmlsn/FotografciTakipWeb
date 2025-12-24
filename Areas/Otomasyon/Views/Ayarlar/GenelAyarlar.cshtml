@@ -1,0 +1,372 @@
+﻿
+@{
+    ViewBag.Title = "Genel Ayarlar";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+
+@model AyarlarGenel
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h3>Genel Ayarlar</h3>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <form action="/Otomasyon/Ayarlar/GenelAyarlar" method="post" enctype="multipart/form-data">
+                        @if (Model != null)
+                        {
+                        <div class="accordion accordion-outline" id="js_demo_accordion-3">
+                            @*<div class="card">
+                                <div class="card-header">
+                                    <a href="javascript:void(0);" class="card-title" data-toggle="collapse" data-target="#js_demo_accordion-3a" aria-expanded="true">
+                                        <i class="fal fa-calendar-check width-2 fs-xl"></i>
+                                        Dashboard Ayarları
+                                        <span class="ml-auto">
+                                            <span class="collapsed-reveal">
+                                                <i class="fal fa-minus fs-xl"></i>
+                                            </span>
+                                            <span class="collapsed-hidden">
+                                                <i class="fal fa-plus fs-xl"></i>
+                                            </span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="js_demo_accordion-3a" class="collapse show" data-parent="#js_demo_accordion-3">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                                @if (Model.CalismaGunuCumartesi == true)
+                                                {<input type="checkbox" class="custom-control-input" name="CalismaGunuCumartesi" id="CalismaGunuCumartesi" checked> }
+                                                else
+                                                { <input type="checkbox" class="custom-control-input" name="CalismaGunuCumartesi" id="CalismaGunuCumartesi">}
+                                                <label class="custom-control-label" for="CalismaGunuCumartesi">Cumartesi Günü Çalışıyoruz</label>
+                                            </div>
+                                            <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                                @if (Model.CalismaGunuPazar == true)
+                                                {<input type="checkbox" class="custom-control-input" name="CalismaGunuPazar" id="CalismaGunuPazar" checked> }
+                                                else
+                                                { <input type="checkbox" class="custom-control-input" name="CalismaGunuPazar" id="CalismaGunuPazar">}
+                                                <label class="custom-control-label" for="CalismaGunuPazar">Pazar Günü Çalışıyoruz</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>*@
+                            <div class="card">
+                                <div class="card-header">
+                                    <a href="javascript:void(0);" class="card-title" data-toggle="collapse" data-target="#js_demo_accordion-3b" aria-expanded="true">
+                                        <i class="fal fa-calendar-check width-2 fs-xl"></i>
+                                        Çalışma Günü Ayarları
+                                        <span class="ml-auto">
+                                            <span class="collapsed-reveal">
+                                                <i class="fal fa-minus fs-xl"></i>
+                                            </span>
+                                            <span class="collapsed-hidden">
+                                                <i class="fal fa-plus fs-xl"></i>
+                                            </span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="js_demo_accordion-3b" class="collapse show" data-parent="#js_demo_accordion-3">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                                @if (Model.CalismaGunuCumartesi == true)
+                                                {<input type="checkbox" class="custom-control-input" name="CalismaGunuCumartesi" id="CalismaGunuCumartesi" checked> }
+                                                else
+                                                { <input type="checkbox" class="custom-control-input" name="CalismaGunuCumartesi" id="CalismaGunuCumartesi">}
+                                                <label class="custom-control-label" for="CalismaGunuCumartesi">Cumartesi Günü Çalışıyoruz</label>
+                                            </div>
+                                            <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                                @if (Model.CalismaGunuPazar == true)
+                                                {<input type="checkbox" class="custom-control-input" name="CalismaGunuPazar" id="CalismaGunuPazar" checked> }
+                                                else
+                                                { <input type="checkbox" class="custom-control-input" name="CalismaGunuPazar" id="CalismaGunuPazar">}
+                                                <label class="custom-control-label" for="CalismaGunuPazar">Pazar Günü Çalışıyoruz</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#js_demo_accordion-3c" aria-expanded="false">
+                                        <i class="fal fa-phone-square width-2 fs-xl"></i>
+                                        Rehber Kayıt Ayarları
+                                        <span class="ml-auto">
+                                            <span class="collapsed-reveal">
+                                                <i class="fal fa-minus fs-xl"></i>
+                                            </span>
+                                            <span class="collapsed-hidden">
+                                                <i class="fal fa-plus fs-xl"></i>
+                                            </span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="js_demo_accordion-3c" class="collapse" data-parent="#js_demo_accordion-3">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                                @if (Model.CariRehberKayit == true)
+                                                {
+                                                    <input type="checkbox" class="custom-control-input" id="CariRehberKayit" name="CariRehberKayit" checked>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="custom-control-input" id="CariRehberKayit" name="CariRehberKayit">
+                                                }
+                                                <label class="custom-control-label" for="CariRehberKayit">Eklenen <span class="color-danger-500 fw-700">Cari</span> Bilgilerini Rehbere Ekle</label>
+                                            </div>
+                                            <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                                @if (Model.MusteriRehberKayit == true)
+                                                {
+                                                    <input type="checkbox" class="custom-control-input" id="MusteriRehberKayit" name="MusteriRehberKayit" checked>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="custom-control-input" id="MusteriRehberKayit" name="MusteriRehberKayit">
+                                                }
+                                                <label class="custom-control-label" for="MusteriRehberKayit">Eklenen <span class="color-danger-500 fw-700">Müşteri</span> Bilgilerini Rehbere Ekle</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                                @if (Model.PersonelRehberKayit == true)
+                                                {
+                                                    <input type="checkbox" class="custom-control-input" id="PersonelRehberKayit" name="PersonelRehberKayit" checked>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="custom-control-input" id="PersonelRehberKayit" name="PersonelRehberKayit">
+                                                }
+                                                <label class="custom-control-label" for="PersonelRehberKayit">Eklenen <span class="color-danger-500 fw-700">Personel</span> Bilgilerini Rehbere Ekle</label>
+                                            </div>
+                                            <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                                @*<input type="checkbox" class="custom-control-input" id="MusteriRehberKayit" name="MusteriRehberKayit" checked>
+                            <label class="custom-control-label" for="MusteriRehberKayit">Eklenen <span class="color-danger-500 fw-700">Müşteriyi</span> Rehbere Ekle</label>*@
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                                @if (Model.GelinDamatRehberKayit == true)
+                                                {
+                                                    <input type="checkbox" class="custom-control-input" id="GelinDamatRehberKayit" name="GelinDamatRehberKayit" checked>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="custom-control-input" id="GelinDamatRehberKayit" name="GelinDamatRehberKayit">
+                                                }
+                                                <label class="custom-control-label" for="GelinDamatRehberKayit">Eklenen <span class="color-danger-500 fw-700">Gelin-Damat</span> Bilgilerini Rehbere Ekle</label>
+                                            </div>
+                                            <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                                @if (Model.AnneBabaRehberKayit == true)
+                                                {
+                                                    <input type="checkbox" class="custom-control-input" id="AnneBabaRehberKayit" name="AnneBabaRehberKayit" checked>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="custom-control-input" id="AnneBabaRehberKayit" name="AnneBabaRehberKayit">
+                                                }
+                                                <label class="custom-control-label" for="AnneBabaRehberKayit">Eklenen <span class="color-danger-500 fw-700">Anne-Baba</span> Bilgilerini Rehbere Ekle</label>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                                @if (Model.RezervasyonYetkiliRehberKayit == true)
+                                                {
+                                                    <input type="checkbox" class="custom-control-input" id="RezervasyonYetkiliRehberKayit" name="RezervasyonYetkiliRehberKayit" checked>
+                                                }
+                                                else
+                                                {
+                                                    <input type="checkbox" class="custom-control-input" id="RezervasyonYetkiliRehberKayit" name="RezervasyonYetkiliRehberKayit">
+                                                }
+                                                <label class="custom-control-label" for="RezervasyonYetkiliRehberKayit">Eklenen <span class="color-danger-500 fw-700">Rezervasyon Yetkilisi</span> Bilgilerini Rehbere Ekle</label>
+                                            </div>
+                                            <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                                @*<input type="checkbox" class="custom-control-input" id="MusteriRehberKayit" name="MusteriRehberKayit" checked>
+                            <label class="custom-control-label" for="MusteriRehberKayit">Eklenen <span class="color-danger-500 fw-700">Müşteriyi</span> Rehbere Ekle</label>*@
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-2 mb-3 mr-4">
+                                    <label class="form-label" for="KonturUyariMiktari">Kalan kontör uyarı miktarı</label>
+                                    <input class="form-control form-control-sm" type="number" id="KonturUyariMiktari" name="KonturUyariMiktari" value="@Model.KonturUyariMiktari" min="0" max="100000">
+                                </div>
+
+                                <div class="form-group col-sm-5 mt-4 ml-4 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.KonturUyariVer == true)
+                                    {<input type="checkbox" class="custom-control-input" id="KonturUyariVer" name="KonturUyariVer" checked> }
+                                    else
+                                    {<input type="checkbox" class="custom-control-input" id="KonturUyariVer" name="KonturUyariVer">}
+
+                                    <label class="custom-control-label" for="KonturUyariVer">Kalan kontor uyarı mesajı göster</label>
+                                </div>
+                            </div>
+                        </div>
+                            <input type="text" id="Id" class="form-control" name="Id" maxlength="50" style="display:none" value="@Model.Id">
+                        }
+                        else
+                        {
+                            <div class="accordion accordion-outline" id="js_demo_accordion-3">
+                                @*<div class="card">
+                                    <div class="card-header">
+                                        <a href="javascript:void(0);" class="card-title" data-toggle="collapse" data-target="#js_demo_accordion-3a" aria-expanded="true">
+                                            <i class="fal fa-calendar-check width-2 fs-xl"></i>
+                                            Firma Yetkilisi Ayarları
+                                            <span class="ml-auto">
+                                                <span class="collapsed-reveal">
+                                                    <i class="fal fa-minus fs-xl"></i>
+                                                </span>
+                                                <span class="collapsed-hidden">
+                                                    <i class="fal fa-plus fs-xl"></i>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div id="js_demo_accordion-3a" class="collapse show" data-parent="#js_demo_accordion-3">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" id="CalismaGunuCumartesi" name="CalismaGunuCumartesi" checked>
+                                                    <label class="custom-control-label" for="CalismaGunuCumartesi">Cumartesi Günü Çalışıyoruz</label>
+                                                </div>
+                                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" id="CalismaGunuPazar" name="CalismaGunuPazar">
+                                                    <label class="custom-control-label" for="CalismaGunuPazar">Pazar Günü Çalışıyoruz</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>*@
+
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a href="javascript:void(0);" class="card-title" data-toggle="collapse" data-target="#js_demo_accordion-3b" aria-expanded="true">
+                                            <i class="fal fa-calendar-check width-2 fs-xl"></i>
+                                            Çalışma Günü Ayarları
+                                            <span class="ml-auto">
+                                                <span class="collapsed-reveal">
+                                                    <i class="fal fa-minus fs-xl"></i>
+                                                </span>
+                                                <span class="collapsed-hidden">
+                                                    <i class="fal fa-plus fs-xl"></i>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div id="js_demo_accordion-3b" class="collapse show" data-parent="#js_demo_accordion-3">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" id="CalismaGunuCumartesi" name="CalismaGunuCumartesi" checked>
+                                                    <label class="custom-control-label" for="CalismaGunuCumartesi">Cumartesi Günü Çalışıyoruz</label>
+                                                </div>
+                                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" id="CalismaGunuPazar" name="CalismaGunuPazar">
+                                                    <label class="custom-control-label" for="CalismaGunuPazar">Pazar Günü Çalışıyoruz</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#js_demo_accordion-3c" aria-expanded="false">
+                                            <i class="fal fa-phone-square width-2 fs-xl"></i>
+                                            Rehber Kayıt Ayarları
+                                            <span class="ml-auto">
+                                                <span class="collapsed-reveal">
+                                                    <i class="fal fa-minus fs-xl"></i>
+                                                </span>
+                                                <span class="collapsed-hidden">
+                                                    <i class="fal fa-plus fs-xl"></i>
+                                                </span>
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div id="js_demo_accordion-3c" class="collapse" data-parent="#js_demo_accordion-3">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" id="CariRehberKayit" name="CariRehberKayit" checked>
+                                                    <label class="custom-control-label" for="CariRehberKayit">Eklenen <span class="color-danger-500 fw-700">Cari</span> Bilgilerini Rehbere Ekle</label>
+                                                </div>
+                                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" id="MusteriRehberKayit" name="MusteriRehberKayit" checked>
+                                                    <label class="custom-control-label" for="MusteriRehberKayit">Eklenen <span class="color-danger-500 fw-700">Müşteri</span> Bilgilerini Rehbere Ekle</label>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" id="PersonelRehberKayit" name="PersonelRehberKayit" checked>
+                                                    <label class="custom-control-label" for="PersonelRehberKayit">Eklenen <span class="color-danger-500 fw-700">Personel</span> Bilgilerini Rehbere Ekle</label>
+                                                </div>
+                                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                                    @*<input type="checkbox" class="custom-control-input" id="MusteriRehberKayit" name="MusteriRehberKayit" checked>
+                            <label class="custom-control-label" for="MusteriRehberKayit">Eklenen <span class="color-danger-500 fw-700">Müşteriyi</span> Rehbere Ekle</label>*@
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" id="GelinDamatRehberKayit" name="GelinDamatRehberKayit" checked>
+                                                    <label class="custom-control-label" for="GelinDamatRehberKayit">Eklenen <span class="color-danger-500 fw-700">Gelin-Damat</span> Bilgilerini Rehbere Ekle</label>
+                                                </div>
+                                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" id="AnneBabaRehberKayit" name="AnneBabaRehberKayit" checked>
+                                                    <label class="custom-control-label" for="AnneBabaRehberKayit">Eklenen <span class="color-danger-500 fw-700">Anne-Baba</span> Bilgilerini Rehbere Ekle</label>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+                                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                                    <input type="checkbox" class="custom-control-input" id="RezervasyonYetkiliRehberKayit" name="RezervasyonYetkiliRehberKayit" checked>
+                                                    <label class="custom-control-label" for="RezervasyonYetkiliRehberKayit">Eklenen <span class="color-danger-500 fw-700">Rezervasyon Yetkilisi</span> Bilgilerini Rehbere Ekle</label>
+                                                </div>
+                                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                                    @*<input type="checkbox" class="custom-control-input" id="MusteriRehberKayit" name="MusteriRehberKayit" checked>
+                            <label class="custom-control-label" for="MusteriRehberKayit">Eklenen <span class="color-danger-500 fw-700">Müşteriyi</span> Rehbere Ekle</label>*@
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-md-2 mb-3 mr-4">
+                                        <label class="form-label" for="KonturUyariMiktari">Kalan kontör uyarı miktarı</label>
+                                        <input class="form-control form-control-sm" type="number" id="KonturUyariMiktari" name="KonturUyariMiktari" value="10" min="0" max="100000">
+                                    </div>
+                                    <div class="form-group col-sm-5 mt-4 ml-4 custom-control custom-checkbox custom-control-inline">
+                                        <input type="checkbox" class="custom-control-input" id="KonturUyariVer" name="KonturUyariVer" checked>
+                                        <label class="custom-control-label" for="KonturUyariVer">Kalan kontor uyarı mesajı göster</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="text" id="Id" class="form-control" name="Id" maxlength="50" style="display:none" value="0">
+                        }
+                        @if (ViewBag.KullaniciYetki)
+                        {
+                            <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                                <button type="submit" class="btn btn-primary ml-auto waves-effect waves-themed"><i class="fal fa-save mr-2"></i>Kaydet</button>
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            $(":input").inputmask();
+        });
+
+    </script>
+}
+

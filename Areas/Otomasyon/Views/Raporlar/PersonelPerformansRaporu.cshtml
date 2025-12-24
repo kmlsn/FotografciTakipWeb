@@ -1,0 +1,212 @@
+﻿
+@{
+    ViewBag.Title = "Personel Performans Raporu";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@section Head
+{
+    <style type="text/css">
+        .c3-region.fff {
+            fill: red;
+        }
+
+        .c3-region.foo {
+            fill: green;
+        }
+    </style>
+}
+@using FotografciTakipWeb.Models
+
+
+<div class="col-xl-12">
+    <div class="row">
+        <div class="col-xl-6">
+            <div id="panel-6" class="panel">
+                <div class="panel-hdr">
+                    <h2>
+                        Personel Performans Raporu
+                    </h2>
+                </div>
+                <div class="panel-container show">
+
+                    <div class="panel-content">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link fs-lg px-4 active" data-toggle="tab" href="#gelir_gider_rapor_grafik" role="tab" aria-selected="true">
+                                    <i class="fal fa-chart-area text-success"></i>
+                                    <span class="hidden-sm-down ml-1">Grafik</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link fs-lg px-4" data-toggle="tab" href="#gelir_gider_rapor_tablo" role="tab" aria-selected="false">
+                                    <i class="fal fa-table text-primary"></i>
+                                    <span class="hidden-sm-down ml-1">Tablo</span>
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content border border-top-0 p-3">
+                            <div class="tab-pane fade active show" id="gelir_gider_rapor_grafik" role="tabpanel">
+                                <div id="chart" style="width:100%; height:400px;"></div>
+                            </div>
+                            <div class="tab-pane fade" id="gelir_gider_rapor_tablo" role="tabpanel">
+                                <table id="dtpersonelperformans" class="table table-bordered table-hover table-striped w-100">
+                                    <thead class="bg-primary-600">
+                                        <tr>
+                                            <th>Personel</th>
+                                            <th>Randevu Sayısı</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablo-rapor">
+
+                       
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        function ParaFormat(fiyat) {
+            var para_sembol = "TL"
+            var format = new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: 'TRY',
+                minumumFractionDigits: 2
+            })
+            //return format.format(fiyat)
+            return format.format(fiyat).replace('TRY', para_sembol)
+        }
+        $(document).ready(function () {
+            $.ajax({
+                type: "POST",
+                url: "/Raporlar/PersonelPerformansRapor",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    data = {};
+                    personel = [];
+                    $.each(response, function (index_1, item_1) {
+                        $.each(item_1, function (index_2, item_2) {
+                            //console.log(index_2);
+                            personel.push(item_2.PersonelAdSoyad);
+                            data[item_2.PersonelAdSoyad] = item_2.RandevuSayisi;
+                        });
+                    });
+
+                    chart = c3.generate({
+                        data: {
+                            json: [data],
+                            keys: {
+                                value: personel,
+                            },
+                            type: 'bar'
+                            //type: 'pie'
+                        },
+                        //pie: {
+                        //    label: {
+                        //        format: function (value, ratio, id) {
+                        //            return value;
+                        //        }
+                        //    }
+                        //}
+                        bar: {
+                            width: {
+                                ratio: 0.7 // this makes bar width 50% of length between ticks
+                            },
+                            space: 0.25
+                            // or
+                            //width: 100 // this makes bar width 100px
+                        },
+                        grid: {
+                            y: {
+                                show: true, lines: [{ value: 0 }]
+                            }
+                        },
+                        axis: {
+                            x: {
+                                type: 'category',
+                                categories: ['Personel']
+                            },
+                            y: {
+                                label: {
+                                    text: 'Randevu Adet',
+                                    position: 'outer-center'
+                                }, tick: {
+                                    values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+
+            $('#dtpersonelperformans').dataTable(
+            {
+                responsive: true,
+                lengthChange: false,
+                "searching": false, // arama kaldır
+                "lengthChange": false, // sayfa başına göster kaldır
+                "bPaginate": false,  // Sayfalamayı Kaldırır
+                //"bLengthChange": false,
+                //"bFilter": true,
+                "bInfo": false, // .. kayıtan 1 ile 5 arası yazısını kaldırır.
+                //"bAutoWidth": false,
+                "bSort": false, // sıralamayı kapatır
+                dom:
+                    "<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'lB>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                buttons: [
+                    //{
+                    //    extend: 'pdfHtml5',
+                    //    text: 'PDF',
+                    //    titleAttr: 'Generate PDF',
+                    //    className: 'btn-outline-danger btn-sm mr-1'
+                    //},
+                    {
+                        extend: 'excelHtml5',
+                        text: 'Excel',
+                        titleAttr: 'Generate Excel',
+                        className: 'btn-outline-success btn-sm mr-1'
+                    }
+            ],
+            "columns": [
+                { "data": "PersonelAdSoyad", "autowidth": true, "className": "align-middle" },
+                { "data": "RandevuSayisi", "autowidth": true, "className": "align-middle" }
+
+            ],
+            "processing": true,
+            "ajax": {
+                "url": "/Raporlar/PersonelPerformansRaporTablo",
+                "contentType": 'application/json; charset=utf-8',
+                'data': function (data) { return data = JSON.stringify(data); }
+            },
+                "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                "oLanguage": {
+                    'sProcessing': 'Yükleniyor... Lütfen Bekleyin',
+                    "sSearchPlaceholder": "Tabloda Ara",
+                    "sZeroRecords": "Kayıt yok.",
+                    "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                    "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                    "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                    "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                    "oPaginate": {
+                        "sPrevious": "Önceki",
+                        "sNext": "Sonraki",
+                        "sFirst": "İlk",
+                        "sLast": "Son"
+                    }
+                }
+            });
+            
+        });
+    </script>
+}

@@ -1,0 +1,529 @@
+﻿
+@{
+    ViewBag.Title = "Tanımlar - Personel Görevleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Personel Görevi Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="gorevhata">
+                                <label class="form-label" for="gorev">Personel Görevi <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control" id="gorev" placeholder="Personel Görevi" name="Gorev" maxlength="50" required>
+                                <div class="invalid-feedback">
+                                    Personel Görevini giriniz!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="GorevKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="gorevduzenlehata">
+                                <label class="form-label" for="gorevduzenle">Personel Görevi <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control" id="gorevduzenle" placeholder="Personel Görevi" maxlength="50" name="Gorev" required>
+                                <div class="invalid-feedback">
+                                    Personel Görevini giriniz!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="GorevGuncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<!-- Varsayılan Geğerleri Ekle Modal Penceresi -->
+<div class="modal fade" id="VarsayilanEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Varsayılan Personel Görevlerini Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content" id="varsayilandegerler">
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-1" checked data-deger="Firma Sahibi" disabled>
+                                    <label class="custom-control-label" for="varsayilan-1">Firma Sahibi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-2" checked data-deger="Şube Yetkilisi" disabled>
+                                    <label class="custom-control-label" for="varsayilan-2">Şube Yetkilisi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-3" checked data-deger="Müdür">
+                                    <label class="custom-control-label" for="varsayilan-3">Müdür</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-4" checked data-deger="Müdür Yardımcısı">
+                                    <label class="custom-control-label" for="varsayilan-4">Müdür Yardımcısı</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-5" checked data-deger="Büro/Ofis Elemanı">
+                                    <label class="custom-control-label" for="varsayilan-5">Büro/Ofis Elemanı</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-6" checked data-deger="Fotoğrafçı">
+                                    <label class="custom-control-label" for="varsayilan-6">Fotoğrafçı</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-7" checked data-deger="Grafiker">
+                                    <label class="custom-control-label" for="varsayilan-7">Grafiker</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-8" checked data-deger="Kameraman">
+                                    <label class="custom-control-label" for="varsayilan-8">Kameraman</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-9" checked data-deger="Asistan">
+                                    <label class="custom-control-label" for="varsayilan-9">Asistan</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-10" checked data-deger="Temizlik Görevlisi">
+                                    <label class="custom-control-label" for="varsayilan-10">Temizlik Görevlisi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-11" checked data-deger="Diğer">
+                                    <label class="custom-control-label" for="varsayilan-11">Diğer</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="VarsayilanKaydet">Seçilenleri Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Varsayılan Geğerleri Ekle Modal Penceresi -->
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                @if (KullaniciYetki.KayitEkle)
+                {
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle">Yeni Personel Görevi Ekle</button>
+                    <div class="" id="personelgorevleridisable">
+                        <button class="btn btn-sm btn-default mr-auto waves-effect waves-themed" id="personelgorevlerivarsayilan" data-toggle="modal" data-target="#VarsayilanEkleModal">Varsayılan Değerleri Yükle</button>
+                    </div>
+                }
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtPersonelGorevleri" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Personel Görevi</th>
+                                <th class="w-10">Durum</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gorevlersatir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+@section Script
+{
+    <script>
+
+        $(document).ready(function () {
+            var varsayilandeger;
+            var Varsayilanlar = new Array();
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $("#gorev").val("");
+            })
+            $("#GorevKaydet").click(function () {
+                if ($("#gorev").val() == "") {
+                    $("#gorev").focus();
+                    $("#gorevhata").append("<div class='hata' style='color:red'>Personel Görevini Giriniz.</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var gorev = $("#gorev").val();
+                    var GorevData = new FormData();
+                    GorevData.append("Gorev", $("#gorev").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: GorevData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/PersonelGoreviVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: GorevData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Tanimlar/PersonelGoreviEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                            {
+                                Swal.fire(
+                                {
+                                    title: "Varolan Kayıt",
+                                    html: "<p><h2 style='font-size:16px; color:red'><strong>Personel Görevi : </strong>" + gorev + "</br><h2> Personel Görevi zaten var!</h2>",
+                                    type: "warning",
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtPersonelGorevleri").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#GorevGuncelle").val($(this).data("gid"))
+                $("#gorevduzenle").val($(this).data("gorev"));
+            });
+            $("#GorevGuncelle").click(function () {
+                if ($("#gorevduzenle").val() == "") {
+                    $("#gorevduzenle").focus();
+                    $("#gorevduzenlehata").append("<div class='hata' style='color:red'>Personel Görevini Giriniz.</div>");
+                }
+                else {
+                    $('#KayitDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    var GorevData = new FormData();
+                    GorevData.append("Gorev", $("#gorevduzenle").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: GorevData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/PersonelGoreviGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtPersonelGorevleri").on('click', '.Sil', function () {
+                var id = $(this).data("gid");
+                var gorev = $(this).data("gorev");
+                Swal.fire(
+                {
+                    title: "Kayıt Silinecek",
+                    html: "<p><h2 style='font-size:16px; color:red'><strong>Personel Görevi : </strong>" + gorev + "</br><h2> Personel Görevi Silinsin mi?</h2>",
+                    type: "error",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Silinsin!",
+                    cancelButtonText: "İptal"
+                }).then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Tanimlar/PersonelGoreviSil/" + id,
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            });
+            $("#dtPersonelGorevleri").on('click', '.durumdegistir', function () {
+                var id = $(this).data("gorevid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/PersonelGoreviDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#VarsayilanKaydet").click(function () {
+                Varsayilanlar = [];
+                $("input[type=checkbox]").each(function (i) {
+                    varsayilandeger = document.getElementById("varsayilan-" + i);
+                    if (varsayilandeger != null) {
+                        if (varsayilandeger.checked) {
+                            Varsayilanlar.push($("#varsayilan-" + i).data("deger"))
+                        }
+                    }
+                });
+                $('#VarsayilanEkleModal').modal('hide');
+                var PGData = new FormData();
+                PGData.append("VarsayilanDegerler", Varsayilanlar);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: PGData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        Swal.fire(
+                        {
+                            title: "Kayıtlar Ekleniyor!",
+                            html: "<strong>Lütfen Bekleyin.</strong>",
+                            onBeforeOpen: function onBeforeOpen() {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    url: "/Otomasyon/Tanimlar/GorevVarsayilanlariEkle/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            swal.close();
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            var dt;
+            var islem;
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            var rolid = $('#RolId').data("rolid");
+            dt = $('#dtPersonelGorevleri').dataTable(
+                           {
+                               ////responsive: true,
+                               "destroy": true,
+                               "columns": [
+                                           { "data": "Gorev", "autowidth": true },
+                                            {
+                                                "data": null,
+                                                "className": "align-middle text-center ",
+                                                "render": function (data, type, row) {
+                                                    islem = "";
+                                                    if (row.KilitBit == false) {
+                                                        if (DuzenleYetki == "True") {
+                                                            if (row.Aktif == true) {
+                                                                //islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                                islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-gorevid='" + row.Id + "'>Aktif</button>"
+                                                            }
+                                                            else {
+                                                                //islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                                islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-gorevid='" + row.Id + "'>Pasif</button>"
+                                                            }
+                                                        }
+                                                        else {
+                                                            if (row.Aktif == true) {
+                                                                islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                                //islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Aktif</button>"
+                                                            }
+                                                            else {
+                                                                islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                                //islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Pasif</button>"
+                                                            }
+                                                        }
+                                                    }
+                                                    return islem
+                                                }
+                                            },
+                                           {
+                                               "data": null,
+                                               "render": function (data, type, row) {
+                                                   islem = "";
+                                                   if (row.KilitBit == false) {
+                                                       if (DuzenleYetki == "True") {
+                                                           islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle' data-gid='" + row.Id + "' data-gorev='" + row.Gorev + "' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                                                                "<i class='fal fa-edit'></i>" +
+                                                                            "</a>"
+                                                       }
+                                                       if (SilYetki == "True") {
+                                                           islem = islem +"<a href='#' class='btn btn-xs btn-danger btn-icon Sil' data-gid='" + row.Id + "' data-gorev='" + row.Gorev + "' style='background-color:crimson;margin-left:5px'>" +
+                                                                                "<i class='fal fa-trash-alt'></i>" +
+                                                                          "</a>"
+                                                       }
+                                                   }
+                                                   return islem
+                                               }
+                                           }
+                               ],
+                               "processing": true,
+                               "ajax": {
+                                   "url": "/Otomasyon/Tanimlar/PersonelGorevleriListesi/",
+                                   "contentType": 'application/json; charset=utf-8',
+                                   'data': function (data) { return data = JSON.stringify(data); }
+                               },
+                               "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                               "oLanguage": {
+                                   "sSearchPlaceholder": "Tabloda Ara",
+                                   "sZeroRecords": "Kayıt yok.",
+                                   "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                                   "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                                   "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                                   "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                                   "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                                   "oPaginate": {
+                                       "sPrevious": "Önceki",
+                                       "sNext": "Sonraki",
+                                       "sFirst": "İlk",
+                                       "sLast": "Son"
+                                   }
+                               }
+                           });
+        });
+    </script>
+}

@@ -1,0 +1,39 @@
+﻿<li class="nav-title">SMS Sayısı</li>
+<li class="pl-2 pr-2">
+        @if (ViewBag.KalanKontur >= 1000)
+            {
+            <div class="progress progress progress-striped left">
+                <span class="progressbar-back-text">@ViewBag.KalanKontur / @ViewBag.ToplamKontur</span>
+                <div class="progress-bar progress-bar-info" data-transitiongoal="@ViewBag.KalanKontur" aria-valuemin="0" aria-valuemax="@ViewBag.ToplamKontur">
+                    <span class="progressbar-front-text" style="width: 236.133px;">@ViewBag.KalanKontur / @ViewBag.ToplamKontur</span>
+                </div>
+            </div>
+        }
+        else if (ViewBag.KalanKontur < 1000 && ViewBag.KalanKontur >= 500)
+        {
+            <div class="progress progress progress-striped left">
+                <span class="progressbar-back-text">@ViewBag.KalanKontur / @ViewBag.ToplamKontur</span>
+                <div class="progress-bar progress-bar-success" data-transitiongoal="@ViewBag.KalanKontur" aria-valuemin="0" aria-valuemax="@ViewBag.ToplamKontur">
+                    <span class="progressbar-front-text" style="width: 236.133px;">@ViewBag.KalanKontur / @ViewBag.ToplamKontur</span>
+                </div>
+            </div>
+        }
+        else if (ViewBag.KalanKontur < 500 && ViewBag.KalanKontur >= 250)
+        {
+            <div class="progress progress progress-striped left">
+                <span class="progressbar-back-text">@ViewBag.KalanKontur / @ViewBag.ToplamKontur</span>
+                <div class="progress-bar progress-bar-warning" data-transitiongoal="@ViewBag.KalanKontur" aria-valuemin="0" aria-valuemax="@ViewBag.ToplamKontur">
+                    <span class="progressbar-front-text" style="width: 236.133px;">@ViewBag.KalanKontur / @ViewBag.ToplamKontur</span>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="progress progress progress-striped left">
+                <span class="progressbar-back-text">@ViewBag.KalanKontur / @ViewBag.ToplamKontur</span>
+                <div class="progress-bar progress-bar-danger" data-transitiongoal="@ViewBag.KalanKontur" aria-valuemin="0" aria-valuemax="@ViewBag.ToplamKontur">
+                    <span class="progressbar-front-text" style="width: 236.133px;">@ViewBag.KalanKontur / @ViewBag.ToplamKontur</span>
+                </div>
+            </div>
+        }
+</li>

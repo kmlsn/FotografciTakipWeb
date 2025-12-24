@@ -1,0 +1,995 @@
+﻿
+@{
+    ViewBag.Title = "Personel Ödemeleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    List<Personel> personellistesi = ViewBag.personeller;
+    List<Sube> SubeListesi = ViewBag.SubeListesi;
+    List<SubeToKullanici> SubeKullanici = ViewBag.SubeKullanici;
+    List<SubeToPersonel> SubePersonel = ViewBag.SubePersonel;
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+<!-- Ödeme Ekle Modal Penceresi -->
+<div class="modal fade" id="OdemeEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Odeme Ekle - <b> <i id="yenieklepersoneladi"></i></b>
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="OdemeTarihi">Ödeme Tarihi</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" value="07/17/2020" id="OdemeTarihi">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="OdemeTuru">Ödeme Türü</label>
+                                <select class="custom-select form-control custom-select-sm" id="OdemeTuru" name="OdemeTuru">
+                                    <option selected="" value="1">Maaş Ödemesi</option>
+                                    <option value="2">Avans</option>
+                                    <option value="3">Prim</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="OdemeSekli">Ödeme Şekli</label>
+                                <select class="custom-select form-control custom-select-sm" id="OdemeSekli" name="OdemeSekli">
+                                    <option selected="" value="1">Banka Havalesi</option>
+                                    <option value="2">Nakit</option>
+                                    <option value="3">Kredi Kartı</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-12" id="UcretHata">
+                                <label class="form-label" for="Ucret">Tutar </label>
+                                <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control form-control-sm" name="Ucret" maxlength="50" id="Ucret">
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label">Açıklama</label>
+                                <div class="input-group">
+                                    <textarea class="form-control" id="Aciklama" placeholder="Açıklama" rows="3" name="Aciklama" style="overflow:auto;resize:none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="submit" class="btn btn-primary" id="Kaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ödeme Ekle Modal Penceresi -->
+<!-- Ödeme Düzenle Modal Penceresi -->
+<div class="modal fade" id="OdemeDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Odeme Düzenle - <b> <i id="duzenlepersoneladi"></i></b>
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="OdemeTarihiDuzenle">Ödeme Tarihi</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" value="07/17/2020" id="OdemeTarihiDuzenle">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="OdemeTuruDuzenle">Ödeme Türü</label>
+                                <select class="custom-select form-control custom-select-sm" id="OdemeTuruDuzenle" name="OdemeTuruDuzenle">
+                                    <option selected="" value="1">Maaş Ödemesi</option>
+                                    <option value="2">Avans</option>
+                                    <option value="3">Prim</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="OdemeSekliDuzenle">Ödeme Şekli</label>
+                                <select class="custom-select form-control custom-select-sm" id="OdemeSekliDuzenle" name="OdemeSekliDuzenle">
+                                    <option selected="" value="1">Banka Havalesi</option>
+                                    <option value="2">Nakit</option>
+                                    <option value="3">Kredi Kartı</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-12" id="UcretDuzenleHata">
+                                <label class="form-label" for="UcretDuzenle">Tutar </label>
+                                <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control form-control-sm" name="UcretDuzenle" maxlength="50" id="UcretDuzenle">
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label">Açıklama</label>
+                                <div class="input-group">
+                                    <textarea class="form-control" id="AciklamaDuzenle" placeholder="Açıklama" rows="3" name="AciklamaDuzenle" style="overflow:auto;resize:none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="submit" class="btn btn-primary" id="Guncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ödeme Düzenle Modal Penceresi -->
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <form id="FiltreForm">
+                <div class="row col col-12 mt-3" id="date_filter">
+                    <div class="form-group col-sm-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" value="07/17/2020" id="IlkTarih" name="IlkTarih">
+                            <div class="input-group-append">
+                                <span class="input-group-text fs-sm">
+                                    <i class="fal fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" value="07/17/2020" id="SonTarih" name="SonTarih">
+                            <div class="input-group-append">
+                                <span class="input-group-text fs-sm">
+                                    <i class="fal fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Oturum Açan Kullanıcının Görüntüleyebildiği Şube Listesi  -->
+                    <div class="form-group col-sm-2">
+                        <select class="custom-select form-control custom-select-sm" id="Sube" name="Sube" title="Görüntülenecek Şube">
+                            <option value="0">Tüm Şubeler</option>
+                            @foreach (var sube in SubeKullanici)
+                            {
+                                if (ViewBag.AktifSubeId == sube.SubeId && sube.Sube.Aktif == true)
+                                {
+                                    <option selected="" value="@sube.Sube.Id">@sube.Sube.SubeAdi</option>
+                                }
+                                else if (sube.Sube.Aktif == true)
+                                {
+                                    <option value="@sube.Sube.Id">@sube.Sube.SubeAdi</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <!-- Seçilen Şubedeki Personellerin Listesi  -->
+                    <div class="form-group col-sm-2">
+                        <select class="custom-select form-control custom-select-sm" id="PersonelAdSoyad" name="PersonelId" title="Personel Seçiniz.">
+                            <option selected="" value="0" data-personelid="0">Personel Seçiniz -- Tümü</option>
+                            @foreach (var pers in personellistesi)
+                            {
+                                <option value="@pers.Id" data-personelid="@pers.Id">@pers.AdiSoyadi</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <select class="custom-select form-control custom-select-sm" id="OdemeTuruFiltre" name="OdemeTuruFiltre" title="Ödeme Türü">
+                            <option selected="" value="0">Ödeme Türü -- Tümü</option>
+                            <option value="1">Maaş Ödemesi</option>
+                            <option value="2">Avas</option>
+                            <option value="3">Prim</option>
+                        </select>
+                    </div>
+                    @*<div class="form-group col-sm-3">
+                            <div class="custom-control custom-checkbox mt-2">
+                                <input type="checkbox" class="custom-control-input" id="EskiGoster">
+                                <label class="custom-control-label" for="EskiGoster">İşten ayrılanları da göster</label>
+                            </div>
+                        </div>*@
+                    @if (KullaniciYetki.KayitEkle)
+                    {
+                        <div class="form-group col-sm-2" id="OdemeEkledisable">
+                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#OdemeEkleModal" id="OdemeEkle"> Ödeme Ekle </button>
+                        </div>
+                    }
+                </div>
+            </form>
+            <div class="border-bottom mt-0"></div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtpersoneltakip" class="table table-bordered table-sm table-hover table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th style="display:none">Firma</th>   @* 0 *@
+                                <th style="display:none">Şube</th>    @* 1 *@
+                                <th>Personel Adı Soyadı</th>          @* 2 *@
+                                <th>Görev</th>                        @* 3 *@
+                                <th>Çalışma Şekli</th>                @* 4 *@
+                                <th>Aktif</th>                        @* 5 *@
+                                <th>Ödeme Tarihi</th>                 @* 6 *@
+                                <th>Ödeme Türü</th>  @*Avans/Maaş*@   @* 7 *@
+                                <th>Ödeme Şekli</th>  @*Nakit/KK*@    @* 8 *@
+                                <th>Tutar</th>                        @* 9 *@
+                                <th>İşlem</th>                        @* 10 *@
+                                <th style="display:none">GörevliŞubeler</th>  @* 11 *@
+                            </tr>
+                        </thead>
+                        <tbody id="personeltakipsatir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ödeme Tolapamları Satırı -->
+<div class="row">
+    <div class="col-sm-4 col-xl-2">
+        <div class="p-3 bg-success-800 rounded overflow-hidden position-relative text-white mb-g" id="AylikMaasToplamRenk">
+            <div class="">
+                <h3 class="display-5 d-block l-h-n m-0 fw-500" id="AylikMaasToplam">
+                    <small class="m-0 l-h-n">Aylık Maaş Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-money-bill position-absolute pos-right pos-bottom opacity-15 mb-n0 mr-n0" id="AylikMaasToplamIkon" style="font-size: 6rem;"></i>
+        </div>
+    </div>
+    <div class="col-sm-4 col-xl-2">
+        <div class="p-3 bg-fusion-300 rounded overflow-hidden position-relative text-white mb-g" id="YillikMaasToplamRenk">
+            <div class="">
+                <h3 class="display-5 d-block l-h-n m-0 fw-500" id="YillikMaasToplam">
+                    <small class="m-0 l-h-n">Yıllık Maaş Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-money-bill position-absolute pos-right pos-bottom opacity-15 mb-n0 mr-n0" id="YillikMaasToplamIkon" style="font-size: 6rem;"></i>
+        </div>
+    </div>
+    <div class="col-sm-4 col-xl-2">
+        <div class="p-3 bg-primary-500 rounded overflow-hidden position-relative text-white mb-g">
+            <div class="">
+                <h3 class="display-5 d-block l-h-n m-0 fw-500" id="AylikAvansToplam">
+                    <small class="m-0 l-h-n">Aylık Avans Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-money-bill position-absolute pos-right pos-bottom opacity-15 mb-n0 mr-n0" style="font-size:6rem"></i>
+        </div>
+    </div>
+    <div class="col-sm-4 col-xl-2">
+        <div class="p-3 bg-warning-500 rounded overflow-hidden position-relative text-white mb-g">
+            <div class="">
+                <h3 class="display-5 d-block l-h-n m-0 fw-500" id="YillikAvansToplam">
+                    <small class="m-0 l-h-n">Yıllık Avans Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-money-bill position-absolute pos-right pos-bottom opacity-15  mb-n0 mr-n0" style="font-size: 6rem;"></i>
+        </div>
+    </div>
+    <div class="col-sm-4 col-xl-2">
+        <div class="p-3 bg-info-400 rounded overflow-hidden position-relative text-white mb-g" id="AylikPrimToplamRenk">
+            <div class="">
+                <h3 class="display-5 d-block l-h-n m-0 fw-500" id="AylikPrimToplam">
+                    <small class="m-0 l-h-n">Aylık Prim Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-money-bill position-absolute pos-right pos-bottom opacity-15 mb-n0 mr-n0" id="AylikPrimToplamIkon" style="font-size: 6rem;"></i>
+        </div>
+    </div>
+    <div class="col-sm-4 col-xl-2">
+        <div class="p-3 bg-danger-400 rounded overflow-hidden position-relative text-white mb-g" id="YillikPrimToplamRenk">
+            <div class="">
+                <h3 class="display-5 d-block l-h-n m-0 fw-500" id="YillikPrimToplam">
+                    <small class="m-0 l-h-n">Yıllık Prim Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-money-bill position-absolute pos-right pos-bottom opacity-15 mb-n0 mr-n0" id="YillikPrimToplamIkon" style="font-size: 6rem;"></i>
+        </div>
+    </div>
+</div>
+<!-- Ödeme Tolapamları Satırı -->
+<input type="text" id="FiltreAyar" style="display:none" data-filtreayar="@ViewBag.FiltreAyar">
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+@section Script
+{
+
+    <script>
+        var controls = {
+            leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
+            rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
+        }
+        var filtreayar = $('#FiltreAyar').data("filtreayar");
+        var runDatePicker = function () {
+            $('#OdemeTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#OdemeTarihiDuzenle').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            if (filtreayar == "0") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+            } // 1 Gün
+            else if (filtreayar == "1") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() + 7)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() - 7)));
+            } // 1 Hafta Öncesi - 1 Hafta Sonrası
+            else if (filtreayar == "2") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() - 1)));
+            } // 1 Ay Öncesi - 1 Ay Sonrası
+            else if (filtreayar == "3") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
+            } // 1 Yıl Öncesi - 1 Yıl Sonrası
+            else if (filtreayar == "4") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+            } // Ayın başından bu güne
+            else if (filtreayar == "5") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), 0, 1));
+            } // Yılın başından bu güne
+        }
+        $(document).ready(function () {
+            runDatePicker();
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            var dt;
+            var aylikavanstoplam = 0;
+            var yillikavanstoplam = 0;
+            var aylikmaastoplam = 0;
+            var yillikmaastoplam = 0;
+            var aylikprimtoplam = 0;
+            var yillikprimtoplam = 0;
+            function dateFormat(d) {
+                return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+            }
+            function ParaFormat(fiyat) {
+                var para_sembol = "TL"
+                var format = new Intl.NumberFormat('de-DE', {
+                    style: 'currency',
+                    currency: 'TRY',
+                    minumumFractionDigits: 2
+                })
+                //return format.format(fiyat)
+                return format.format(fiyat).replace('TRY', para_sembol)
+            }
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            $("#Ucret").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#Sube").change(function () { //Kullanıcının yetkili olduğu şubelerdeki personelleri getirir.
+                subeid = $(this).find("option:selected").val();
+                var id = subeid;
+                debugger;
+                $("#PersonelAdSoyad").empty();
+                $("#PersonelAdSoyad").append("<option value='0' selected=''> Personel Seçiniz -- Tümü </option>");
+                //if (id > 0) {
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    url: "/Personeller/SubePersonelGetir/" + id,
+                    success: function (data) {
+                        $.each(data.data, function (index, item) {
+                            $("#PersonelAdSoyad").append("<option value=" + item.Id + " data-personelid=" + item.Id + ">" + item.AdiSoyadi + "</option>");
+                        });
+                    }
+                });
+                dt.fnDraw();
+                //}
+            });//Kullanıcının yetkili olduğu şubelerdeki personelleri getirir.
+            var PersonelId = $("#PersonelAdSoyad").find("option:selected").val(); // Seçilen GrupId ye göre tablo filtrelenecek
+            var perid = $("#PersonelAdSoyad").find("option:selected").data("personelid");
+            var PersonelAdi = $("#PersonelAdSoyad").find("option:selected ").text();
+            if (PersonelId == "0") {
+                $("#OdemeEkledisable").addClass("disabled");
+                document.getElementById("OdemeEkle").setAttribute("disabled", "");
+            }
+            else {
+                $("#OdemeEkledisable").removeClass("disabled");
+                document.getElementById("OdemeEkle").removeAttribute("disabled", "");
+            }
+            $("#PersonelAdSoyad").change(function () {
+                PersonelId = $(this).find("option:selected").val();
+                PersonelAdi = $(this).find("option:selected").text();
+                perid = $(this).find("option:selected").data("personelid");
+                if (PersonelId == "0") {
+                    $("#OdemeEkledisable").addClass("disabled");
+                    document.getElementById("OdemeEkle").setAttribute("disabled", "");
+                }
+                else {
+                    $("#OdemeEkledisable").removeClass("disabled");
+                    document.getElementById("OdemeEkle").removeAttribute("disabled", "");
+                }
+                dt.fnDraw();
+            });
+            $("#OdemeEkle").click(function () {
+                document.getElementById("yenieklepersoneladi").innerHTML = PersonelAdi;
+            });
+            $("#Kaydet").click(function () {
+                //var odemetarihidizi = $("#OdemeTarihi").val().split(".");
+                //var odemetarihi = new Date(odemetarihidizi[2], odemetarihidizi[1], odemetarihidizi[0]);
+                if ($("#Ucret").val() == "0,00 TL") {
+                    $("#Ucret").focus();
+                    $("#UcretHata").append("<div class='hata' style='color:red'>Bir Ücret giriniz!</div>");
+                }
+                else {
+                    $('#OdemeEkleModal').modal('hide');
+                    var ucret = $("#Ucret").val().replace(" TL", "");
+                    var OdemeTuru = $("#OdemeTuru").find("option:selected ").text();
+                    var OdemeSekli = $("#OdemeSekli").find("option:selected ").text();
+                    var OdemeData = new FormData();
+                    OdemeData.append("PersonelId", perid);
+                    OdemeData.append("OdemeTarihi", $("#OdemeTarihi").val().toString());
+                    OdemeData.append("OdemeTuru", OdemeTuru);
+                    OdemeData.append("OdemeSekli", OdemeSekli);
+                    OdemeData.append("Ucret", ucret);
+                    OdemeData.append("Aciklama", $("#Aciklama").val());
+                    //IzinData.forEach((value, key) => { console.log(key + " = " + value) });
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: OdemeData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Personeller/PersonelOdemeEkle/",
+                        success: function (data) {
+                            aylikavanstoplam = 0; yillikavanstoplam = 0; aylikmaastoplam = 0; yillikmaastoplam = 0;
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            }); // Yeni Kayıt Modal KAYDET
+            $("#dtpersoneltakip").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                //$("#Guncelle").data("odemeid", $(this).data("odemeid"));
+                $("#Guncelle").val($(this).data("odemeid"));
+                document.getElementById("duzenlepersoneladi").innerHTML = $(this).data("personelad");
+                $("#OdemeTarihiDuzenle").val($(this).data("odemetarihi"));
+                if ($(this).data("odemeturu") == "Maaş Ödemesi") {
+                    $("#OdemeTuruDuzenle").val("1").attr("selected", "selected");
+                }
+                else if ($(this).data("odemeturu") == "Avans") {
+                    $("#OdemeTuruDuzenle").val("2").attr("selected", "selected");
+                }
+                else if ($(this).data("odemeturu") == "Prim") {
+                    $("#OdemeTuruDuzenle").val("3").attr("selected", "selected");
+                }
+                if ($(this).data("odemesekli") == "Banka Havalesi") {
+                    $("#OdemeSekliDuzenle").val("1").attr("selected", "selected");
+                }
+                else if ($(this).data("odemesekli") == "Nakit") {
+                    $("#OdemeSekliDuzenle").val("2").attr("selected", "selected");
+                }
+                else if ($(this).data("odemesekli") == "Kredi Kartı") {
+                    $("#OdemeSekliDuzenle").val("3").attr("selected", "selected");
+                }
+                $("#UcretDuzenle").val($(this).data("tutar"));
+                $("#AciklamaDuzenle").val($(this).data("aciklama"));
+            });
+            $("#Guncelle").click(function () {
+                if ($("#UcretDuzenle").val() == "0,00 TL") {
+                    $("#UcretDuzenle").focus();
+                    $("#UcretDuzenleHata").append("<div class='hata' style='color:red'>Bir Ücret giriniz!</div>");
+                }
+                else {
+                    $('#OdemeDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    console.log("odemeid: " + id);
+                    console.log("odemeid type: " + typeof (id));
+                    var ucretduzenle = $("#UcretDuzenle").val().replace("TL", "").trim();
+                    var OdemeTuruDuzenle = $("#OdemeTuruDuzenle").find("option:selected ").text();
+                    var OdemeSekliDuzenle = $("#OdemeSekliDuzenle").find("option:selected ").text();
+                    var OdemeData = new FormData();
+                    OdemeData.append("Id", id);
+                    OdemeData.append("OdemeTarihi", $("#OdemeTarihiDuzenle").val().toString());
+                    OdemeData.append("OdemeTuru", OdemeTuruDuzenle);
+                    OdemeData.append("OdemeSekli", OdemeSekliDuzenle);
+                    OdemeData.append("Ucret", ucretduzenle.trim());
+                    OdemeData.append("Aciklama", $("#AciklamaDuzenle").val());
+                    OdemeData.forEach((value, key) => { console.log(key + " = " + value) });
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: OdemeData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Personeller/PersonelOdemeGuncelle/",
+                        success: function (data) {
+                            aylikavanstoplam = 0; yillikavanstoplam = 0; aylikmaastoplam = 0; yillikmaastoplam = 0;
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            }); // Yeni Kayıt Modal KAYDET
+            $("#dtpersoneltakip").on('click', '.Sil', function () {
+                var id = $(this).data("odemeid");
+                var adsoyad = $(this).data("personelad");
+                var tutar = $(this).data("tutar");
+                var odemetarihi = $(this).data("odemetarihi");
+                var odemeturu = $(this).data("odemeturu");
+
+                Swal.fire(
+                    {
+                        title: "Kayıt Silinecek",
+                        html: "<p>" +
+                            "<h2 style='font-size:16px; color:red'><strong>Ad-Soyad : </strong>" + adsoyad + "</h2></br>" +
+                            "<h2 style='font-size:16px; color:red'><strong>Ödeme Tarihi : </strong>" + odemetarihi + "</h2>" +
+                            "<h2 style='font-size:16px; color:red'><strong>Ödeme Türü : </strong>" + odemeturu + "</h2>" +
+                            "<h2 style='font-size:16px; color:red'><strong>Tutar : </strong>" + tutar + "</h2>" +
+                            "</p>" +
+                            "<h4>PERSONEL ÖDEMESİNİ SİLMEK İSTEDİĞİNİZDEN EMİN MİSİNİZ?</h4>",
+                        type: "error",
+                        showCancelButton: true,
+                        confirmButtonText: "Evet, Silinsin!"
+                    }).then(function (result) {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                contentType: false,
+                                processData: false,
+                                url: "/Otomasyon/Personeller/PersonelOdemeSil/" + id,
+                                success: function (data) {
+                                    aylikavanstoplam = 0; yillikavanstoplam = 0; aylikmaastoplam = 0; yillikmaastoplam = 0;
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        dt.api().ajax.reload();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+  
+
+       
+
+            }); // Kayıt SİLME
+
+            $("#AylikAvansToplam").html(accounting.formatMoney(aylikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Avans Toplamı</small>");
+            $("#YillikAvansToplam").html(accounting.formatMoney(yillikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Avans Toplamı</small>");
+            $("#AylikMaasToplam").html(accounting.formatMoney(aylikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Maaş Toplamı</small>");
+            $("#YillikMaasToplam").html(accounting.formatMoney(yillikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Maaş Toplamı</small>");
+            $("#AylikPrimToplam").html(accounting.formatMoney(aylikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Prim Toplamı</small>");
+            $("#YillikPrimToplam").html(accounting.formatMoney(yillikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Prim Toplamı</small>");
+
+            aylikavanstoplam = 0; yillikavanstoplam = 0; aylikmaastoplam = 0; yillikmaastoplam = 0; aylikprimtoplam = 0; yillikprimtoplam = 0;
+            $.fn.dataTableExt.afnFiltering.push(
+                function (Settings, Data, DataIndex) {
+                    //var eskigoster = document.getElementById("EskiGoster");
+                    var odemeturu, tutar, tarih;
+                    tarih = Data[6];
+                    var aybasi = dateFormat(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+                    var yilbasi = dateFormat(new Date(new Date().getFullYear(), 0, 1));
+
+                    let trh = tarih.split("."); // gün(0).ay(1).yıl(2)
+                    let aybsi = aybasi.split("."); // gün(0).ay(1).yıl(2)
+                    let yilbsi = yilbasi.split("."); // gün(0).ay(1).yıl(2)
+
+                    var t = trh[1] + "/" + trh[0] + "/" + trh[2];
+                    var ab = aybsi[1] + "/" + aybsi[0] + "/" + aybsi[2];
+                    var yb = yilbsi[1] + "/" + yilbsi[0] + "/" + yilbsi[2];
+
+                    let tr = new Date(t);
+                    let aybs = new Date(ab);
+                    let yilbs = new Date(yb);
+
+                    tr.setHours(0, 0, 0, 0);
+                    aybs.setHours(0, 0, 0, 0);
+                    yilbs.setHours(0, 0, 0, 0);
+                    odemeturu = Data[6]; // Avans / Maaş
+                    if (Data[7] == "Avans") {
+                        tutar = Data[9];
+                        tutar = tutar.replace("TL", "");
+                        tutar = tutar.replace(".", "");
+                        tutar = tutar.replace(",", ".");
+                        if (aybs <= tr) {
+                            aylikavanstoplam = parseFloat(aylikavanstoplam) + parseFloat(tutar);
+                        } // avans ödeme tarihi ayın başından büyükse topla
+                        if (yilbs <= tr) {
+                            yillikavanstoplam = parseFloat(yillikavanstoplam) + parseFloat(tutar);
+                        } // avans ödeme tarihi yılın başından büyükse topla
+                    }
+                    if (Data[7] == "Maaş Ödemesi") {
+                        tutar = Data[9];
+                        tutar = tutar.replace("TL", "");
+                        tutar = tutar.replace(".", "");
+                        tutar = tutar.replace(",", ".");
+                        if (aybs <= tr) {
+                            aylikmaastoplam = parseFloat(aylikmaastoplam) + parseFloat(tutar);
+                        } // maaş ödeme tarihi ayın başından büyükse topla
+                        if (yilbs <= tr) {
+                            yillikmaastoplam = parseFloat(yillikmaastoplam) + parseFloat(tutar);
+                        } // maaş ödeme tarihi ayın başından büyükse topla
+                    }
+                    if (Data[7] == "Prim") {
+                        tutar = Data[9];
+                        tutar = tutar.replace("TL", "");
+                        tutar = tutar.replace(".", "");
+                        tutar = tutar.replace(",", ".");
+                        if (aybs <= tr) {
+                            aylikprimtoplam = parseFloat(aylikprimtoplam) + parseFloat(tutar);
+                        } // avans ödeme tarihi ayın başından büyükse topla
+                        if (yilbs <= tr) {
+                            yillikprimtoplam = parseFloat(yillikprimtoplam) + parseFloat(tutar);
+                        } // avans ödeme tarihi yılın başından büyükse topla
+                    }
+                    $("#AylikAvansToplam").html(accounting.formatMoney(aylikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Avans Toplamı</small>");
+                    $("#YillikAvansToplam").html(accounting.formatMoney(yillikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Avans Toplamı</small>");
+                    $("#AylikMaasToplam").html(accounting.formatMoney(aylikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Maaş Toplamı</small>");
+                    $("#YillikMaasToplam").html(accounting.formatMoney(yillikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Maaş Toplamı</small>");
+                    $("#AylikPrimToplam").html(accounting.formatMoney(aylikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Prim Toplamı</small>");
+                    $("#YillikPrimToplam").html(accounting.formatMoney(yillikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Prim Toplamı</small>");
+
+                    return true;
+                });
+
+            dt = $('#dtpersoneltakip').dataTable(
+                {
+                    "createdRow": function (row, data, dataIndex) {
+                        if (data["Aktif"] == false) {
+                            //$(row).addClass('bg-warning-100 text-white');
+                            $('td', row).addClass('bg-danger-100');
+                        }
+                    },
+                    responsive: true,
+                    "destroy": true,
+                    "columns": [
+                        { "data": "Firma", "autowidth": true, "visible": false },
+                        { "data": "Sube", "autowidth": true, "visible": false },
+                        { "data": "AdSoyad", "autowidth": true },
+                        { "data": "Gorev", "autowidth": true },
+                        { "data": "CalismaSekli", "autowidth": true },
+                        { "data": "Aktif", "autowidth": true, "visible": false },
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "render": function (data, type, row) {
+                                var odemetarihi = row.OdemeTarihi;
+                                var tarih = dateFormat(new Date(parseInt(odemetarihi.match(/\d+/)[0])));
+                                return tarih
+                            }
+                        },
+                        { "data": "OdemeTuru", "autowidth": true },
+                        { "data": "OdemeSekli", "autowidth": true },
+                        { // Tutar
+                            "data": null,
+                            "className": "align-middle",
+                            "autowidth": true,
+                            "render": function (data, type, row) {
+                                return ParaFormat(row.Tutar)
+                            }
+                        }, // Tutar
+                        {
+                            "data": null,
+                            "render": function (data, type, row) {
+                                var tarih = row.OdemeTarihi;
+                                var odemetarih = dateFormat(new Date(parseInt(tarih.match(/\d+/)[0])));
+                                islem = "";
+                                if (row.Kilit == false) {
+                                    if (DuzenleYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon mr-1 Duzenle' data-odemeid='" + row.Id + "' data-personelad='" + row.AdSoyad + "'" +
+                                            " data-gorev='" + row.Gorev + "' data-calismasekli='" + row.CalismaSekli + "' data-tutar='" + ParaFormat(row.Tutar) + "' data-aciklama='" + row.Aciklama + "'" +
+                                            " data-aktif='" + row.Aktif + "' data-odemetarihi='" + odemetarih + "' data-odemeturu='" + row.OdemeTuru + "'  data-odemesekli='" + row.OdemeSekli + "' data-toggle='modal' data-target='#OdemeDuzenleModal' title='Düzenle'>" +
+                                            "<i class='fal fa-edit'></i>" +
+                                            "</a>"
+                                    }
+                                    if (SilYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon mr-1 Sil' data-odemeid='" + row.Id + "' data-personelad='" + row.AdSoyad + "' data-tutar='" + ParaFormat(row.Tutar) + "' data-odemetarihi='" + odemetarih + "' data-odemeturu='" + row.OdemeTuru + "' style='background-color:crimson;' title='Sil'>" +
+                                            "<i class='fal fa-trash-alt'></i>" +
+                                            "</a>"
+                                    }
+                                }
+                                else {
+                                    if (row.Aktif == true) {
+                                        if (DuzenleYetki == "True") {
+                                            islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon mr-1 Duzenle' data-odemeid='" + row.Id + "' data-personelad='" + row.AdSoyad + "'" +
+                                                " data-gorev='" + row.Gorev + "' data-calismasekli='" + row.CalismaSekli + "' data-tutar='" + ParaFormat(row.Tutar) + "' data-aciklama='" + row.Aciklama + "'" +
+                                                " data-aktif='" + row.Aktif + "' data-odemetarihi='" + odemetarih + "' data-odemeturu='" + row.OdemeTuru + "' data-odemesekli='" + row.OdemeSekli + "' data-toggle='modal' data-target='#OdemeDuzenleModal' title='Düzenle'>" +
+                                                "<i class='fal fa-edit'></i>" +
+                                                "</a>"
+                                        }
+                                        if (SilYetki == "True") {
+                                            islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon mr-1 Sil' data-odemeid='" + row.Id + "' data-personelad='" + row.AdSoyad + "' data-tutar='" + ParaFormat(row.Tutar) + "' data-odemetarihi='" + odemetarih + "' data-odemeturu='" + row.OdemeTuru + "' style='background-color:crimson;' title='Sil'>" +
+                                                "<i class='fal fa-trash-alt'></i>" +
+                                                "</a>"
+                                        }
+                                    }
+                                }
+                                return islem
+                            }
+                        }, // İşlem
+                        { "data": "Subeler", "autowidth": true, "visible": false },
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Otomasyon/Personeller/PersonelOdemeTakibiListesi/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "processing": "Yükleniyor... Lütfen Bekleyin",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+
+            $("#IlkTarih").keyup(function () {
+                aylikavanstoplam = 0; yillikavanstoplam = 0; aylikmaastoplam = 0; yillikmaastoplam = 0; aylikprimtoplam = 0; yillikprimtoplam = 0;
+                $("#AylikAvansToplam").html(accounting.formatMoney(aylikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Avans Toplamı</small>");
+                $("#YillikAvansToplam").html(accounting.formatMoney(yillikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Avans Toplamı</small>");
+                $("#AylikMaasToplam").html(accounting.formatMoney(aylikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Maaş Toplamı</small>");
+                $("#YillikMaasToplam").html(accounting.formatMoney(yillikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Maaş Toplamı</small>");
+                $("#AylikPrimToplam").html(accounting.formatMoney(aylikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Prim Toplamı</small>");
+                $("#YillikPrimToplam").html(accounting.formatMoney(yillikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Prim Toplamı</small>");
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelOdemeTakibiListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#IlkTarih").change(function () {
+                aylikavanstoplam = 0; yillikavanstoplam = 0; aylikmaastoplam = 0; yillikmaastoplam = 0; aylikprimtoplam = 0; yillikprimtoplam = 0;
+                $("#AylikAvansToplam").html(accounting.formatMoney(aylikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Avans Toplamı</small>");
+                $("#YillikAvansToplam").html(accounting.formatMoney(yillikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Avans Toplamı</small>");
+                $("#AylikMaasToplam").html(accounting.formatMoney(aylikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Maaş Toplamı</small>");
+                $("#YillikMaasToplam").html(accounting.formatMoney(yillikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Maaş Toplamı</small>");
+                $("#AylikPrimToplam").html(accounting.formatMoney(aylikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Prim Toplamı</small>");
+                $("#YillikPrimToplam").html(accounting.formatMoney(yillikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Prim Toplamı</small>");
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelOdemeTakibiListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#SonTarih").keyup(function () {
+                aylikavanstoplam = 0; yillikavanstoplam = 0; aylikmaastoplam = 0; yillikmaastoplam = 0; aylikprimtoplam = 0; yillikprimtoplam = 0;
+                $("#AylikAvansToplam").html(accounting.formatMoney(aylikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Avans Toplamı</small>");
+                $("#YillikAvansToplam").html(accounting.formatMoney(yillikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Avans Toplamı</small>");
+                $("#AylikMaasToplam").html(accounting.formatMoney(aylikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Maaş Toplamı</small>");
+                $("#YillikMaasToplam").html(accounting.formatMoney(yillikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Maaş Toplamı</small>");
+                $("#AylikPrimToplam").html(accounting.formatMoney(aylikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Prim Toplamı</small>");
+                $("#YillikPrimToplam").html(accounting.formatMoney(yillikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Prim Toplamı</small>");
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelOdemeTakibiListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#SonTarih").change(function () {
+                aylikavanstoplam = 0; yillikavanstoplam = 0; aylikmaastoplam = 0; yillikmaastoplam = 0; aylikprimtoplam = 0; yillikprimtoplam = 0;
+                $("#AylikAvansToplam").html(accounting.formatMoney(aylikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Avans Toplamı</small>");
+                $("#YillikAvansToplam").html(accounting.formatMoney(yillikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Avans Toplamı</small>");
+                $("#AylikMaasToplam").html(accounting.formatMoney(aylikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Maaş Toplamı</small>");
+                $("#YillikMaasToplam").html(accounting.formatMoney(yillikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Maaş Toplamı</small>");
+                $("#AylikPrimToplam").html(accounting.formatMoney(aylikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Prim Toplamı</small>");
+                $("#YillikPrimToplam").html(accounting.formatMoney(yillikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Prim Toplamı</small>");
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelOdemeTakibiListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#OdemeTuruFiltre").change(function () {
+                aylikavanstoplam = 0; yillikavanstoplam = 0; aylikmaastoplam = 0; yillikmaastoplam = 0; aylikprimtoplam = 0; yillikprimtoplam = 0;
+                $("#AylikAvansToplam").html(accounting.formatMoney(aylikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Avans Toplamı</small>");
+                $("#YillikAvansToplam").html(accounting.formatMoney(yillikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Avans Toplamı</small>");
+                $("#AylikMaasToplam").html(accounting.formatMoney(aylikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Maaş Toplamı</small>");
+                $("#YillikMaasToplam").html(accounting.formatMoney(yillikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Maaş Toplamı</small>");
+                $("#AylikPrimToplam").html(accounting.formatMoney(aylikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Prim Toplamı</small>");
+                $("#YillikPrimToplam").html(accounting.formatMoney(yillikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Prim Toplamı</small>");
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelOdemeTakibiListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#PersonelAdSoyad").change(function () {
+                aylikavanstoplam = 0; yillikavanstoplam = 0; aylikmaastoplam = 0; yillikmaastoplam = 0; aylikprimtoplam = 0; yillikprimtoplam = 0;
+                $("#AylikAvansToplam").html(accounting.formatMoney(aylikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Avans Toplamı</small>");
+                $("#YillikAvansToplam").html(accounting.formatMoney(yillikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Avans Toplamı</small>");
+                $("#AylikMaasToplam").html(accounting.formatMoney(aylikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Maaş Toplamı</small>");
+                $("#YillikMaasToplam").html(accounting.formatMoney(yillikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Maaş Toplamı</small>");
+                $("#AylikPrimToplam").html(accounting.formatMoney(aylikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Prim Toplamı</small>");
+                $("#YillikPrimToplam").html(accounting.formatMoney(yillikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Prim Toplamı</small>");
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelOdemeTakibiListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#Sube").change(function () {
+                aylikavanstoplam = 0; yillikavanstoplam = 0; aylikmaastoplam = 0; yillikmaastoplam = 0; aylikprimtoplam = 0; yillikprimtoplam = 0;
+                $("#AylikAvansToplam").html(accounting.formatMoney(aylikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Avans Toplamı</small>");
+                $("#YillikAvansToplam").html(accounting.formatMoney(yillikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Avans Toplamı</small>");
+                $("#AylikMaasToplam").html(accounting.formatMoney(aylikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Maaş Toplamı</small>");
+                $("#YillikMaasToplam").html(accounting.formatMoney(yillikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Maaş Toplamı</small>");
+                $("#AylikPrimToplam").html(accounting.formatMoney(aylikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Prim Toplamı</small>");
+                $("#YillikPrimToplam").html(accounting.formatMoney(yillikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Prim Toplamı</small>");
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelOdemeTakibiListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("input[type='search']").keydown(function () {
+                aylikavanstoplam = 0; yillikavanstoplam = 0; aylikmaastoplam = 0; yillikmaastoplam = 0; aylikprimtoplam = 0; yillikprimtoplam = 0;
+                $("#AylikAvansToplam").html(accounting.formatMoney(aylikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Avans Toplamı</small>");
+                $("#AylikMaasToplam").html(accounting.formatMoney(aylikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Maaş Toplamı</small>");
+                $("#YillikAvansToplam").html(accounting.formatMoney(yillikavanstoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Avans Toplamı</small>");
+                $("#YillikMaasToplam").html(accounting.formatMoney(yillikmaastoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Maaş Toplamı</small>");
+                $("#AylikPrimToplam").html(accounting.formatMoney(aylikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Aylık Prim Toplamı</small>");
+                $("#YillikPrimToplam").html(accounting.formatMoney(yillikprimtoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Yıllık Prim Toplamı</small>");
+            });
+        });
+
+
+    </script>
+}
+
+
+

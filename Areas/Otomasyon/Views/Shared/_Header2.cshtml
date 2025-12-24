@@ -1,0 +1,26 @@
+﻿@using FotografciTakipWeb.Models
+@{Lisanslar lisans = (Lisanslar)Session["Lisans"];}
+<header class="page-header" role="banner">
+    <!-- we need this logo when user switches to nav-function-top -->
+    <div class="page-logo">
+        <a href="~/Otomasyon/Giris/GirisYap" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
+            @*<img src="~/Areas/Otomasyon/Content/img/logo.png" alt="TeTRa Bilişim" aria-roledescription="logo"> @* TETRA BİBİŞİM LOGOSU
+                <span class="page-logo-text mr-1">TeTRa Bilişim</span>*@
+            <img src="/Areas/Otomasyon/Content/img/Logo_Tek_28x28.png" alt="SmartAdmin WebApp" aria-roledescription="logo">
+            <span class="page-logo-text mr-1">TeTRa Bilişim <br> Fotoğrafçı Takip Uygulaması</span>
+            <span class="position-absolute text-white opacity-50 small pos-top pos-right mr-2 mt-n2"></span>
+            <i class="fal fa-angle-down d-inline-block ml-1 fs-lg color-primary-300"></i>
+        </a>
+    </div>
+    <div class="info-card-firma" style="width: 100%;">
+        <a href="~/Otomasyon/Giris/GirisYap">
+            <img src="~/Areas/Otomasyon/Dosyalar/FirmaLogolar/TetraBilisim.png" class="profile-image rounded-plus pr-4" style="width: 12.125rem;">
+        </a>
+            <div class="search"></div> <!-- İki logoyo sağa-sola yaslamak için kullanıldı-->
+            <a href="~/Home/Index">
+                <img src="~/Areas/Otomasyon/Dosyalar/FirmaLogolar/Fotografci_Takip_Logo_Tek_Sira_Mavi.png" class="profile-image rounded-plus" style="width: 20.125rem; float:right">
+
+                @*<img src="~/Areas/Otomasyon/Dosyalar/FirmaLogolar/Fotografci_Takip_Logo_1_Mavi.png" class="profile-image rounded-plus" style="width: 20.125rem; float:right">*@
+            </a>
+</div>
+</header>

@@ -1,0 +1,73 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool personelleryetki = ky.FirstOrDefault(x => x.SayfaId == 8 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 8 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool personellistesiyetki = ky.FirstOrDefault(x => x.SayfaId == 68 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 68 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool personelizinleryetki = ky.FirstOrDefault(x => x.SayfaId == 69 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 69 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool personelodemeleriyetki = ky.FirstOrDefault(x => x.SayfaId == 70 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 70 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool personelistakibiyetki = ky.FirstOrDefault(x => x.SayfaId == 71 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 71 && x.Sil == false && x.Aktif == true).SayfaYetki;
+
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Personeller" ? "active open" : "";
+    string altmenupersonellistesi = ViewBag.AltMenu == "Personel Listesi" ? "active" : "";
+    string altmenupersonelizinleri = ViewBag.AltMenu == "Personel İzinleri" ? "active" : "";
+    string altmenupersonelodemeleri = ViewBag.AltMenu == "Personel Ödemeleri" ? "active" : "";
+    string altmenupersonelistakibi = ViewBag.AltMenu == "Personel İş Takibi" ? "active" : "";
+}
+@if (personelleryetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Personeller" data-filter-tags="personeller">
+            <i class="fal fa-id-card-alt"></i>
+            <span class="nav-link-text" data-i18n="nav.personeller">Personeller</span>
+        </a>
+        <ul>
+            @if (lisans.Personeller_PersonelListesi)
+            {
+                if (personellistesiyetki)
+                {
+                    <li class=@altmenupersonellistesi>
+                        <a href="~/Otomasyon/Personeller/Personeller" title="Personeller" data-filter-tags="personeller personel listesi">
+                            <span class="nav-link-text" data-i18n="nav.personeller_personel_listesi">Personel Listesi</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Personeller_PersonelIzinleri)
+            {
+                if (personelizinleryetki)
+                {
+                    <li class=@altmenupersonelizinleri>
+                        <a href="~/Otomasyon/Personeller/PersonelIzinleri" title="Personel İzinleri" data-filter-tags="personeller personel izinleri">
+                            <span class="nav-link-text" data-i18n="nav.personeller_personel_izinleri">Personel İzinleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Personeller_PersonelOdemeleri)
+            {
+                if (personelodemeleriyetki)
+                {
+                    <li class=@altmenupersonelodemeleri>
+                        <a href="~/Otomasyon/Personeller/PersonelOdemeleri" title="Personel Ödemeleri" data-filter-tags="personeller personel ödemeleri">
+                            <span class="nav-link-text" data-i18n="nav.personeller_personel_odemeleri">Personel Ödemeleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Personeller_PersonelIsTakibi)
+            {
+                if (personelistakibiyetki)
+                {
+                    <li class=@altmenupersonelistakibi>
+                        <a href="~/Otomasyon/Personeller/PersonelIsTakibi" title="Personel İş Takibi" data-filter-tags="personeller personel iş takibi">
+                            <span class="nav-link-text" data-i18n="nav.personeller_personel_is_takibi">Personel İş Takibi</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}

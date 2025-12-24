@@ -1,0 +1,1449 @@
+﻿
+@{
+    ViewBag.Title = "Kullanıcı Yetkileri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model List<ModulSayfa>
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    Kullanici kl = ViewBag.Kullanici; // seçilen kullanıcı
+    IEnumerable<KullaniciYetki> kullaniciyetkileri = ViewBag.Kullaniciyetkileri; // seçilen kullanıcını yetkileri sayfa modülleri checkboxlar için
+    long FirmaId = Convert.ToInt64(Session["FirmaId"]);
+}
+<div id="panel-2" class="panel">
+    <div class="panel-hdr">
+        <h2>
+            Kullanıcı Yetkileri - <span class="fw-300"><i>@kl.AdSoyad ( @kl.Email )</i></span>
+        </h2>
+            <button type="button" class="btn btn-primary m-2 Kaydet" id="Kaydet" value="@kl.Id"> Kaydet </button>
+    </div>
+    <div class="panel-container show">
+        <div class="panel-content">
+            @*@RecursiveMenu(Model.Where(x => x.ModulId == null))*@
+            @{IEnumerable<ModulSayfa> sayfalar = Model.Where(x => x.ModulId == null && x.Aktif==true && x.Sil==false);}
+            <div class="accordion accordion-outline" id="ModulSayfa">
+                @foreach (var item in sayfalar)
+                {
+                    <div class="card">
+                        <div class="card-header">
+                            <a href="javascript:void(0);" class="card-title" data-toggle="collapse" data-target="#ModulSayfa-@item.Id" aria-expanded="false">
+                                <span class="collapsed-reveal">
+                                    <i class="fal fa-lock-open-alt width-2 fs-xl"></i>
+                                </span>
+                                <span class="collapsed-hidden">
+                                    <i class="fal fa-lock-alt width-2 fs-xl"></i>
+                                </span>
+                                @item.SayfaAdi
+                                <span class="ml-auto">
+                                    <span class="collapsed-reveal">
+                                        <i class="fal fa-minus fs-xl"></i>
+                                    </span>
+                                    <span class="collapsed-hidden">
+                                        <i class="fal fa-plus fs-xl"></i>
+                                    </span>
+                                </span>
+                            </a>
+                        </div>
+                        <div id="ModulSayfa-@item.Id" class="collapse" data-parent="#ModulSayfa">
+                            <div class="card-body">
+                                @*  Seçilen Kullanıcı Modül Yetkisi varsa Modül Yetkisi ve Alt Sayfalar Seçili Gelecek *@
+                                @{KullaniciYetki kly = kullaniciyetkileri.FirstOrDefault(x => x.SayfaId == item.Id); }
+                                @if (kly.SayfaYetki == true)
+                                {
+                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                        <input type="checkbox" class="custom-control-input" id="ModuluYetkilendir-@item.Id" data-modulid="@item.Id" data-islem="ModuluYetkilendir" checked="checked" value="ModuluYetkilendir-@item.Id-@item.SayfaAdi">
+                                        <label class="custom-control-label" for="ModuluYetkilendir-@item.Id">Modülü Yetkilendir</label>
+                                    </div>
+                                    if (item.SayfaAdi != "Dashboard" && item.SayfaAdi != "SMS Gönder" && item.SayfaAdi != "TümŞubeleriGör")
+                                    {
+                                    <table class="table table-sm table-bordered table-hover m-0">
+                                        <thead class="bg-primary-500">
+                                            <tr>
+                                                <th>Sayfa Adı</th>
+                                                <th class="text-center">Sayfayı Gör</th>
+                                                <th class="text-center">Kayıt Detayı</th>
+                                                <th class="text-center">Kayıt Ekle</th>
+                                                <th class="text-center">Kayıt Düzenle</th>
+                                                <th class="text-center">Kayıt Sil</th>
+                                                <th class="text-center">Yazdır</th>
+                                                <th class="text-center">SMS Gönder</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @*TümünüŞeç Satırı*@
+                                            <tr class="bg-warning-50">
+                                                <td></td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="SayfayiGorTumunuSec" id="SayfayiGorTumunuSec-@item.Id" value="SayfayiGorTumunuSec-@item.Id-@item.SayfaAdi" checked="">
+                                                        <label class="custom-control-label" for="SayfayiGorTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="KayitDetayTumunuSec" id="KayitDetayTumunuSec-@item.Id" value="KayitDetayTumunuSec-@item.Id-@item.SayfaAdi" checked="">
+                                                        <label class="custom-control-label" for="KayitDetayTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="KayitEkleTumunuSec" id="KayitEkleTumunuSec-@item.Id" value="KayitEkleTumunuSec-@item.Id-@item.SayfaAdi" checked="">
+                                                        <label class="custom-control-label" for="KayitEkleTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="KayitDuzenleTumunuSec" id="KayitDuzenleTumunuSec-@item.Id" value="KayitDuzenleTumunuSec-@item.Id-@item.SayfaAdi" checked="">
+                                                        <label class="custom-control-label" for="KayitDuzenleTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="KayitSilTumunuSec" id="KayitSilTumunuSec-@item.Id" value="KayitSilTumunuSec-@item.Id-@item.SayfaAdi" checked="">
+                                                        <label class="custom-control-label" for="KayitSilTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="YazdirTumunuSec" id="YazdirTumunuSec-@item.Id" value="YazdirTumunuSec-@item.Id-@item.SayfaAdi" checked="">
+                                                        <label class="custom-control-label" for="YazdirTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="SmsGonderTumunuSec" id="SmsGonderTumunuSec-@item.Id" value="SmsGonderTumunuSec-@item.Id-@item.SayfaAdi" checked="">
+                                                        <label class="custom-control-label" for="SmsGonderTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            @if (item.ModulSayfa1.Any())
+                                            {
+                                                foreach (var sayfa in item.ModulSayfa1.Where(x => x.Aktif == true && x.Sil == false))
+                                                {
+                                                    KullaniciYetki klysayfa = kullaniciyetkileri.FirstOrDefault(x => x.SayfaId == sayfa.Id);
+                                                    //Alt sayfalar var ise satır başına ikon koymak için kullanıldı
+                                                    if (sayfa.ModulSayfa1.Any())
+                                                    {
+                                                        <tr class="bg-success-400">
+                                                            <td><i class="fal fa-arrow-alt-from-top"></i> @sayfa.SayfaAdi</td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.SayfaYetkiAktif == true)
+                                                                    {
+                                                                        if (klysayfa.SayfaYetki == true) // Seçilen kullanıcının sayfayı görme yetkisi var mı kontrolü
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SayfaGor" data-islem2="AltSayfaGor" id="SayfaGor-@sayfa.Id" value="SayfaGor-@sayfa.Id-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="SayfaGor-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SayfaGor" data-islem2="AltSayfaGor" id="SayfaGor-@sayfa.Id" value="SayfaGor-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="SayfaGor-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SayfaGor" data-islem2="AltSayfaGor" id="SayfaGor-@sayfa.Id" value="SayfaGor-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="SayfaGor-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitDetayiAktif == true)
+                                                                    {
+                                                                        if (klysayfa.KayitDetayi == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDetay" data-islem2="AltKayitDetay" id="KayitDetay-@sayfa.Id" value="KayitDetay-@sayfa.Id-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="KayitDetay-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDetay" data-islem2="AltKayitDetay" id="KayitDetay-@sayfa.Id" value="KayitDetay-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="KayitDetay-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDetay" data-islem2="AltKayitDetay" id="KayitDetay-@sayfa.Id" value="KayitDetay-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitDetay-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitEkleAktif == true)
+                                                                    {
+                                                                        if (klysayfa.KayitEkle == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitEkle" data-islem2="AltKayitEkle" id="KayitEkle-@sayfa.Id" value="KayitEkle-@sayfa.Id-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="KayitEkle-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitEkle" data-islem2="AltKayitEkle" id="KayitEkle-@sayfa.Id" value="KayitEkle-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="KayitEkle-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitEkle" data-islem2="AltKayitEkle" id="KayitEkle-@sayfa.Id" value="KayitEkle-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitEkle-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitDuzenleAktif == true)
+                                                                    {
+                                                                        if (klysayfa.KayitDuzenle == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDuzenle" data-islem2="AltKayitDuzenle" id="KayitDuzenle-@sayfa.Id" value="KayitDuzenle-@sayfa.Id-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="KayitDuzenle-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDuzenle" data-islem2="AltKayitDuzenle" id="KayitDuzenle-@sayfa.Id" value="KayitDuzenle-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="KayitDuzenle-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDuzenle" data-islem2="AltKayitDuzenle" id="KayitDuzenle-@sayfa.Id" value="KayitDuzenle-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitDuzenle-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitSilAktif == true)
+                                                                    {
+                                                                        if (klysayfa.KayitSil == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitSil" data-islem2="AltKayitSil" id="KayitSil-@sayfa.Id" value="KayitSil-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="KayitSil-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitSil" data-islem2="AltKayitSil" id="KayitSil-@sayfa.Id" value="KayitSil-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="KayitSil-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitSil" data-islem2="AltKayitSil" id="KayitSil-@sayfa.Id" value="KayitSil-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitSil-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.Yazdirma == true)
+                                                                    {
+                                                                        if (klysayfa.Yazdir == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="Yazdir" data-islem2="AltYazdir" id="Yazdir-@sayfa.Id" value="Yazdir-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="Yazdir-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="Yazdir" data-islem2="AltYazdir" id="Yazdir-@sayfa.Id" value="Yazdir-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="Yazdir-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="Yazdir" data-islem2="AltYazdir" id="Yazdir-@sayfa.Id" value="Yazdir-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="Yazdir-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.SMSGonder == true)
+                                                                    {
+                                                                        if (klysayfa.SmsGonder == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SmsGonder" data-islem2="AltSmsGonder" id="SmsGonder-@sayfa.Id" value="SmsGonder-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="SmsGonder-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SmsGonder" data-islem2="AltSmsGonder" id="SmsGonder-@sayfa.Id" value="SmsGonder-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="SmsGonder-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SmsGonder" data-islem2="AltSmsGonder" id="SmsGonder-@sayfa.Id" value="SmsGonder-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="SmsGonder-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr>
+                                                            <td>@sayfa.SayfaAdi</td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.SayfaYetkiAktif == true)
+                                                                    {
+                                                                        if (klysayfa.SayfaYetki == true) // Seçilen kullanıcının sayfayı görme yetkisi var mı kontrolü
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SayfaGor" data-islem2="AltSayfaGor" id="SayfaGor-@sayfa.Id" value="SayfaGor-@sayfa.Id-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="SayfaGor-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SayfaGor" data-islem2="AltSayfaGor" id="SayfaGor-@sayfa.Id" value="SayfaGor-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="SayfaGor-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SayfaGor" data-islem2="AltSayfaGor" id="SayfaGor-@sayfa.Id" value="SayfaGor-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="SayfaGor-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitDetayiAktif == true)
+                                                                    {
+                                                                        if (klysayfa.KayitDetayi == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDetay" data-islem2="AltKayitDetay" id="KayitDetay-@sayfa.Id" value="KayitDetay-@sayfa.Id-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="KayitDetay-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDetay" data-islem2="AltKayitDetay" id="KayitDetay-@sayfa.Id" value="KayitDetay-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="KayitDetay-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDetay" data-islem2="AltKayitDetay" id="KayitDetay-@sayfa.Id" value="KayitDetay-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitDetay-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitEkleAktif == true)
+                                                                    {
+                                                                        if (klysayfa.KayitEkle == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitEkle" data-islem2="AltKayitEkle" id="KayitEkle-@sayfa.Id" value="KayitEkle-@sayfa.Id-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="KayitEkle-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitEkle" data-islem2="AltKayitEkle" id="KayitEkle-@sayfa.Id" value="KayitEkle-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="KayitEkle-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitEkle" data-islem2="AltKayitEkle" id="KayitEkle-@sayfa.Id" value="KayitEkle-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitEkle-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitDuzenleAktif == true)
+                                                                    {
+                                                                        if (klysayfa.KayitDuzenle == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDuzenle" data-islem2="AltKayitDuzenle" id="KayitDuzenle-@sayfa.Id" value="KayitDuzenle-@sayfa.Id-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="KayitDuzenle-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDuzenle" data-islem2="AltKayitDuzenle" id="KayitDuzenle-@sayfa.Id" value="KayitDuzenle-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="KayitDuzenle-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDuzenle" data-islem2="AltKayitDuzenle" id="KayitDuzenle-@sayfa.Id" value="KayitDuzenle-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitDuzenle-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitSilAktif == true)
+                                                                    {
+                                                                        if (klysayfa.KayitSil == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitSil" data-islem2="AltKayitSil" id="KayitSil-@sayfa.Id" value="KayitSil-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="KayitSil-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitSil" data-islem2="AltKayitSil" id="KayitSil-@sayfa.Id" value="KayitSil-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="KayitSil-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitSil" data-islem2="AltKayitSil" id="KayitSil-@sayfa.Id" value="KayitSil-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitSil-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.Yazdirma == true)
+                                                                    {
+                                                                        if (klysayfa.Yazdir == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="Yazdir" data-islem2="AltYazdir" id="Yazdir-@sayfa.Id" value="Yazdir-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="Yazdir-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="Yazdir" data-islem2="AltYazdir" id="Yazdir-@sayfa.Id" value="Yazdir-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="Yazdir-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="Yazdir" data-islem2="AltYazdir" id="Yazdir-@sayfa.Id" value="Yazdir-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="Yazdir-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.SMSGonder == true)
+                                                                    {
+                                                                        if (klysayfa.SmsGonder == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SmsGonder" data-islem2="AltSmsGonder" id="SmsGonder-@sayfa.Id" value="SmsGonder-@sayfa.SayfaAdi" checked="">
+                                                                            <label class="custom-control-label" for="SmsGonder-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SmsGonder" data-islem2="AltSmsGonder" id="SmsGonder-@sayfa.Id" value="SmsGonder-@sayfa.SayfaAdi">
+                                                                            <label class="custom-control-label" for="SmsGonder-@sayfa.Id">Yetkilendir</label>
+                                                                        }
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SmsGonder" data-islem2="AltSmsGonder" id="SmsGonder-@sayfa.Id" value="SmsGonder-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="SmsGonder-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    if (sayfa.ModulSayfa1.Any())
+                                                    {
+                                                        foreach (var sayfa1 in sayfa.ModulSayfa1.Where(x => x.Aktif == true && x.Sil == false))
+                                                        {
+                                                            KullaniciYetki klysayfa1 = kullaniciyetkileri.FirstOrDefault(x => x.SayfaId == sayfa1.Id);
+                                                            <tr class="bg-success-50">
+                                                                <td><i class="fal fa-1x fa-arrow-alt-from-left"></i> @sayfa1.SayfaAdi</td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.SayfaYetkiAktif == true)
+                                                                        {
+                                                                            if (klysayfa1.SayfaYetki == true)
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="SayfaGor" id="SayfaGor-@sayfa1.Id" value="SayfaGor-@sayfa1.Id-@sayfa1.SayfaAdi" checked="">
+                                                                                <label class="custom-control-label" for="SayfaGor-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="SayfaGor" id="SayfaGor-@sayfa1.Id" value="SayfaGor-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                                <label class="custom-control-label" for="SayfaGor-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="SayfaGor" id="SayfaGor-@sayfa1.Id" value="SayfaGor-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="SayfaGor-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.KayitDetayiAktif == true)
+                                                                        {
+                                                                            if (klysayfa1.KayitDetayi == true)
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitDetay" id="KayitDetay-@sayfa1.Id" value="KayitDetay-@sayfa1.Id-@sayfa1.SayfaAdi" checked="">
+                                                                                <label class="custom-control-label" for="KayitDetay-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitDetay" id="KayitDetay-@sayfa1.Id" value="KayitDetay-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                                <label class="custom-control-label" for="KayitDetay-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitDetay" id="KayitDetay-@sayfa1.Id" value="KayitDetay-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="KayitDetay-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.KayitEkleAktif == true)
+                                                                        {
+                                                                            if (klysayfa1.KayitEkle == true)
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitEkle" id="KayitEkle-@sayfa1.Id" value="KayitEkle-@sayfa1.Id-@sayfa1.SayfaAdi" checked="">
+                                                                                <label class="custom-control-label" for="KayitEkle-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitEkle" id="KayitEkle-@sayfa1.Id" value="KayitEkle-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                                <label class="custom-control-label" for="KayitEkle-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitEkle" id="KayitEkle-@sayfa1.Id" value="KayitEkle-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="KayitEkle-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.KayitDuzenleAktif == true)
+                                                                        {
+                                                                            if (klysayfa1.KayitDuzenle == true)
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitDuzenle" id="KayitDuzenle-@sayfa1.Id" value="KayitDuzenle-@sayfa1.Id-@sayfa1.SayfaAdi" checked="">
+                                                                                <label class="custom-control-label" for="KayitDuzenle-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitDuzenle" id="KayitDuzenle-@sayfa1.Id" value="KayitDuzenle-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                                <label class="custom-control-label" for="KayitDuzenle-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitDuzenle" id="KayitDuzenle-@sayfa1.Id" value="KayitDuzenle-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="KayitDuzenle-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.KayitSilAktif == true)
+                                                                        {
+                                                                            if (klysayfa1.KayitSil == true)
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitSil" id="KayitSil-@sayfa1.Id" value="KayitSil-@sayfa1.Id-@sayfa1.SayfaAdi" checked="">
+                                                                                <label class="custom-control-label" for="KayitSil-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitSil" id="KayitSil-@sayfa1.Id" value="KayitSil-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                                <label class="custom-control-label" for="KayitSil-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitSil" id="KayitSil-@sayfa1.Id" value="KayitSil-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="KayitSil-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.Yazdirma == true)
+                                                                        {
+                                                                            if (klysayfa1.Yazdir == true)
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="Yazdir" id="Yazdir-@sayfa1.Id" value="Yazdir-@sayfa1.Id-@sayfa1.SayfaAdi" checked="">
+                                                                                <label class="custom-control-label" for="Yazdir-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="Yazdir" id="Yazdir-@sayfa1.Id" value="Yazdir-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                                <label class="custom-control-label" for="Yazdir-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="Yazdir" id="Yazdir-@sayfa1.Id" value="Yazdir-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="Yazdir-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.SMSGonder == true)
+                                                                        {
+                                                                            if (klysayfa1.SmsGonder == true)
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="SmsGonder" id="SmsGonder-@sayfa1.Id" value="SmsGonder-@sayfa1.Id-@sayfa1.SayfaAdi" checked="">
+                                                                                <label class="custom-control-label" for="SmsGonder-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="SmsGonder" id="SmsGonder-@sayfa1.Id" value="SmsGonder-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                                <label class="custom-control-label" for="SmsGonder-@sayfa1.Id">Yetkilendir</label>
+                                                                            }
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="SmsGonder" id="SmsGonder-@sayfa1.Id" value="SmsGonder-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="SmsGonder-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                        <input type="checkbox" class="custom-control-input" id="ModuluYetkilendir-@item.Id" data-modulid="@item.Id" data-islem="ModuluYetkilendir" value="ModuluYetkilendir-@item.Id-@item.SayfaAdi">
+                                        <label class="custom-control-label" for="ModuluYetkilendir-@item.Id">Modülü Yetkilendir</label>
+                                    </div>
+                                    if (item.SayfaAdi != "Dashboard" && item.SayfaAdi != "SMS Gönder" && item.SayfaAdi != "TümŞubeleriGör")
+                                    {
+                                    <table class="table table-sm table-bordered table-hover m-0">
+                                        <thead class="bg-primary-500">
+                                            <tr>
+                                                <th>Sayfa Adı</th>
+                                                <th class="text-center">Sayfayı Gör</th>
+                                                <th class="text-center">Kayıt Detayı</th>
+                                                <th class="text-center">Kayıt Ekle</th>
+                                                <th class="text-center">Kayıt Düzenle</th>
+                                                <th class="text-center">Kayıt Sil</th>
+                                                <th class="text-center">Yazdır</th>
+                                                <th class="text-center">SMS Gönder</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @*TümünüŞeç Satırı*@
+                                            <tr class="bg-warning-50">
+                                                <td></td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="SayfayiGorTumunuSec" id="SayfayiGorTumunuSec-@item.Id" value="SayfayiGorTumunuSec-@item.Id-@item.SayfaAdi">
+                                                        <label class="custom-control-label" for="SayfayiGorTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="KayitDetayTumunuSec" id="KayitDetayTumunuSec-@item.Id" value="KayitDetayTumunuSec-@item.Id-@item.SayfaAdi">
+                                                        <label class="custom-control-label" for="KayitDetayTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="KayitEkleTumunuSec" id="KayitEkleTumunuSec-@item.Id" value="KayitEkleTumunuSec-@item.Id-@item.SayfaAdi">
+                                                        <label class="custom-control-label" for="KayitEkleTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="KayitDuzenleTumunuSec" id="KayitDuzenleTumunuSec-@item.Id" value="KayitDuzenleTumunuSec-@item.Id-@item.SayfaAdi">
+                                                        <label class="custom-control-label" for="KayitDuzenleTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="KayitSilTumunuSec" id="KayitSilTumunuSec-@item.Id" value="KayitSilTumunuSec-@item.Id-@item.SayfaAdi">
+                                                        <label class="custom-control-label" for="KayitSilTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="YazdirTumunuSec" id="YazdirTumunuSec-@item.Id" value="YazdirTumunuSec-@item.Id-@item.SayfaAdi">
+                                                        <label class="custom-control-label" for="YazdirTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="custom-control custom-checkbox custom-control-inline ml-auto pb-2">
+                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-islem="SmsGonderTumunuSec" id="SmsGonderTumunuSec-@item.Id" value="SmsGonderTumunuSec-@item.Id-@item.SayfaAdi">
+                                                        <label class="custom-control-label" for="SmsGonderTumunuSec-@item.Id">Tümünü Seç</label>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            @if (item.ModulSayfa1.Any())
+                                            {
+                                                foreach (var sayfa in item.ModulSayfa1.Where(x => x.Aktif == true && x.Sil == false))
+                                                {
+                                                    //Alt sayfalar var ise satır başına ikon koymak için kullanıldı
+                                                    if (sayfa.ModulSayfa1.Any())
+                                                    {
+                                                        <tr class="bg-success-400">
+                                                            <td><i class="fal fa-arrow-alt-from-top"></i> @sayfa.SayfaAdi</td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.SayfaYetkiAktif == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SayfaGor" data-islem2="AltSayfaGor" id="SayfaGor-@sayfa.Id" value="SayfaGor-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="SayfaGor-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SayfaGor" data-islem2="AltSayfaGor" id="SayfaGor-@sayfa.Id" value="SayfaGor-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="SayfaGor-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitDetayiAktif == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDetay" data-islem2="AltKayitDetay" id="KayitDetay-@sayfa.Id" value="KayitDetay-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="KayitDetay-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDetay" data-islem2="AltKayitDetay" id="KayitDetay-@sayfa.Id" value="KayitDetay-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitDetay-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitEkleAktif == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitEkle" data-islem2="AltKayitEkle" id="KayitEkle-@sayfa.Id" value="KayitEkle-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="KayitEkle-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitEkle" data-islem2="AltKayitEkle" id="KayitEkle-@sayfa.Id" value="KayitEkle-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitEkle-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitDuzenleAktif == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDuzenle" data-islem2="AltKayitDuzenle" id="KayitDuzenle-@sayfa.Id" value="KayitDuzenle-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="KayitDuzenle-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDuzenle" data-islem2="AltKayitDuzenle" id="KayitDuzenle-@sayfa.Id" value="KayitDuzenle-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitDuzenle-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitSilAktif == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitSil" data-islem2="AltKayitSil" id="KayitSil-@item.Id" value="KayitSil-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="KayitSil-@item.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitSil" data-islem2="AltKayitSil" id="KayitSil-@item.Id" value="KayitSil-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitSil-@item.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.Yazdirma == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="Yazdir" data-islem2="AltYazdir" id="Yazdir-@item.Id" value="Yazdir-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="Yazdir-@item.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="Yazdir" data-islem2="AltYazdir" id="Yazdir-@item.Id" value="Yazdir-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="Yazdir-@item.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.SMSGonder == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SmsGonder" data-islem2="AltSmsGonder" id="SmsGonder-@item.Id" value="SmsGonder-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="SmsGonder-@item.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SmsGonder" data-islem2="AltSmsGonder" id="SmsGonder-@item.Id" value="SmsGonder-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="SmsGonder-@item.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    else
+                                                    {
+                                                        <tr>
+                                                            <td>@sayfa.SayfaAdi</td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.SayfaYetkiAktif == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SayfaGor" id="SayfaGor-@sayfa.Id" value="SayfaGor-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="SayfaGor-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SayfaGor" id="SayfaGor-@sayfa.Id" value="SayfaGor-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="SayfaGor-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitDetayiAktif == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDetay" id="KayitDetay-@sayfa.Id" value="KayitDetay-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="KayitDetay-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDetay" id="KayitDetay-@item.Id" value="KayitDetay-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitDetay-@item.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitEkleAktif == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitEkle" id="KayitEkle-@sayfa.Id" value="KayitEkle-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="KayitEkle-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitEkle" id="KayitEkle-@sayfa.Id" value="KayitEkle-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitEkle-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitDuzenleAktif == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDuzenle" id="KayitDuzenle-@sayfa.Id" value="KayitDuzenle-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="KayitDuzenle-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitDuzenle" id="KayitDuzenle-@sayfa.Id" value="KayitDuzenle-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitDuzenle-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.KayitSilAktif == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitSil" id="KayitSil-@sayfa.Id" value="KayitSil-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="KayitSil-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="KayitSil" id="KayitSil-@sayfa.Id" value="KayitSil-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="KayitSil-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.Yazdirma == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="Yazdir" id="Yazdir-@sayfa.Id" value="Yazdir-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="Yazdir-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="Yazdir" id="Yazdir-@sayfa.Id" value="Yazdir-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="Yazdir-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    @if (sayfa.SMSGonder == true)
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SmsGonder" id="SmsGonder-@sayfa.Id" value="SmsGonder-@sayfa.Id-@sayfa.SayfaAdi">
+                                                                        <label class="custom-control-label" for="SmsGonder-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-islem="SmsGonder" id="SmsGonder-@sayfa.Id" value="SmsGonder-@sayfa.Id-@sayfa.SayfaAdi" disabled>
+                                                                        <label class="custom-control-label" for="SmsGonder-@sayfa.Id">Yetkilendir</label>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                    if (sayfa.ModulSayfa1.Any())
+                                                    {
+                                                        foreach (var sayfa1 in sayfa.ModulSayfa1.Where(x => x.Aktif == true && x.Sil == false))
+                                                        {
+                                                            <tr class="bg-success-50">
+                                                                <td><i class="fal fa-1x fa-arrow-alt-from-left"></i> @sayfa1.SayfaAdi</td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.SayfaYetkiAktif == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="SayfaGor" id="SayfaGor-@sayfa1.Id" value="SayfaGor-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                            <label class="custom-control-label" for="SayfaGor-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="SayfaGor" id="SayfaGor-@sayfa1.Id" value="SayfaGor-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="SayfaGor-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.KayitDetayiAktif == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitDetay" id="KayitDetay-@sayfa1.Id" value="KayitDetay-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                            <label class="custom-control-label" for="KayitDetay-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitDetay" id="KayitDetay-@sayfa1.Id" value="KayitDetay-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="KayitDetay-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.KayitEkleAktif == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitEkle" id="KayitEkle-@sayfa1.Id" value="KayitEkle-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                            <label class="custom-control-label" for="KayitEkle-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitEkle" id="KayitEkle-@sayfa1.Id" value="KayitEkle-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="KayitEkle-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.KayitDuzenleAktif == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitDuzenle" id="KayitDuzenle-@sayfa1.Id" value="KayitDuzenle-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                            <label class="custom-control-label" for="KayitDuzenle-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitDuzenle" id="KayitDuzenle-@sayfa1.Id" value="KayitDuzenle-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="KayitDuzenle-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.KayitSilAktif == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitSil" id="KayitSil-@sayfa1.Id" value="KayitSil-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                            <label class="custom-control-label" for="KayitSil-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="KayitSil" id="KayitSil-@sayfa1.Id" value="KayitSil-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="KayitSil-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.Yazdirma == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="Yazdir" id="Yazdir-@sayfa1.Id" value="Yazdir-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                            <label class="custom-control-label" for="Yazdir-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="Yazdir" id="Yazdir-@sayfa1.Id" value="Yazdir-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="Yazdir-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                                        @if (sayfa1.SMSGonder == true)
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="SmsGonder" id="SmsGonder-@sayfa1.Id" value="SmsGonder-@sayfa1.Id-@sayfa1.SayfaAdi">
+                                                                            <label class="custom-control-label" for="SmsGonder-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <input type="checkbox" class="custom-control-input" data-modulid="@item.Id" data-sayfaid="@sayfa.Id" data-sayfa1id="@sayfa1.Id" data-islem="SmsGonder" id="SmsGonder-@sayfa1.Id" value="SmsGonder-@sayfa1.Id-@sayfa1.SayfaAdi" disabled>
+                                                                            <label class="custom-control-label" for="SmsGonder-@sayfa1.Id">Yetkilendir</label>
+                                                                        }
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        </tbody>
+                                    </table>
+                                    }
+                                }
+
+                            </div>
+                        </div>
+                    </div>
+                                    }
+            </div>
+
+            <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                    <button type="button" class="btn btn-primary ml-auto waves-effect waves-themed Kaydet" value="@kl.Id" id="Kaydet2">Kaydet</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            var SecilenModuluYetkilendir = new Array();
+            var SecilenSayfaGor = new Array();
+            var SecilenKayitDetay = new Array();
+            var SecilenKayitEkle = new Array();
+            var SecilenKayitDuzenle = new Array();
+            var SecilenKayitSil = new Array();
+            var SecilenYazdir = new Array();
+            var SecilenSmsGonder = new Array();
+            var SecilmeyenModuluYetkilendir = new Array();
+            var SecilmeyenSayfaGor = new Array();
+            var SecilmeyenKayitDetay = new Array();
+            var SecilmeyenKayitEkle = new Array();
+            var SecilmeyenKayitDuzenle = new Array();
+            var SecilmeyenKayitSil = new Array();
+            var SecilmeyenYazdir = new Array();
+            var SecilmeyenSmsGonder = new Array();
+            //---------------------------------------------------- Modül Yetkilendirme Seç İşlemi
+            $("input[type=checkbox]").on("change", function () {
+                var modulid = $(this).data("modulid");
+                var sec = $("input[type=checkbox]");
+                if ($(this).data("islem") == "ModuluYetkilendir" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("modulid") == modulid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "ModuluYetkilendir" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("modulid") == modulid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+            });
+            //---------------------------------------------------- Modül Yetkilendirme Seç İşlemi
+
+            //---------------------------------------------------- Tümünü Seç İşlemi
+            $("input[type=checkbox]").on("change", function () {
+                var modulid = $(this).data("modulid");
+                var sec = $("input[type=checkbox]");
+                if ($(this).data("islem") == "SayfayiGorTumunuSec" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "SayfaGor") && ($(item).data("modulid") == modulid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "SayfayiGorTumunuSec" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "SayfaGor") && ($(item).data("modulid") == modulid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "KayitDetayTumunuSec" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitDetay") && ($(item).data("modulid") == modulid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "KayitDetayTumunuSec" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitDetay") && ($(item).data("modulid") == modulid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "KayitEkleTumunuSec" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitEkle") && ($(item).data("modulid") == modulid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "KayitEkleTumunuSec" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitEkle") && ($(item).data("modulid") == modulid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "KayitDuzenleTumunuSec" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitDuzenle") && ($(item).data("modulid") == modulid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "KayitDuzenleTumunuSec" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitDuzenle") && ($(item).data("modulid") == modulid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "KayitSilTumunuSec" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitSil") && ($(item).data("modulid") == modulid) && $(this).is(":disabled") == false) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "KayitSilTumunuSec" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitSil") && ($(item).data("modulid") == modulid) && $(this).is(":disabled") == false) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "YazdirTumunuSec" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "Yazdir") && ($(item).data("modulid") == modulid) && $(this).is(":disabled") == false) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "YazdirTumunuSec" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "Yazdir") && ($(item).data("modulid") == modulid) && $(this).is(":disabled") == false) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "SmsGonderTumunuSec" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "SmsGonder") && ($(item).data("modulid") == modulid) && $(this).is(":disabled") == false) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem") == "SmsGonderTumunuSec" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "SmsGonder") && ($(item).data("modulid") == modulid) && $(this).is(":disabled") == false) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+            });
+            //---------------------------------------------------- Tümünü Seç İşlemi
+
+            //---------------------------------------------------- Üst Sayfa seçildiğinde alt sayfa Seç İşlemi
+            $("input[type=checkbox]").on("change", function () {
+                var sayfaid = $(this).data("sayfaid");
+                var sec = $("input[type=checkbox]");
+                if ($(this).data("islem2") == "AltSayfaGor" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "SayfaGor") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltSayfaGor" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "SayfaGor") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltKayitDetay" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitDetay") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltKayitDetay" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitDetay") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltKayitEkle" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitEkle") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltKayitEkle" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitEkle") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltKayitDuzenle" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitDuzenle") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltKayitDuzenle" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitDuzenle") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltKayitSil" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitSil") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltKayitSil" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "KayitSil") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltYazdir" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "Yazdir") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltYazdir" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "Yazdir") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltSmsGonder" && $(this).is(':checked')) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "SmsGonder") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", false);
+                            $(item).prop("checked", true);
+                        }
+                    });
+                }
+                else if ($(this).data("islem2") == "AltSmsGonder" && $(this).is(':checked') == false) {
+                    $.each(sec, function (index, item) {
+                        if (($(item).data("islem") == "SmsGonder") && ($(item).data("sayfaid") == sayfaid && $(this).is(":disabled") == false)) {
+                            $(item).prop("checked", true);
+                            $(item).prop("checked", false);
+                        }
+                    });
+                }
+            });
+            //---------------------------------------------------- Üst Sayfa seçildiğinde alt sayfa Seç İşlemi
+
+            $(".Kaydet").click(function () {
+
+                $("input[type=checkbox]").each(function (i) {
+                    //: i = sayfa id si olacak
+                    //alert(i+"="+$(this).val());
+                    var ModuluYetkilendir = document.getElementById("ModuluYetkilendir-" + i);
+                    var SayfaGor = document.getElementById("SayfaGor-" + i);
+                    var KayitDetay = document.getElementById("KayitDetay-" + i);
+                    var KayitEkle = document.getElementById("KayitEkle-" + i);
+                    var KayitDuzenle = document.getElementById("KayitDuzenle-" + i);
+                    var KayitSil = document.getElementById("KayitSil-" + i);
+                    var Yazdir = document.getElementById("Yazdir-" + i);
+                    var SmsGonder = document.getElementById("SmsGonder-" + i);
+                    // -------- Seçilen Yetkilerin Id'leri dizilere ekleniyor.
+                    if (ModuluYetkilendir != null && ModuluYetkilendir.checked == true && ModuluYetkilendir.disabled == false) {
+                        SecilenModuluYetkilendir.push(i);
+                    }
+                    if (SayfaGor != null && SayfaGor.checked == true && SayfaGor.disabled == false) {
+                        SecilenSayfaGor.push(i);
+                    }
+                    if (KayitDetay != null && KayitDetay.checked == true && KayitDetay.disabled == false) {
+                        SecilenKayitDetay.push(i);
+                    }
+                    if (KayitEkle != null && KayitEkle.checked == true && KayitEkle.disabled == false) {
+                        SecilenKayitEkle.push(i);
+                    }
+                    if (KayitDuzenle != null && KayitDuzenle.checked == true && KayitDuzenle.disabled == false) {
+                        SecilenKayitDuzenle.push(i);
+                    }
+                    if (KayitSil != null && KayitSil.checked == true && KayitSil.disabled == false) {
+                        SecilenKayitSil.push(i);
+                    }
+                    if (Yazdir != null && Yazdir.checked == true && Yazdir.disabled == false) {
+                        SecilenYazdir.push(i);
+                    }
+                    if (SmsGonder != null && SmsGonder.checked == true && SmsGonder.disabled == false) {
+                        SecilenSmsGonder.push(i);
+                    }
+                    // -------- Seçilen Yetkilerin Id'leri dizilere ekleniyor.
+
+                    // -------- Seçilmeyen Yetkilerin Id'leri dizilere ekleniyor.
+                    if (ModuluYetkilendir != null && ModuluYetkilendir.checked == false) {
+                        SecilmeyenModuluYetkilendir.push(i);
+                    }
+                    if (SayfaGor != null && SayfaGor.checked == false) {
+                        SecilmeyenSayfaGor.push(i);
+                    }
+                    if (KayitDetay != null && KayitDetay.checked == false) {
+                        SecilmeyenKayitDetay.push(i);
+                    }
+                    if (KayitEkle != null && KayitEkle.checked == false) {
+                        SecilmeyenKayitEkle.push(i);
+                    }
+                    if (KayitDuzenle != null && KayitDuzenle.checked == false) {
+                        SecilmeyenKayitDuzenle.push(i);
+                    }
+                    if (KayitSil != null && KayitSil.checked == false) {
+                        SecilmeyenKayitSil.push(i);
+                    }
+                    if (Yazdir != null && Yazdir.checked == false) {
+                        SecilmeyenYazdir.push(i);
+                    }
+                    if (SmsGonder != null && SmsGonder.checked == false) {
+                        SecilmeyenSmsGonder.push(i);
+                    }
+                    // -------- Seçilmeyen Yetkilerin Id'leri dizilere ekleniyor.
+
+                });
+
+                var KullaniciYetkiData = new FormData();
+                KullaniciYetkiData.append("Id", $(this).val());
+                KullaniciYetkiData.append("SecilenModuluYetkilendir", SecilenModuluYetkilendir);
+                KullaniciYetkiData.append("SecilenSayfaGor", SecilenSayfaGor);
+                KullaniciYetkiData.append("SecilenKayitDetay", SecilenKayitDetay);
+                KullaniciYetkiData.append("SecilenKayitEkle", SecilenKayitEkle);
+                KullaniciYetkiData.append("SecilenKayitDuzenle", SecilenKayitDuzenle);
+                KullaniciYetkiData.append("SecilenKayitSil", SecilenKayitSil);
+                KullaniciYetkiData.append("SecilenYazdir", SecilenYazdir);
+                KullaniciYetkiData.append("SecilenSmsGonder", SecilenSmsGonder);
+                KullaniciYetkiData.append("SecilmeyenModuluYetkilendir", SecilmeyenModuluYetkilendir);
+                KullaniciYetkiData.append("SecilmeyenSayfaGor", SecilmeyenSayfaGor);
+                KullaniciYetkiData.append("SecilmeyenKayitDetay", SecilmeyenKayitDetay);
+                KullaniciYetkiData.append("SecilmeyenKayitEkle", SecilmeyenKayitEkle);
+                KullaniciYetkiData.append("SecilmeyenKayitDuzenle", SecilmeyenKayitDuzenle);
+                KullaniciYetkiData.append("SecilmeyenKayitSil", SecilmeyenKayitSil);
+                KullaniciYetkiData.append("SecilmeyenYazdir", SecilmeyenYazdir);
+                KullaniciYetkiData.append("SecilmeyenSmsGonder", SecilmeyenSmsGonder);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: KullaniciYetkiData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        Swal.fire(
+                        {
+                            title: "Yetkiler Güncelleniyor!",
+                            html: "<strong>Lütfen Bekleyin.</strong>",
+                            onBeforeOpen: function onBeforeOpen() {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    url: "/Otomasyon/KullaniciIslemleri/KullaniciYetkileriKaydet/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            Swal.fire(
+                            {
+                                title: "HATA",
+                                //text: "<< " + paketadi + " >> adlı bir paket zaten var! Bu kaydı güncellemek istermisiniz?",
+                                html: "<p><h3>" + data.mesaj + "<h3/></p>",
+                                type: "warning",
+                                //showCancelButton: true,
+                                confirmButtonText: "Tamam"
+                            });
+                        }
+                        else {
+                            swal.close();
+                            window.location.replace("/Otomasyon/KullaniciIslemleri/KullaniciListesi");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+                //alert("SecilenModuluYetkilendir=" + SecilenModuluYetkilendir);
+                //alert("SecilenSayfaGor=" + SecilenSayfaGor);
+                //alert("SecilenKayitDetay=" + SecilenKayitDetay);
+                //alert("SecilenKayitEkle=" + SecilenKayitEkle);
+                //alert("SecilenKayitDuzenle=" + SecilenKayitDuzenle);
+                //alert("SecilenKayitSil=" + SecilenKayitSil);
+
+                //alert("SecilmeyenModuluYetkilendir=" + SecilmeyenModuluYetkilendir);
+                //alert("SecilmeyenSayfaGor=" + SecilmeyenSayfaGor);
+                //alert("SecilmeyenKayitDetay=" + SecilmeyenKayitDetay);
+                //alert("SecilmeyenKayitEkle=" + SecilmeyenKayitEkle);
+                //alert("SecilmeyenKayitDuzenle=" + SecilmeyenKayitDuzenle);
+                //alert("SecilmeyenKayitSil=" + SecilmeyenKayitSil);
+                //alert("SecilenYazdir=" + SecilenYazdir);
+                //alert("SecilmeyenYazdir=" + SecilmeyenYazdir);
+            });
+        });
+    </script>
+}

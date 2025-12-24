@@ -1,0 +1,1562 @@
+﻿
+@{
+    ViewBag.Title = "Tanımlar - Rezervasyon Türleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+@section Head
+{
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Otomasyon/Content/css/formplugins/bootstrap-colorpicker/bootstrap-colorpicker.css">
+}
+
+
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Rezervasyon Türü Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="rezervasyonturuhata">
+                                <label class="form-label" for="rezervasyonturu">Rezervasyon Türü</label>
+                                <input type="text" class="form-control" id="rezervasyonturu" name="RezervasyonTuru" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="form-row col col-md-12  mb-0">
+                            <label class="form-label">Takvimde Görüntüleneceği Renk</label>
+                            @*<div id="cp2" class="input-group colorpicker-element col-12 mb-3" title="Renk Şeçimi">
+                                    <input type="text" class="form-control input-lg renk" value="#FFFFFF" />
+                                    <span class="input-group-append">
+                                        <span class="input-group-text colorpicker-input-addon"><i></i></span>
+                                    </span>
+                                </div>*@
+                        </div>
+                        <div class="form-row col col-md-12 mb-2">
+                            <div class="row col-md-4">
+                                <div class="form-row col-md-12">
+                                    <label class="form-label" style="margin-right:15px" for="ZeminRengi">Zemin Rengi</label>
+                                </div>
+                                <div class="form-row col-md-12">
+                                    <label class="form-label" style="margin-right:15px" for="CerceveRengi">Çerçeve Rengi</label>
+                                </div>
+                                <div class="form-row col-md-12">
+                                    <label class="form-label" style="margin-right:15px" for="YaziRengi">Yazı Rengi</label>
+                                </div>
+                            </div>
+                            <div class="row col-md-4">
+                                <div class="form-row col-md-12">
+                                    <select id="ZeminRengi" name="ZeminRengi" title="Zemin Rengini Seçiniz">
+                                        <option value="0" data-color="#1DC9B7"></option> @*   Success - bg-success   *@
+                                        <option value="1" data-color="#FFC241"></option> @*   Warning - bg-warning   *@
+                                        <option value="2" data-color="#FD3995"></option> @*   Danger - bg-danger   *@
+                                        <option selected="" value="3" data-color="#2196F3"></option> @*   Info - bg-info   *@
+                                        <option value="4" data-color="#886AB5"></option> @*   Primary - bg-primary   *@
+                                        <option value="5" data-color="#868E96"></option> @*   Secondary - bg-secondary   *@
+                                        <option value="6" data-color="#ffffff"></option> @*   White - bg-white   *@
+                                        <option value="7" data-color="#505050"></option> @*   White - bg-dark   *@
+                                    </select>
+                                </div>
+                                <div class="form-row col-md-12">
+                                    <select id="CerceveRengi" name="CerceveRengi" title="Çerçeve Rengini Seçiniz">
+                                        <option value="0" data-color="#1DC9B7"></option> @*   Success - border-success   *@
+                                        <option value="1" data-color="#FFC241"></option> @*   Warning - border-warning   *@
+                                        <option selected="" value="2" data-color="#FD3995"></option> @*   Danger - border-danger   *@
+                                        <option value="3" data-color="#2196F3"></option> @*   Info - border-info   *@
+                                        <option value="4" data-color="#886AB5"></option> @*   Primary - border-primary   *@
+                                        <option value="5" data-color="#868E96"></option> @*   Secondary - border-secondary   *@
+                                        <option value="6" data-color="#ffffff"></option> @*   White - border-white   *@
+                                        <option value="7" data-color="#505050"></option> @*   White - border-dark   *@
+                                    </select>
+                                </div>
+                                <div class="form-row col-md-12">
+                                    <select id="YaziRengi" name="YaziRengi" title="Yazı Rengini Seçiniz">
+                                        <option value="0" data-color="#1DC9B7"></option> @*   Success - text-success   *@
+                                        <option value="1" data-color="#FFC241"></option> @*   Warning - text-warning   *@
+                                        <option value="2" data-color="#FD3995"></option> @*   Danger - text-danger   *@
+                                        <option value="3" data-color="#2196F3"></option> @*   Info - text-info   *@
+                                        <option value="4" data-color="#886AB5"></option> @*   Primary - text-primary   *@
+                                        <option value="5" data-color="#868E96"></option> @*   Secondary - text-secondary   *@
+                                        <option selected="" value="6" data-color="#ffffff"></option> @*   White - text-white   *@
+                                        <option value="7" data-color="#505050"></option> @*   White - text-dark   *@
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="bg-info border-danger text-white" id="onizleme" style="width:25%; height:100%; border-radius:4px; padding:5px;border:solid; border-width:1px">
+                                19:00-23:00 <br />
+                                Düğün Çekimi <br />
+                                Gelin & Damat
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label mb-2">Rezervasyon Ekleme Formunda Görüntülenecek Alanlar</label>
+                            <div class="custom-control custom-radio mb-2">
+                                <input type="radio" class="custom-control-input" id="gelindamatradio" name="radio-stacked" checked>
+                                <label class="custom-control-label" for="gelindamatradio">Gelin-Damat</label>
+                            </div>
+                            <div class="custom-control custom-radio mb-2">
+                                <input type="radio" class="custom-control-input" id="bebekcocukradio" name="radio-stacked">
+                                <label class="custom-control-label" for="bebekcocukradio">Bebek-Çocuk</label>
+                            </div>
+                            <div class="custom-control custom-radio mb-2">
+                                <input type="radio" class="custom-control-input" id="urunkatalogradio" name="radio-stacked">
+                                <label class="custom-control-label" for="urunkatalogradio">Ürün-Katalog</label>
+                            </div>
+                            <div class="custom-control custom-radio mb-2">
+                                <input type="radio" class="custom-control-input" id="modelmankenradio" name="radio-stacked">
+                                <label class="custom-control-label" for="modelmankenradio">Model-Manken</label>
+                            </div>
+                            <div class="custom-control custom-radio mb-3">
+                                <input type="radio" class="custom-control-input" id="yetkiliradio" name="radio-stacked">
+                                <label class="custom-control-label" for="yetkiliradio">Yetliki</label>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-12 mb-3">
+                                <label class="form-label" for="aciklama">Açıklama</label>
+                                <textarea class="form-control" id="aciklama" rows="3" maxlength="250" name="Aciklama" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="RezervasyonTuruKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-2" id="rezervasyonturuduzenlehata">
+                                <label class="form-label" for="rezervasyonturuduzenle">Rezervasyon Türü</label>
+                                <input type="text" class="form-control" id="rezervasyonturuduzenle" name="RezervasyonTuru" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <label class="form-label" for="renk">Takvimde Görüntüleneceği Renk</label>
+                            @*<div id="cp2duzenle" class="input-group colorpicker-element col-12 mb-2" title="Renk Şeçimi">
+                                    <input type="text" class="form-control input-lg renkduzenle" value="#FFFFFF" />
+                                    <span class="input-group-append">
+                                        <span class="input-group-text colorpicker-input-addon"><i></i></span>
+                                    </span>
+                                </div>*@
+                        </div>
+                        <div class="form-row col col-md-12 mb-2">
+                            <div class="row col-md-4">
+                                <div class="form-row col-md-12">
+                                    <label class="form-label" style="margin-right:15px" for="ZeminRengiDuzenle">Zemin Rengi</label>
+                                </div>
+                                <div class="form-row col-md-12">
+                                    <label class="form-label" style="margin-right:15px" for="CerceveRengiDuzenle">Çerçeve Rengi</label>
+                                </div>
+                                <div class="form-row col-md-12">
+                                    <label class="form-label" style="margin-right:15px" for="YaziRengiDuzenle">Yazı Rengi</label>
+                                </div>
+                            </div>
+                            <div class="row col-md-4">
+                                <div class="form-row col-md-12">
+                                    <select id="ZeminRengiDuzenle" name="ZeminRengiDuzenle" title="Zemin Rengini Seçiniz">
+                                        <option value="0" data-color="#1DC9B7"></option> @*   Success - bg-success   *@
+                                        <option value="1" data-color="#FFC241"></option> @*   Warning - bg-warning   *@
+                                        <option value="2" data-color="#FD3995"></option> @*   Danger - bg-danger   *@
+                                        <option selected="" value="3" data-color="#2196F3"></option> @*   Info - bg-info   *@
+                                        <option value="4" data-color="#886AB5"></option> @*   Primary - bg-primary   *@
+                                        <option value="5" data-color="#868E96"></option> @*   Secondary - bg-secondary   *@
+                                        <option value="6" data-color="#ffffff"></option> @*   White - bg-white   *@
+                                        <option value="7" data-color="#505050"></option> @*   White - bg-dark   *@
+                                    </select>
+                                </div>
+                                <div class="form-row col-md-12">
+                                    <select id="CerceveRengiDuzenle" name="CerceveRengiDuzenle" title="Çerçeve Rengini Seçiniz">
+                                        <option value="0" data-color="#1DC9B7"></option> @*   Success - border-success   *@
+                                        <option value="1" data-color="#FFC241"></option> @*   Warning - border-warning   *@
+                                        <option selected="" value="2" data-color="#FD3995"></option> @*   Danger - border-danger   *@
+                                        <option value="3" data-color="#2196F3"></option> @*   Info - border-info   *@
+                                        <option value="4" data-color="#886AB5"></option> @*   Primary - border-primary   *@
+                                        <option value="5" data-color="#868E96"></option> @*   Secondary - border-secondary   *@
+                                        <option value="6" data-color="#ffffff"></option> @*   White - border-white   *@
+                                        <option value="7" data-color="#505050"></option> @*   White - border-dark   *@
+                                    </select>
+                                </div>
+                                <div class="form-row col-md-12">
+                                    <select id="YaziRengiDuzenle" name="YaziRengiDuzenle" title="Yazı Rengini Seçiniz">
+                                        <option value="0" data-color="#1DC9B7"></option> @*   Success - text-success   *@
+                                        <option value="1" data-color="#FFC241"></option> @*   Warning - text-warning   *@
+                                        <option value="2" data-color="#FD3995"></option> @*   Danger - text-danger   *@
+                                        <option value="3" data-color="#2196F3"></option> @*   Info - text-info   *@
+                                        <option value="4" data-color="#886AB5"></option> @*   Primary - text-primary   *@
+                                        <option value="5" data-color="#868E96"></option> @*   Secondary - text-secondary   *@
+                                        <option selected="" value="6" data-color="#ffffff"></option> @*   White - text-white   *@
+                                        <option value="7" data-color="#505050"></option> @*   White - text-dark   *@
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="bg-info border-danger text-white" id="onizlemeduzenle" style="width:25%; height:100%; border-radius:4px; padding:5px;border:solid; border-width:1px">
+                                19:00-23:00 <br />
+                                Düğün Çekimi <br />
+                                Gelin & Damat
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label mb-2">Rezervasyon Ekleme Formunda Görüntülenecek Alanlar</label>
+                            <div class="custom-control custom-radio mb-2">
+                                <input type="radio" class="custom-control-input" id="gelindamatradioduzenle" name="radio-stacked">
+                                <label class="custom-control-label" for="gelindamatradioduzenle">Gelin-Damat</label>
+                            </div>
+                            <div class="custom-control custom-radio mb-2">
+                                <input type="radio" class="custom-control-input" id="bebekcocukradioduzenle" name="radio-stacked">
+                                <label class="custom-control-label" for="bebekcocukradioduzenle">Bebek-Çocuk</label>
+                            </div>
+                            <div class="custom-control custom-radio mb-2">
+                                <input type="radio" class="custom-control-input" id="urunkatalogradioduzenle" name="radio-stacked">
+                                <label class="custom-control-label" for="urunkatalogradioduzenle">Ürün-Katalog</label>
+                            </div>
+                            <div class="custom-control custom-radio mb-2">
+                                <input type="radio" class="custom-control-input" id="modelmankenradioduzenle" name="radio-stacked">
+                                <label class="custom-control-label" for="modelmankenradioduzenle">Model-Manken</label>
+                            </div>
+                            <div class="custom-control custom-radio mb-3">
+                                <input type="radio" class="custom-control-input" id="yetkiliradioduzenle" name="radio-stacked">
+                                <label class="custom-control-label" for="yetkiliradioduzenle">Yetkili</label>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-12 mb-2">
+                                <label class="form-label" for="aciklamaduzenle">Açıklama</label>
+                                <textarea class="form-control" id="aciklamaduzenle" rows="3" maxlength="250" name="Aciklama" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="RezervasyonTuruGuncelle">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<!-- Varsayılan Geğerleri Ekle Modal Penceresi -->
+<div class="modal fade" id="VarsayilanEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Varsayılan Rezervasyon Türlerini Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content" id="varsayilandegerler">
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-1" checked data-deger="Açılış Töreni" data-alan="Yetkili">
+                                    <label class="custom-control-label" for="varsayilan-1">Açılış Töreni</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-2" checked data-deger="Bebek - Doğum Çekimi" data-alan="Bebek/Çocuk">
+                                    <label class="custom-control-label" for="varsayilan-2">Bebek - Doğum Çekimi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-3" checked data-deger="Çocuk Çekimi" data-alan="Bebek/Çocuk">
+                                    <label class="custom-control-label" for="varsayilan-3">Çocuk Çekimi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-4" checked data-deger="Dış Mekan Çekimi" data-alan="Gelin/Damat">
+                                    <label class="custom-control-label" for="varsayilan-4">Dış Mekan Çekimi</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-5" checked data-deger="Doğa Çekimi" data-alan="Yetkili">
+                                    <label class="custom-control-label" for="varsayilan-5">Doğa Çekimi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-6" checked data-deger="Düğün" data-alan="Gelin/Damat">
+                                    <label class="custom-control-label" for="varsayilan-6">Düğün</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-7" checked data-deger="Düğün Hikayesi" data-alan="Gelin/Damat">
+                                    <label class="custom-control-label" for="varsayilan-7">Düğün Hikayesi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-8" checked data-deger="Düğün Klibi" data-alan="Gelin/Damat">
+                                    <label class="custom-control-label" for="varsayilan-8">Düğün Klibi</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-9" checked data-deger="Kına" data-alan="Gelin/Damat">
+                                    <label class="custom-control-label" for="varsayilan-9">Kına</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-10" checked data-deger="Lansman Çekimi" data-alan="Yetkili">
+                                    <label class="custom-control-label" for="varsayilan-10">Lansman Çekimi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-11" checked data-deger="Nişan" data-alan="Gelin/Damat">
+                                    <label class="custom-control-label" for="varsayilan-11">Nişan</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-12" checked data-deger="Okul Mezuniyeti" data-alan="Yetkili">
+                                    <label class="custom-control-label" for="varsayilan-12">Okul Mezuniyeti</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-13" checked data-deger="Okul Partisi" data-alan="Yetkili">
+                                    <label class="custom-control-label" for="varsayilan-13">Okul Partisi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-14" checked data-deger="Stüdyo Çekimi" data-alan="Yetkili">
+                                    <label class="custom-control-label" for="varsayilan-14">Stüdyo Çekimi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-15" checked data-deger="Sünnet" data-alan="Bebek/Çocuk">
+                                    <label class="custom-control-label" for="varsayilan-15">Sünnet</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-16" checked data-deger="Şehir Dışı Çekimi" data-alan="Yetkili">
+                                    <label class="custom-control-label" for="varsayilan-16">Şehir Dışı Çekimi</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-17" checked data-deger="Şirket Galası" data-alan="Yetkili">
+                                    <label class="custom-control-label" for="varsayilan-17">Şirket Galası</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-18" checked data-deger="Şirket Toplantısı" data-alan="Yetkili">
+                                    <label class="custom-control-label" for="varsayilan-18">Şirket Toplantısı</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-19" checked data-deger="Ürün - Katalog Çekimi" data-alan="Ürün/Katalog">
+                                    <label class="custom-control-label" for="varsayilan-19">Ürün - Katalog Çekimi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-20" checked data-deger="Model-Manken Çekimi" data-alan="Model/Manken">
+                                    <label class="custom-control-label" for="varsayilan-20">Model-Manken Çekimi</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="VarsayilanKaydet">Seçilenleri Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Varsayılan Geğerleri Ekle Modal Penceresi -->
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                @if (KullaniciYetki.KayitEkle)
+                {
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle">Yeni Rezervasyon Türü Ekle</button>
+                    <div class="" id="rezervasyonturdisable">
+                        <button class="btn btn-sm btn-default mr-auto waves-effect waves-themed" id="rezervasyonturlerivarsayilan" data-toggle="modal" data-target="#VarsayilanEkleModal">Varsayılan Değerleri Yükle</button>
+                    </div>
+                }
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtRezervasyonTurleri" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Rezervasyon Türü</th>
+                                <th>Takvim Görünümü</th>
+                                <th>Form Alan</th>
+                                <th>Açıklama</th>
+                                <th class="w-10">Durum</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rezervastonturlerisatir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+<script src="~/Areas/Otomasyon/Content/js/formplugins/bootstrap-colorpicker/bootstrap-colorpicker.js"></script>
+-    <script>
+        $(document).ready(function () {
+            var zeminrengi = "bg-info";
+            var cerceverengi = "border-danger";
+            var yazirengi = "text-white";
+            var clas = "";
+            var varsayilandeger;
+            var Varsayilanlar = new Array();
+            var VarsayilanAlanlar = new Array();
+            $("#ZeminRengi").colorselector();
+            $("#CerceveRengi").colorselector();
+            $("#YaziRengi").colorselector();
+            $("#ZeminRengiDuzenle").colorselector();
+            $("#CerceveRengiDuzenle").colorselector();
+            $("#YaziRengiDuzenle").colorselector();
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            });
+            $('#cp2').colorpicker();
+            $('#cp2duzenle').colorpicker();
+            $("#ZeminRengi").change(function () {
+                var renkkod = $(this).find("option:selected").val();
+                if (renkkod == 0) {
+                    $("#onizleme").removeClass("bg-success");
+                    $("#onizleme").removeClass("bg-warning");
+                    $("#onizleme").removeClass("bg-danger");
+                    $("#onizleme").removeClass("bg-info");
+                    $("#onizleme").removeClass("bg-primary");
+                    $("#onizleme").removeClass("bg-secondary");
+                    $("#onizleme").removeClass("bg-white");
+                    $("#onizleme").removeClass("bg-dark");
+                    $("#onizleme").addClass("bg-success");
+                    zeminrengi = "bg-success";
+                }
+                else if (renkkod == 1) {
+                    $("#onizleme").removeClass("bg-success");
+                    $("#onizleme").removeClass("bg-warning");
+                    $("#onizleme").removeClass("bg-danger");
+                    $("#onizleme").removeClass("bg-info");
+                    $("#onizleme").removeClass("bg-primary");
+                    $("#onizleme").removeClass("bg-secondary");
+                    $("#onizleme").removeClass("bg-white");
+                    $("#onizleme").removeClass("bg-dark");
+                    $("#onizleme").addClass("bg-warning");
+                    zeminrengi = "bg-warning";
+                }
+                else if (renkkod == 2) {
+                    $("#onizleme").removeClass("bg-success");
+                    $("#onizleme").removeClass("bg-warning");
+                    $("#onizleme").removeClass("bg-danger");
+                    $("#onizleme").removeClass("bg-info");
+                    $("#onizleme").removeClass("bg-primary");
+                    $("#onizleme").removeClass("bg-secondary");
+                    $("#onizleme").removeClass("bg-white");
+                    $("#onizleme").removeClass("bg-dark");
+                    $("#onizleme").addClass("bg-danger");
+                    zeminrengi = "bg-danger";
+                }
+                else if (renkkod == 3) {
+                    $("#onizleme").removeClass("bg-success");
+                    $("#onizleme").removeClass("bg-warning");
+                    $("#onizleme").removeClass("bg-danger");
+                    $("#onizleme").removeClass("bg-info");
+                    $("#onizleme").removeClass("bg-primary");
+                    $("#onizleme").removeClass("bg-secondary");
+                    $("#onizleme").removeClass("bg-white");
+                    $("#onizleme").removeClass("bg-dark");
+                    $("#onizleme").addClass("bg-info");
+                    zeminrengi = "bg-info";
+                }
+                else if (renkkod == 4) {
+                    $("#onizleme").removeClass("bg-success");
+                    $("#onizleme").removeClass("bg-warning");
+                    $("#onizleme").removeClass("bg-danger");
+                    $("#onizleme").removeClass("bg-info");
+                    $("#onizleme").removeClass("bg-primary");
+                    $("#onizleme").removeClass("bg-secondary");
+                    $("#onizleme").removeClass("bg-white");
+                    $("#onizleme").removeClass("bg-dark");
+                    $("#onizleme").addClass("bg-primary");
+                    zeminrengi = "bg-primary";
+                }
+                else if (renkkod == 5) {
+                    $("#onizleme").removeClass("bg-success");
+                    $("#onizleme").removeClass("bg-warning");
+                    $("#onizleme").removeClass("bg-danger");
+                    $("#onizleme").removeClass("bg-info");
+                    $("#onizleme").removeClass("bg-primary");
+                    $("#onizleme").removeClass("bg-secondary");
+                    $("#onizleme").removeClass("bg-white");
+                    $("#onizleme").removeClass("bg-dark");
+                    $("#onizleme").addClass("bg-secondary");
+                    zeminrengi = "bg-secondary";
+                }
+                else if (renkkod == 6) {
+                    $("#onizleme").removeClass("bg-success");
+                    $("#onizleme").removeClass("bg-warning");
+                    $("#onizleme").removeClass("bg-danger");
+                    $("#onizleme").removeClass("bg-info");
+                    $("#onizleme").removeClass("bg-primary");
+                    $("#onizleme").removeClass("bg-secondary");
+                    $("#onizleme").removeClass("bg-white");
+                    $("#onizleme").removeClass("bg-dark");
+                    $("#onizleme").addClass("bg-white");
+                    zeminrengi = "bg-white";
+                }
+                else if (renkkod == 7) {
+                    $("#onizleme").removeClass("bg-success");
+                    $("#onizleme").removeClass("bg-warning");
+                    $("#onizleme").removeClass("bg-danger");
+                    $("#onizleme").removeClass("bg-info");
+                    $("#onizleme").removeClass("bg-primary");
+                    $("#onizleme").removeClass("bg-secondary");
+                    $("#onizleme").removeClass("bg-white");
+                    $("#onizleme").removeClass("bg-dark");
+                    $("#onizleme").addClass("bg-dark");
+                    zeminrengi = "bg-dark";
+                }
+            });
+            $("#CerceveRengi").change(function () {
+                var renkkod = $(this).find("option:selected").val();
+                if (renkkod == 0) {
+                    $("#onizleme").removeClass("border-success");
+                    $("#onizleme").removeClass("border-warning");
+                    $("#onizleme").removeClass("border-danger");
+                    $("#onizleme").removeClass("border-info");
+                    $("#onizleme").removeClass("border-primary");
+                    $("#onizleme").removeClass("border-secondary");
+                    $("#onizleme").removeClass("border-white");
+                    $("#onizleme").removeClass("border-dark");
+                    $("#onizleme").addClass("border-success");
+                    cerceverengi = "border-success";
+                }
+                else if (renkkod == 1) {
+                    $("#onizleme").removeClass("border-success");
+                    $("#onizleme").removeClass("border-warning");
+                    $("#onizleme").removeClass("border-danger");
+                    $("#onizleme").removeClass("border-info");
+                    $("#onizleme").removeClass("border-primary");
+                    $("#onizleme").removeClass("border-secondary");
+                    $("#onizleme").removeClass("border-white");
+                    $("#onizleme").removeClass("border-dark");
+                    $("#onizleme").addClass("border-warning");
+                    cerceverengi = "border-warning";
+                }
+                else if (renkkod == 2) {
+                    $("#onizleme").removeClass("border-success");
+                    $("#onizleme").removeClass("border-warning");
+                    $("#onizleme").removeClass("border-danger");
+                    $("#onizleme").removeClass("border-info");
+                    $("#onizleme").removeClass("border-primary");
+                    $("#onizleme").removeClass("border-secondary");
+                    $("#onizleme").removeClass("border-white");
+                    $("#onizleme").removeClass("border-dark");
+                    $("#onizleme").addClass("border-danger");
+                    cerceverengi = "border-danger";
+                }
+                else if (renkkod == 3) {
+                    $("#onizleme").removeClass("border-success");
+                    $("#onizleme").removeClass("border-warning");
+                    $("#onizleme").removeClass("border-danger");
+                    $("#onizleme").removeClass("border-info");
+                    $("#onizleme").removeClass("border-primary");
+                    $("#onizleme").removeClass("border-secondary");
+                    $("#onizleme").removeClass("border-white");
+                    $("#onizleme").removeClass("border-dark");
+                    $("#onizleme").addClass("border-primary");
+                    cerceverengi = "border-primary";
+                }
+                else if (renkkod == 4) {
+                    $("#onizleme").removeClass("border-success");
+                    $("#onizleme").removeClass("border-warning");
+                    $("#onizleme").removeClass("border-danger");
+                    $("#onizleme").removeClass("border-info");
+                    $("#onizleme").removeClass("border-primary");
+                    $("#onizleme").removeClass("border-secondary");
+                    $("#onizleme").removeClass("border-white");
+                    $("#onizleme").removeClass("border-dark");
+                    $("#onizleme").addClass("border-info");
+                    cerceverengi = "border-info";
+                }
+                else if (renkkod == 5) {
+                    $("#onizleme").removeClass("border-success");
+                    $("#onizleme").removeClass("border-warning");
+                    $("#onizleme").removeClass("border-danger");
+                    $("#onizleme").removeClass("border-info");
+                    $("#onizleme").removeClass("border-primary");
+                    $("#onizleme").removeClass("border-secondary");
+                    $("#onizleme").removeClass("border-white");
+                    $("#onizleme").removeClass("border-dark");
+                    $("#onizleme").addClass("border-secondary");
+                    cerceverengi = "border-secondary";
+                }
+                else if (renkkod == 6) {
+                    $("#onizleme").removeClass("border-success");
+                    $("#onizleme").removeClass("border-warning");
+                    $("#onizleme").removeClass("border-danger");
+                    $("#onizleme").removeClass("border-info");
+                    $("#onizleme").removeClass("border-primary");
+                    $("#onizleme").removeClass("border-secondary");
+                    $("#onizleme").removeClass("border-white");
+                    $("#onizleme").removeClass("border-dark");
+                    $("#onizleme").addClass("border-white");
+                    cerceverengi = "border-white";
+                }
+                else if (renkkod == 7) {
+                    $("#onizleme").removeClass("border-success");
+                    $("#onizleme").removeClass("border-warning");
+                    $("#onizleme").removeClass("border-danger");
+                    $("#onizleme").removeClass("border-info");
+                    $("#onizleme").removeClass("border-primary");
+                    $("#onizleme").removeClass("border-secondary");
+                    $("#onizleme").removeClass("border-white");
+                    $("#onizleme").removeClass("border-dark");
+                    $("#onizleme").addClass("border-dark");
+                    cerceverengi = "border-dark";
+                }
+            });
+            $("#YaziRengi").change(function () {
+                var renkkod = $(this).find("option:selected").val();
+                if (renkkod == 0) {
+                    $("#onizleme").removeClass("text-success");
+                    $("#onizleme").removeClass("text-warning");
+                    $("#onizleme").removeClass("text-danger");
+                    $("#onizleme").removeClass("text-info");
+                    $("#onizleme").removeClass("text-primary");
+                    $("#onizleme").removeClass("text-secondary");
+                    $("#onizleme").removeClass("text-white");
+                    $("#onizleme").removeClass("text-dark");
+                    $("#onizleme").addClass("text-success");
+                    yazirengi = "text-success";
+                }
+                else if (renkkod == 1) {
+                    $("#onizleme").removeClass("text-success");
+                    $("#onizleme").removeClass("text-warning");
+                    $("#onizleme").removeClass("text-danger");
+                    $("#onizleme").removeClass("text-info");
+                    $("#onizleme").removeClass("text-primary");
+                    $("#onizleme").removeClass("text-secondary");
+                    $("#onizleme").removeClass("text-white");
+                    $("#onizleme").removeClass("text-dark");
+                    $("#onizleme").addClass("text-warning");
+                    yazirengi = "text-warning";
+                }
+                else if (renkkod == 2) {
+                    $("#onizleme").removeClass("text-success");
+                    $("#onizleme").removeClass("text-warning");
+                    $("#onizleme").removeClass("text-danger");
+                    $("#onizleme").removeClass("text-info");
+                    $("#onizleme").removeClass("text-primary");
+                    $("#onizleme").removeClass("text-secondary");
+                    $("#onizleme").removeClass("text-white");
+                    $("#onizleme").removeClass("text-dark");
+                    $("#onizleme").addClass("text-danger");
+                    yazirengi = "text-danger";
+                }
+                else if (renkkod == 3) {
+                    $("#onizleme").removeClass("text-success");
+                    $("#onizleme").removeClass("text-warning");
+                    $("#onizleme").removeClass("text-danger");
+                    $("#onizleme").removeClass("text-info");
+                    $("#onizleme").removeClass("text-primary");
+                    $("#onizleme").removeClass("text-secondary");
+                    $("#onizleme").removeClass("text-white");
+                    $("#onizleme").removeClass("text-dark");
+                    $("#onizleme").addClass("text-primary");
+                    yazirengi = "text-primary";
+                }
+                else if (renkkod == 4) {
+                    $("#onizleme").removeClass("text-success");
+                    $("#onizleme").removeClass("text-warning");
+                    $("#onizleme").removeClass("text-danger");
+                    $("#onizleme").removeClass("text-info");
+                    $("#onizleme").removeClass("text-primary");
+                    $("#onizleme").removeClass("text-secondary");
+                    $("#onizleme").removeClass("text-white");
+                    $("#onizleme").removeClass("text-dark");
+                    $("#onizleme").addClass("text-info");
+                    yazirengi = "text-info";
+                }
+                else if (renkkod == 5) {
+                    $("#onizleme").removeClass("text-success");
+                    $("#onizleme").removeClass("text-warning");
+                    $("#onizleme").removeClass("text-danger");
+                    $("#onizleme").removeClass("text-info");
+                    $("#onizleme").removeClass("text-primary");
+                    $("#onizleme").removeClass("text-secondary");
+                    $("#onizleme").removeClass("text-white");
+                    $("#onizleme").removeClass("text-dark");
+                    $("#onizleme").addClass("text-secondary");
+                    yazirengi = "text-secondary";
+                }
+                else if (renkkod == 6) {
+                    $("#onizleme").removeClass("text-success");
+                    $("#onizleme").removeClass("text-warning");
+                    $("#onizleme").removeClass("text-danger");
+                    $("#onizleme").removeClass("text-info");
+                    $("#onizleme").removeClass("text-primary");
+                    $("#onizleme").removeClass("text-secondary");
+                    $("#onizleme").removeClass("text-white");
+                    $("#onizleme").removeClass("text-dark");
+                    $("#onizleme").addClass("text-white");
+                    yazirengi = "text-white";
+                }
+                else if (renkkod == 7) {
+                    $("#onizleme").removeClass("text-success");
+                    $("#onizleme").removeClass("text-warning");
+                    $("#onizleme").removeClass("text-danger");
+                    $("#onizleme").removeClass("text-info");
+                    $("#onizleme").removeClass("text-primary");
+                    $("#onizleme").removeClass("text-secondary");
+                    $("#onizleme").removeClass("text-white");
+                    $("#onizleme").removeClass("text-dark");
+                    $("#onizleme").addClass("text-dark");
+                    yazirengi = "text-dark";
+                }
+            });
+            $("#ZeminRengiDuzenle").change(function () {
+                var renkkod = $(this).find("option:selected").val();
+                if (renkkod == 0) {
+                    $("#onizlemeduzenle").removeClass("bg-success");
+                    $("#onizlemeduzenle").removeClass("bg-warning");
+                    $("#onizlemeduzenle").removeClass("bg-danger");
+                    $("#onizlemeduzenle").removeClass("bg-info");
+                    $("#onizlemeduzenle").removeClass("bg-primary");
+                    $("#onizlemeduzenle").removeClass("bg-secondary");
+                    $("#onizlemeduzenle").removeClass("bg-white");
+                    $("#onizlemeduzenle").removeClass("bg-dark");
+                    $("#onizlemeduzenle").addClass("bg-success");
+                    zeminrengi = "bg-success";
+                }
+                else if (renkkod == 1) {
+                    $("#onizlemeduzenle").removeClass("bg-success");
+                    $("#onizlemeduzenle").removeClass("bg-warning");
+                    $("#onizlemeduzenle").removeClass("bg-danger");
+                    $("#onizlemeduzenle").removeClass("bg-info");
+                    $("#onizlemeduzenle").removeClass("bg-primary");
+                    $("#onizlemeduzenle").removeClass("bg-secondary");
+                    $("#onizlemeduzenle").removeClass("bg-white");
+                    $("#onizlemeduzenle").removeClass("bg-dark");
+                    $("#onizlemeduzenle").addClass("bg-warning");
+                    zeminrengi = "bg-warning";
+                }
+                else if (renkkod == 2) {
+                    $("#onizlemeduzenle").removeClass("bg-success");
+                    $("#onizlemeduzenle").removeClass("bg-warning");
+                    $("#onizlemeduzenle").removeClass("bg-danger");
+                    $("#onizlemeduzenle").removeClass("bg-info");
+                    $("#onizlemeduzenle").removeClass("bg-primary");
+                    $("#onizlemeduzenle").removeClass("bg-secondary");
+                    $("#onizlemeduzenle").removeClass("bg-white");
+                    $("#onizlemeduzenle").removeClass("bg-dark");
+                    $("#onizlemeduzenle").addClass("bg-danger");
+                    zeminrengi = "bg-danger";
+                }
+                else if (renkkod == 3) {
+                    $("#onizlemeduzenle").removeClass("bg-success");
+                    $("#onizlemeduzenle").removeClass("bg-warning");
+                    $("#onizlemeduzenle").removeClass("bg-danger");
+                    $("#onizlemeduzenle").removeClass("bg-info");
+                    $("#onizlemeduzenle").removeClass("bg-primary");
+                    $("#onizlemeduzenle").removeClass("bg-secondary");
+                    $("#onizlemeduzenle").removeClass("bg-white");
+                    $("#onizlemeduzenle").removeClass("bg-dark");
+                    $("#onizlemeduzenle").addClass("bg-info");
+                    zeminrengi = "bg-info";
+                }
+                else if (renkkod == 4) {
+                    $("#onizlemeduzenle").removeClass("bg-success");
+                    $("#onizlemeduzenle").removeClass("bg-warning");
+                    $("#onizlemeduzenle").removeClass("bg-danger");
+                    $("#onizlemeduzenle").removeClass("bg-info");
+                    $("#onizlemeduzenle").removeClass("bg-primary");
+                    $("#onizlemeduzenle").removeClass("bg-secondary");
+                    $("#onizlemeduzenle").removeClass("bg-white");
+                    $("#onizlemeduzenle").removeClass("bg-dark");
+                    $("#onizlemeduzenle").addClass("bg-primary");
+                    zeminrengi = "bg-primary";
+                }
+                else if (renkkod == 5) {
+                    $("#onizlemeduzenle").removeClass("bg-success");
+                    $("#onizlemeduzenle").removeClass("bg-warning");
+                    $("#onizlemeduzenle").removeClass("bg-danger");
+                    $("#onizlemeduzenle").removeClass("bg-info");
+                    $("#onizlemeduzenle").removeClass("bg-primary");
+                    $("#onizlemeduzenle").removeClass("bg-secondary");
+                    $("#onizlemeduzenle").removeClass("bg-white");
+                    $("#onizlemeduzenle").removeClass("bg-dark");
+                    $("#onizlemeduzenle").addClass("bg-secondary");
+                    zeminrengi = "bg-secondary";
+                }
+                else if (renkkod == 6) {
+                    $("#onizlemeduzenle").removeClass("bg-success");
+                    $("#onizlemeduzenle").removeClass("bg-warning");
+                    $("#onizlemeduzenle").removeClass("bg-danger");
+                    $("#onizlemeduzenle").removeClass("bg-info");
+                    $("#onizlemeduzenle").removeClass("bg-primary");
+                    $("#onizlemeduzenle").removeClass("bg-secondary");
+                    $("#onizlemeduzenle").removeClass("bg-white");
+                    $("#onizlemeduzenle").removeClass("bg-dark");
+                    $("#onizlemeduzenle").addClass("bg-white");
+                    zeminrengi = "bg-white";
+                }
+                else if (renkkod == 7) {
+                    $("#onizlemeduzenle").removeClass("bg-success");
+                    $("#onizlemeduzenle").removeClass("bg-warning");
+                    $("#onizlemeduzenle").removeClass("bg-danger");
+                    $("#onizlemeduzenle").removeClass("bg-info");
+                    $("#onizlemeduzenle").removeClass("bg-primary");
+                    $("#onizlemeduzenle").removeClass("bg-secondary");
+                    $("#onizlemeduzenle").removeClass("bg-white");
+                    $("#onizlemeduzenle").removeClass("bg-dark");
+                    $("#onizlemeduzenle").addClass("bg-dark");
+                    zeminrengi = "bg-dark";
+                }
+            });
+            $("#CerceveRengiDuzenle").change(function () {
+                var renkkod = $(this).find("option:selected").val();
+                if (renkkod == 0) {
+                    $("#onizlemeduzenle").removeClass("border-success");
+                    $("#onizlemeduzenle").removeClass("border-warning");
+                    $("#onizlemeduzenle").removeClass("border-danger");
+                    $("#onizlemeduzenle").removeClass("border-info");
+                    $("#onizlemeduzenle").removeClass("border-primary");
+                    $("#onizlemeduzenle").removeClass("border-secondary");
+                    $("#onizlemeduzenle").removeClass("border-white");
+                    $("#onizlemeduzenle").removeClass("border-dark");
+                    $("#onizlemeduzenle").addClass("border-success");
+                    cerceverengi = "border-success";
+                }
+                else if (renkkod == 1) {
+                    $("#onizlemeduzenle").removeClass("border-success");
+                    $("#onizlemeduzenle").removeClass("border-warning");
+                    $("#onizlemeduzenle").removeClass("border-danger");
+                    $("#onizlemeduzenle").removeClass("border-info");
+                    $("#onizlemeduzenle").removeClass("border-primary");
+                    $("#onizlemeduzenle").removeClass("border-secondary");
+                    $("#onizlemeduzenle").removeClass("border-white");
+                    $("#onizlemeduzenle").removeClass("border-dark");
+                    $("#onizlemeduzenle").addClass("border-warning");
+                    cerceverengi = "border-warning";
+                }
+                else if (renkkod == 2) {
+                    $("#onizlemeduzenle").removeClass("border-success");
+                    $("#onizlemeduzenle").removeClass("border-warning");
+                    $("#onizlemeduzenle").removeClass("border-danger");
+                    $("#onizlemeduzenle").removeClass("border-info");
+                    $("#onizlemeduzenle").removeClass("border-primary");
+                    $("#onizlemeduzenle").removeClass("border-secondary");
+                    $("#onizlemeduzenle").removeClass("border-white");
+                    $("#onizlemeduzenle").removeClass("border-dark");
+                    $("#onizlemeduzenle").addClass("border-danger");
+                    cerceverengi = "border-danger";
+                }
+                else if (renkkod == 3) {
+                    $("#onizlemeduzenle").removeClass("border-success");
+                    $("#onizlemeduzenle").removeClass("border-warning");
+                    $("#onizlemeduzenle").removeClass("border-danger");
+                    $("#onizlemeduzenle").removeClass("border-info");
+                    $("#onizlemeduzenle").removeClass("border-primary");
+                    $("#onizlemeduzenle").removeClass("border-secondary");
+                    $("#onizlemeduzenle").removeClass("border-white");
+                    $("#onizlemeduzenle").removeClass("border-dark");
+                    $("#onizlemeduzenle").addClass("border-primary");
+                    cerceverengi = "border-primary";
+                }
+                else if (renkkod == 4) {
+                    $("#onizlemeduzenle").removeClass("border-success");
+                    $("#onizlemeduzenle").removeClass("border-warning");
+                    $("#onizlemeduzenle").removeClass("border-danger");
+                    $("#onizlemeduzenle").removeClass("border-info");
+                    $("#onizlemeduzenle").removeClass("border-primary");
+                    $("#onizlemeduzenle").removeClass("border-secondary");
+                    $("#onizlemeduzenle").removeClass("border-white");
+                    $("#onizlemeduzenle").removeClass("border-dark");
+                    $("#onizlemeduzenle").addClass("border-info");
+                    cerceverengi = "border-info";
+                }
+                else if (renkkod == 5) {
+                    $("#onizlemeduzenle").removeClass("border-success");
+                    $("#onizlemeduzenle").removeClass("border-warning");
+                    $("#onizlemeduzenle").removeClass("border-danger");
+                    $("#onizlemeduzenle").removeClass("border-info");
+                    $("#onizlemeduzenle").removeClass("border-primary");
+                    $("#onizlemeduzenle").removeClass("border-secondary");
+                    $("#onizlemeduzenle").removeClass("border-white");
+                    $("#onizlemeduzenle").removeClass("border-dark");
+                    $("#onizlemeduzenle").addClass("border-secondary");
+                    cerceverengi = "border-secondary";
+                }
+                else if (renkkod == 6) {
+                    $("#onizlemeduzenle").removeClass("border-success");
+                    $("#onizlemeduzenle").removeClass("border-warning");
+                    $("#onizlemeduzenle").removeClass("border-danger");
+                    $("#onizlemeduzenle").removeClass("border-info");
+                    $("#onizlemeduzenle").removeClass("border-primary");
+                    $("#onizlemeduzenle").removeClass("border-secondary");
+                    $("#onizlemeduzenle").removeClass("border-white");
+                    $("#onizlemeduzenle").removeClass("border-dark");
+                    $("#onizlemeduzenle").addClass("border-white");
+                    cerceverengi = "border-white";
+                }
+                else if (renkkod == 7) {
+                    $("#onizlemeduzenle").removeClass("border-success");
+                    $("#onizlemeduzenle").removeClass("border-warning");
+                    $("#onizlemeduzenle").removeClass("border-danger");
+                    $("#onizlemeduzenle").removeClass("border-info");
+                    $("#onizlemeduzenle").removeClass("border-primary");
+                    $("#onizlemeduzenle").removeClass("border-secondary");
+                    $("#onizlemeduzenle").removeClass("border-white");
+                    $("#onizlemeduzenle").removeClass("border-dark");
+                    $("#onizlemeduzenle").addClass("border-dark");
+                    cerceverengi = "border-dark";
+                }
+            });
+            $("#YaziRengiDuzenle").change(function () {
+                var renkkod = $(this).find("option:selected").val();
+                if (renkkod == 0) {
+                    $("#onizlemeduzenle").removeClass("text-success");
+                    $("#onizlemeduzenle").removeClass("text-warning");
+                    $("#onizlemeduzenle").removeClass("text-danger");
+                    $("#onizlemeduzenle").removeClass("text-info");
+                    $("#onizlemeduzenle").removeClass("text-primary");
+                    $("#onizlemeduzenle").removeClass("text-secondary");
+                    $("#onizlemeduzenle").removeClass("text-white");
+                    $("#onizlemeduzenle").removeClass("text-dark");
+                    $("#onizlemeduzenle").addClass("text-success");
+                    yazirengi = "text-success";
+                }
+                else if (renkkod == 1) {
+                    $("#onizlemeduzenle").removeClass("text-success");
+                    $("#onizlemeduzenle").removeClass("text-warning");
+                    $("#onizlemeduzenle").removeClass("text-danger");
+                    $("#onizlemeduzenle").removeClass("text-info");
+                    $("#onizlemeduzenle").removeClass("text-primary");
+                    $("#onizlemeduzenle").removeClass("text-secondary");
+                    $("#onizlemeduzenle").removeClass("text-white");
+                    $("#onizlemeduzenle").removeClass("text-dark");
+                    $("#onizlemeduzenle").addClass("text-warning");
+                    yazirengi = "text-warning";
+                }
+                else if (renkkod == 2) {
+                    $("#onizlemeduzenle").removeClass("text-success");
+                    $("#onizlemeduzenle").removeClass("text-warning");
+                    $("#onizlemeduzenle").removeClass("text-danger");
+                    $("#onizlemeduzenle").removeClass("text-info");
+                    $("#onizlemeduzenle").removeClass("text-primary");
+                    $("#onizlemeduzenle").removeClass("text-secondary");
+                    $("#onizlemeduzenle").removeClass("text-white");
+                    $("#onizlemeduzenle").removeClass("text-dark");
+                    $("#onizlemeduzenle").addClass("text-danger");
+                    yazirengi = "text-danger";
+                }
+                else if (renkkod == 3) {
+                    $("#onizlemeduzenle").removeClass("text-success");
+                    $("#onizlemeduzenle").removeClass("text-warning");
+                    $("#onizlemeduzenle").removeClass("text-danger");
+                    $("#onizlemeduzenle").removeClass("text-info");
+                    $("#onizlemeduzenle").removeClass("text-primary");
+                    $("#onizlemeduzenle").removeClass("text-secondary");
+                    $("#onizlemeduzenle").removeClass("text-white");
+                    $("#onizlemeduzenle").removeClass("text-dark");
+                    $("#onizlemeduzenle").addClass("text-primary");
+                    yazirengi = "text-primary";
+                }
+                else if (renkkod == 4) {
+                    $("#onizlemeduzenle").removeClass("text-success");
+                    $("#onizlemeduzenle").removeClass("text-warning");
+                    $("#onizlemeduzenle").removeClass("text-danger");
+                    $("#onizlemeduzenle").removeClass("text-info");
+                    $("#onizlemeduzenle").removeClass("text-primary");
+                    $("#onizlemeduzenle").removeClass("text-secondary");
+                    $("#onizlemeduzenle").removeClass("text-white");
+                    $("#onizlemeduzenle").removeClass("text-dark");
+                    $("#onizlemeduzenle").addClass("text-info");
+                    yazirengi = "text-info";
+                }
+                else if (renkkod == 5) {
+                    $("#onizlemeduzenle").removeClass("text-success");
+                    $("#onizlemeduzenle").removeClass("text-warning");
+                    $("#onizlemeduzenle").removeClass("text-danger");
+                    $("#onizlemeduzenle").removeClass("text-info");
+                    $("#onizlemeduzenle").removeClass("text-primary");
+                    $("#onizlemeduzenle").removeClass("text-secondary");
+                    $("#onizlemeduzenle").removeClass("text-white");
+                    $("#onizlemeduzenle").removeClass("text-dark");
+                    $("#onizlemeduzenle").addClass("text-secondary");
+                    yazirengi = "text-secondary";
+                }
+                else if (renkkod == 6) {
+                    $("#onizlemeduzenle").removeClass("text-success");
+                    $("#onizlemeduzenle").removeClass("text-warning");
+                    $("#onizlemeduzenle").removeClass("text-danger");
+                    $("#onizlemeduzenle").removeClass("text-info");
+                    $("#onizlemeduzenle").removeClass("text-primary");
+                    $("#onizlemeduzenle").removeClass("text-secondary");
+                    $("#onizlemeduzenle").removeClass("text-white");
+                    $("#onizlemeduzenle").removeClass("text-dark");
+                    $("#onizlemeduzenle").addClass("text-white");
+                    yazirengi = "text-white";
+                }
+                else if (renkkod == 7) {
+                    $("#onizlemeduzenle").removeClass("text-success");
+                    $("#onizlemeduzenle").removeClass("text-warning");
+                    $("#onizlemeduzenle").removeClass("text-danger");
+                    $("#onizlemeduzenle").removeClass("text-info");
+                    $("#onizlemeduzenle").removeClass("text-primary");
+                    $("#onizlemeduzenle").removeClass("text-secondary");
+                    $("#onizlemeduzenle").removeClass("text-white");
+                    $("#onizlemeduzenle").removeClass("text-dark");
+                    $("#onizlemeduzenle").addClass("text-dark");
+                    yazirengi = "text-dark";
+                }
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $("#rezervasyonturu").val("");
+                $("#aciklama").val("");
+            })
+            $("#RezervasyonTuruKaydet").click(function () {
+                if ($("#rezervasyonturu").val() == "") {
+                    $("#rezervasyonturu").focus();
+                    $("#rezervasyonturuhata").append("<div class='hata' style='color:red'>Rezervasyon Türünü Giriniz.</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var rezturu = $("#rezervasyonturu").val();
+                    var formalan;
+                    if ($("#gelindamatradio").is(":checked")) {
+                        formalan = "Gelin/Damat";
+                    }
+                    else if ($("#bebekcocukradio").is(":checked")) {
+                        formalan = "Bebek/Çocuk";
+                    }
+                    else if ($("#urunkatalogradio").is(":checked")) {
+                        formalan = "Ürün/Katalog";
+                    }
+                    else if ($("#modelmankenradio").is(":checked")) {
+                        formalan = "Model/Manken";
+                    }
+                    else if ($("#yetkiliradio").is(":checked")) {
+                        formalan = "Yetkili";
+                    }
+                    var RezervasyonData = new FormData();
+                    clas = zeminrengi + " " + cerceverengi + " " + yazirengi;
+                    RezervasyonData.append("RezervasyonTuru", $("#rezervasyonturu").val());
+                    RezervasyonData.append("Clas", clas);
+                    RezervasyonData.append("FormAlan", formalan);
+                    RezervasyonData.append("Aciklama", $("#aciklama").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: RezervasyonData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/RezervasyonTuruVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: RezervasyonData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Tanimlar/RezervasyonTurleriEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                            {
+                                Swal.fire(
+                                {
+                                    title: "Varolan Kayıt",
+                                    html: "<p><h2 style='font-size:16px; color:red'><strong>Rezervasyon Türü : </strong>" + rezturu + "</br><h2> Rezervasyon Türü zaten var!</h2>",
+                                    type: "warning"
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            $("#dtRezervasyonTurleri").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#RezervasyonTuruGuncelle").val($(this).data("rezid"))
+                $("#rezervasyonturuduzenle").val($(this).data("rezturu"));
+                $("#onizlemeduzenle").removeClass();
+                $("#onizlemeduzenle").addClass($(this).data("clas"));
+                var renkler = $(this).data("clas").split(" ");
+                if (renkler[0] == "bg-success") { // Zemin Rengi
+                    $("#ZeminRengiDuzenle").colorselector("setValue", 0);
+                    zeminrengi = "bg-success";
+                } if (renkler[0] == "bg-warning") {
+                    $("#ZeminRengiDuzenle").colorselector("setValue", 1);
+                    zeminrengi = "bg-warning";
+                } if (renkler[0] == "bg-danger") {
+                    $("#ZeminRengiDuzenle").colorselector("setValue", 2);
+                    zeminrengi = "bg-danger";
+                } if (renkler[0] == "bg-info") {
+                    $("#ZeminRengiDuzenle").colorselector("setValue", 3);
+                    zeminrengi = "bg-info";
+                } if (renkler[0] == "bg-primary") {
+                    $("#ZeminRengiDuzenle").colorselector("setValue", 4);
+                    zeminrengi = "bg-primary";
+                } if (renkler[0] == "bg-secondary") {
+                    $("#ZeminRengiDuzenle").colorselector("setValue", 5);
+                    zeminrengi = "bg-secondary";
+                } if (renkler[0] == "bg-white") {
+                    $("#ZeminRengiDuzenle").colorselector("setValue", 6);
+                    zeminrengi = "bg-white";
+                } if (renkler[0] == "bg-dark") {
+                    $("#ZeminRengiDuzenle").colorselector("setValue", 7);
+                    zeminrengi = "bg-dark";
+                }
+                if (renkler[1] == "border-success") { // Çerçeve Rengi
+                    $("#CerceveRengiDuzenle").colorselector("setValue", 0);
+                    cerceverengi = "border-success";
+                } if (renkler[1] == "border-warning") {
+                    $("#CerceveRengiDuzenle").colorselector("setValue", 1);
+                    cerceverengi = "border-warning";
+                } if (renkler[1] == "border-danger") {
+                    $("#CerceveRengiDuzenle").colorselector("setValue", 2);
+                    cerceverengi = "border-danger";
+                } if (renkler[1] == "border-info") {
+                    $("#CerceveRengiDuzenle").colorselector("setValue", 3);
+                    cerceverengi = "border-info";
+                } if (renkler[1] == "border-primary") {
+                    $("#CerceveRengiDuzenle").colorselector("setValue", 4);
+                    cerceverengi = "border-primary";
+                } if (renkler[1] == "border-secondary") {
+                    $("#CerceveRengiDuzenle").colorselector("setValue", 5);
+                    cerceverengi = "border-secondary";
+                } if (renkler[1] == "border-white") {
+                    $("#CerceveRengiDuzenle").colorselector("setValue", 6);
+                    cerceverengi = "border-white";
+                } if (renkler[1] == "border-dark") {
+                    $("#CerceveRengiDuzenle").colorselector("setValue", 7);
+                    cerceverengi = "border-dark";
+                }
+                if (renkler[2] == "text-success") { // Yazı Rengi
+                    $("#YaziRengiDuzenle").colorselector("setValue", 0);
+                    yazirengi = "text-success";
+                } if (renkler[2] == "text-warning") {
+                    $("#YaziRengiDuzenle").colorselector("setValue", 1);
+                    yazirengi = "text-warning";
+                } if (renkler[2] == "text-danger") {
+                    $("#YaziRengiDuzenle").colorselector("setValue", 2);
+                    yazirengi = "text-danger";
+                } if (renkler[2] == "text-info") {
+                    $("#YaziRengiDuzenle").colorselector("setValue", 3);
+                    yazirengi = "text-info";
+                } if (renkler[2] == "text-primary") {
+                    $("#YaziRengiDuzenle").colorselector("setValue", 4);
+                    yazirengi = "text-primary";
+                } if (renkler[2] == "text-secondary") {
+                    $("#YaziRengiDuzenle").colorselector("setValue", 5);
+                    yazirengi = "text-secondary";
+                } if (renkler[2] == "text-white") {
+                    $("#YaziRengiDuzenle").colorselector("setValue", 6);
+                    yazirengi = "text-white";
+                } if (renkler[2] == "text-dark") {
+                    $("#YaziRengiDuzenle").colorselector("setValue", 7);
+                    yazirengi = "text-dark";
+                }
+                if ($(this).data("formalan") == "Gelin/Damat") {
+                    $("#gelindamatradioduzenle").prop("checked", "checked");
+                    $("#bebekcocukradioduzenle").removeAttr("checked");
+                    $("#urunkatalogradioduzenle").removeAttr("checked");
+                    $("#modelmankenradioduzenle").removeAttr("checked");
+                    $("#yetkiliradioduzenle").removeAttr("checked");
+                }
+                else if ($(this).data("formalan") == "Bebek/Çocuk") {
+                    $("#bebekcocukradioduzenle").prop("checked", "checked");
+                    $("#gelindamatradioduzenle").removeAttr("checked");
+                    $("#urunkatalogradioduzenle").removeAttr("checked");
+                    $("#modelmankenradioduzenle").removeAttr("checked");
+                    $("#yetkiliradioduzenle").removeAttr("checked");
+                }
+                else if ($(this).data("formalan") == "Ürün/Katalog") {
+                    $("#urunkatalogradioduzenle").prop("checked", "checked");
+                    $("#bebekcocukradioduzenle").removeAttr("checked");
+                    $("#gelindamatradioduzenle").removeAttr("checked");
+                    $("#modelmankenradioduzenle").removeAttr("checked");
+                    $("#yetkiliradioduzenle").removeAttr("checked");
+                }
+                else if ($(this).data("formalan") == "Model/Manken") {
+                    $("#modelmankenradioduzenle").prop("checked", "checked");
+                    $("#bebekcocukradioduzenle").removeAttr("checked");
+                    $("#gelindamatradioduzenle").removeAttr("checked");
+                    $("#urunkatalogradioduzenle").removeAttr("checked");
+                    $("#yetkiliradioduzenle").removeAttr("checked");
+                }
+                else if ($(this).data("formalan") == "Yetkili") {
+                    $("#yetkiliradioduzenle").prop("checked", "checked");
+                    $("#bebekcocukradioduzenle").removeAttr("checked");
+                    $("#urunkatalogradioduzenle").removeAttr("checked");
+                    $("#modelmankenradioduzenle").removeAttr("checked");
+                    $("#gelindamatradioduzenle").removeAttr("checked");
+                }
+                var aciklama = $(this).data("aciklama").replace(/\<br \/\>/g, "\r\n");  // textarea daki bilgi veri tabanına kaydedilirken "\r\n" karakterleri "<br />" tagına dönüştürülmüştü, bura da da tersi yapılıyor.
+                var aciklama = $(this).data("aciklama").replace(/\<br \/\>/g, "\r");  // textarea daki bilgi veri tabanına kaydedilirken "\r\n" karakterleri "<br />" tagına dönüştürülmüştü, bura da da tersi yapılıyor.
+                var aciklama = $(this).data("aciklama").replace(/\<br \/\>/g, "\n");  // textarea daki bilgi veri tabanına kaydedilirken "\r\n" karakterleri "<br />" tagına dönüştürülmüştü, bura da da tersi yapılıyor.
+                $("#aciklamaduzenle").val(aciklama);
+            });
+            $("#RezervasyonTuruGuncelle").click(function () {
+                if ($("#rezervasyonturuduzenle").val() == "") {
+                    $("#rezervasyonturuduzenle").focus();
+                    $("#rezervasyonturuduzenlehata").append("<div class='hata' style='color:red'>Rezervasyon Türünü Giriniz.</div>");
+                }
+                else {
+                    $('#KayitDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    var formalan;
+                    if ($("#gelindamatradioduzenle").is(":checked")) {
+                        formalan = "Gelin/Damat";
+                    }
+                    else if ($("#bebekcocukradioduzenle").is(":checked")) {
+                        formalan = "Bebek/Çocuk";
+                    }
+                    else if ($("#urunkatalogradioduzenle").is(":checked")) {
+                        formalan = "Ürün/Katalog";
+                    }
+                    else if ($("#modelmankenradioduzenle").is(":checked")) {
+                        formalan = "Model/Manken";
+                    }
+                    else if ($("#yetkiliradioduzenle").is(":checked")) {
+                        formalan = "Yetkili";
+                    }
+                    var RezervasyonData = new FormData();
+                    clas = zeminrengi + " " + cerceverengi + " " + yazirengi;
+                    RezervasyonData.append("RezervasyonTuru", $("#rezervasyonturuduzenle").val());
+                    RezervasyonData.append("Clas", clas);
+                    RezervasyonData.append("FormAlan", formalan);
+                    RezervasyonData.append("Aciklama", $("#aciklamaduzenle").val());
+
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: RezervasyonData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/RezervasyonTurleriGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            $("#dtRezervasyonTurleri").on('click', '.Sil', function () {
+                var id = $(this).data("rezid");
+                var rezturu = $(this).data("rezturu");
+                Swal.fire(
+                {
+                    title: "Kayıt Silinecek",
+                    html: "<p><h2 style='font-size:16px; color:red'><strong>Rezervasyon Türü : </strong>" + rezturu + "</br><h2> Rezervasyon Türü Silinsin mi?</h2>",
+                    type: "error",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Silinsin!"
+                }).then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Tanimlar/RezervasyonTurleriSil/" + id,
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            });
+            $("#dtRezervasyonTurleri").on('click', '.durumdegistir', function () {
+                var id = $(this).data("rezid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/RezervasyonTurleriDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#VarsayilanKaydet").click(function () {
+                Varsayilanlar = [];
+                VarsayilanAlanlar = [];
+                $("input[type=checkbox]").each(function (i) {
+                    varsayilandeger = document.getElementById("varsayilan-" + i);
+                    if (varsayilandeger != null) {
+                        if (varsayilandeger.checked) {
+                            Varsayilanlar.push($("#varsayilan-" + i).data("deger"))
+                            VarsayilanAlanlar.push($("#varsayilan-" + i).data("alan"))
+                        }
+                    }
+                });
+                $('#VarsayilanEkleModal').modal('hide');
+                var RezTurData = new FormData();
+                RezTurData.append("VarsayilanDegerler", Varsayilanlar);
+                RezTurData.append("VarsayilanAlanlar", VarsayilanAlanlar);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: RezTurData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        Swal.fire(
+                        {
+                            title: "Kayıtlar Ekleniyor!",
+                            html: "<strong>Lütfen Bekleyin.</strong>",
+                            onBeforeOpen: function onBeforeOpen() {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    url: "/Otomasyon/Tanimlar/RezervasyonVarsayilanlariEkle/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            swal.close();
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            document.getElementById("rezervasyonturlerivarsayilan").setAttribute("disabled", "");
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            var dt;
+            var islem;
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            dt = $('#dtRezervasyonTurleri').dataTable(
+               {
+                   responsive: true,
+                   "destroy": true,
+                   "columns": [
+                               { "data": "RezervasyonTuru", "autowidth": true, "className": "align-middle" },
+                               {
+                                   "data": null,
+                                   "className": "align-middle",
+                                   "render": function (data, type, row) {
+                                       var renkler = row.Clas.split(" ");
+                                       return "<div class='" + renkler[0] + " " + renkler[1] + " " + renkler[2] + "' style='width:100%; height:100%; border-radius:4px; padding:5px;border:solid; border-width:1px'>" +
+                                       "19:00-23:00 <br />" +
+                                       "Düğün Çekimi <br />" +
+                                       "Gelin & Damat" +
+                                   "</div>"
+                                   }
+                               },
+                               { "data": "FormAlan", "autowidth": true, "className": "align-middle" },
+                               { "data": "Aciklama", "autowidth": true, "className": "align-middle" },
+                               {
+                                   "data": null,
+                                   "className": "align-middle text-center ",
+                                   "render": function (data, type, row) {
+                                       islem = "";
+                                       if (row.KilitBit==false) {
+                                           if (DuzenleYetki == "True") {
+                                               if (row.Aktif == true) {
+                                                   //islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                   islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-rezid='" + row.Id + "'>Aktif</button>"
+                                               }
+                                               else {
+                                                   //islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                   islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-rezid='" + row.Id + "'>Pasif</button>"
+                                               }
+                                           }
+                                           else {
+                                               if (row.Aktif == true) {
+                                                   islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                   //islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Aktif</button>"
+                                               }
+                                               else {
+                                                   islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                   //islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Pasif</button>"
+                                               }
+                                           }
+                                       }
+                                       return islem
+                                   }
+                               },
+                               {
+                                   "data": null,
+                                   "className": "align-middle",
+                                   "render": function (data, type, row) {
+                                       islem = "";
+                                       if (row.KilitBit == false) {
+                                           if (DuzenleYetki == "True") {
+                                               islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle' data-rezid='" + row.Id + "' data-rezturu='" + row.RezervasyonTuru + "' data-clas='" + row.Clas + "' data-formalan='" + row.FormAlan + "' data-aciklama='" + row.Aciklama + "' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                                                    "<i class='fal fa-edit'></i>" +
+                                                                "</a>"
+                                           }
+                                           if (SilYetki == "True") {
+                                               islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon Sil' data-rezid='" + row.Id + "' data-rezturu='" + row.RezervasyonTuru + "' style='background-color:crimson;margin-left:5px'>" +
+                                                                  "<i class='fal fa-trash-alt'></i>" +
+                                                                "</a>"
+                                           }
+                                       }
+                                       return islem
+                                   }
+                               }
+                   ],
+                   "processing": true,
+                   "ajax": {
+                       "url": "/Otomasyon/Tanimlar/RezervasyonTurleriListesi/",
+                       "contentType": 'application/json; charset=utf-8',
+                       'data': function (data) { return data = JSON.stringify(data); }
+                   },
+                   "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                   "oLanguage": {
+                       "sSearchPlaceholder": "Tabloda Ara",
+                       "sZeroRecords": "Kayıt yok.",
+                       "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                       "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                       "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                       "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                       "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                       "oPaginate": {
+                           "sPrevious": "Önceki",
+                           "sNext": "Sonraki",
+                           "sFirst": "İlk",
+                           "sLast": "Son"
+                       }
+                   }
+               });
+        });
+    </script>
+}
+
+
+
+

@@ -1,0 +1,683 @@
+﻿
+@{
+    ViewBag.Title = "Siparisler";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+}
+@if (ViewBag.Mesaj != null)
+{
+    if (ViewBag.Mesaj == "SUCCESS")
+    {
+        <script type="text/javascript">
+                Swal.fire(
+                    {
+                        title: "HATA",
+                        //text: "Kullanıcı Adı veya Şifre Hatalı",
+                        html: "<strong>Ödeme işleminiz başarıyla gerçekleştirildi. Lisans aktivasyonunuz yapıldı. <br/>Teşekkür ederiz.</strong>",
+                        type: "success",
+                        showCancelButton: false,
+                        confirmButtonText: "Tamam"
+                    });
+        </script>
+    }
+    else if (ViewBag.Mesaj == "FAILURE")
+    {
+        <script type="text/javascript">
+                Swal.fire(
+                    {
+                        title: "HATA",
+                        //text: "Kullanıcı Adı veya Şifre Hatalı",
+                        html: "<strong>Ödeme esnasında bir hata oluştu. Ödemeniz gerçekleştirilemedi. <br/>Lütfen bilgilerinizi kontrol ederek tekrar deneyiniz.</strong>",
+                        type: "error",
+                        showCancelButton: false,
+                        confirmButtonText: "Tamam"
+                    });
+        </script>
+    }
+    else if (ViewBag.Mesaj == "Lisans Güncelleme Hatası")
+    {
+        <script type="text/javascript">
+            Swal.fire(
+                {
+                    title: "HATA",
+                    //text: "Kullanıcı Adı veya Şifre Hatalı",
+                    html: "<strong>Ödeme işlemi gerçekleşti ancak Lisans bilgileriniz güncellernirken bir hata oluştu.<br/>Lütfen destek@fotografcitakip.com adresinden bizimle iletişime geçiniz.</strong>",
+                    type: "error",
+                    showCancelButton: false,
+                    confirmButtonText: "Tamam"
+                });
+        </script>
+    }
+}
+
+<!-- Ödeme Bildir Modal Penceresi -->
+<div class="modal fade" id="OdemeBildirModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Banka Havale/Eft ödemesi bildir.
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <table class="table" width="100">
+                                <tr style="display:none"><td><b>Sipariş Id :</b></td> <td id="OdemeBildirSiparisId"></td></tr>
+                                <tr style="display:none"><td><b>Sipariş No :</b></td> <td id="OdemeBildirSiparisNo"></td></tr>
+                                <tr><td class="w-25"><b>Paket Adı :</b></td> <td id="OdemeBildirPaketAdi"></td></tr>
+                                <tr><td class="w-25"><b>Paket Tutarı :</b></td> <td id="OdemeBildirPaketTutar"></td></tr>
+                                <tr><td class="w-25"><b></b></td> <td></td></tr>
+                            </table>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="Aciklama">Aciklama</label>
+                                <textarea class="form-control form-control-sm" id="Aciklama" rows="2" name="Aciklama" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-12 pl-2">
+                                <label for="DekontYukle" class="form-label">Dekont - Ekran Görüntüsü Yükle</label>
+                                <input class="form-control" type="file" id="DekontYukle">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="SiparisOdemeBildir">Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ödeme Bildir Ekle Modal Penceresi -->
+
+<input type="text" id="SiparisYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciId" class="form-control" name="Id" maxlength="50" style="display:none" value="@Session["Id"].ToString()">
+<input type="text" id="FiltreAyar" style="display:none" data-filtreayar="@ViewBag.FiltreAyar">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="row col col-12 mt-3" id="date_filter">
+                <div class="form-group col-sm-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="IlkTarih">
+                        <div class="input-group-append">
+                            <span class="input-group-text fs-sm">
+                                <i class="fal fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="SonTarih">
+                        <div class="input-group-append">
+                            <span class="input-group-text fs-sm">
+                                <i class="fal fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-3 mb-3">
+                    <select class="custom-select form-control custom-select-sm" id="IslemTip" name="IslemTip" title="İşlem Tipi">
+                        <option selected="" value="0">Tüm İşlemler</option>
+                        <option value="1">Lisans İşlemleri</option>
+                        <option value="2">SMS Bakiye İşlemleri</option>
+                    </select>
+                </div>
+                <div class="form-group col-sm-3 mb-3">
+                    @*DURUM:  0: Onay Bekliyor, 1: Onaylandı, 2: Tamamlandı, 3: İptal Edildi 4: Ödeme Başarısız*@
+                    <select class="custom-select form-control custom-select-sm" id="DurumTip" name="DurumTip" title="Durum">
+                        <option selected="" value="0">Durum (Tüm İşlemler)</option>
+                        <option value="1">Onay Bekleyenler</option>
+                        <option value="2">Onaylandı</option>
+                        <option value="3">Tamamlandı</option>
+                        <option value="4">İptal Edilenler</option>
+                        <option value="4">Başarısız Ödemeler</option>
+                        <option value="4">Bekleyen Ödemeler</option>
+                    </select>
+                </div>
+            </div>
+            <div class="border-bottom"></div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtsiparisler" class="table table-bordered table-hover table-striped table-sm w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>TarihSıralama</th>
+                                <th class="w-15">Sipariş No</th>
+                                <th>Sipariş Tarihi</th>
+                                <th class="w-15">Paket Adı</th>
+                                <th class="w-20">Paket Detay</th>
+                                <th class="w-10">Paket Tutarı</th>
+                                <th>Süre</th>
+                                <th>Ödeme Şekli</th>
+                                <th>Durum</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Script
+{
+    <script src="~/Areas/Otomasyon/Content/js/tablotarihsirala.js"></script>
+    <script>
+        var controls = {
+            leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
+            rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
+        }
+        var filtreayar = $('#FiltreAyar').data("filtreayar");
+        var runDatePicker = function () {
+            if (filtreayar == "0") {
+                $('#SonTarih').datepicker(
+               {
+                   todayBtn: "linked",
+                   todayHighlight: true,
+                   templates: controls,
+                   language: 'tr',
+                   autoclose: true
+               }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                   {
+                       todayBtn: "linked",
+                       todayHighlight: true,
+                       templates: controls,
+                       language: 'tr',
+                       autoclose: true
+                   }).datepicker("setDate", new Date());
+            } // 1 Gün
+            else if (filtreayar == "1") {
+                $('#SonTarih').datepicker(
+                 {
+                     todayBtn: "linked",
+                     todayHighlight: true,
+                     templates: controls,
+                     language: 'tr',
+                     autoclose: true
+                 }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() + 7)));
+                $('#IlkTarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() - 7)));
+            } // 1 Hafta Öncesi - 1 Hafta Sonrası
+            else if (filtreayar == "2") {
+                $('#SonTarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() + 1)));
+                $('#IlkTarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() - 1)));
+            } // 1 Ay Öncesi - 1 Ay Sonrası
+            else if (filtreayar == "3") {
+                $('#SonTarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
+                $('#IlkTarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
+            } // 1 Yıl Öncesi - 1 Yıl Sonrası
+            else if (filtreayar == "4") {
+                $('#SonTarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+            } // Ayın başından bu güne
+            else if (filtreayar == "5") {
+                $('#SonTarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date(new Date().getFullYear(), 0, 1));
+            } // Yılın başından bu güne
+        }
+        var dt;
+        
+        $(document).ready(function () {
+            $(":input").inputmask();
+            runDatePicker();
+            function ParaFormat(fiyat) {
+                var para_sembol = "TL"
+                var format = new Intl.NumberFormat('de-DE', {
+                    style: 'currency',
+                    currency: 'TRY',
+                    minumumFractionDigits: 2
+                })
+                //return format.format(fiyat)
+                return format.format(fiyat).replace('TRY', para_sembol)
+            }
+            function parseDateValue(rawDate) {
+                var dateArray = rawDate.split(".");
+                var parsedDate = dateArray[2] + dateArray[1] + dateArray[0];
+                return parsedDate;
+            }
+            var islem = "";
+            var DuzenleYetki = $("#SiparisYetkiKayitDuzenle").val();
+            var KullaniciId = $("#KullaniciId").val();
+            $("#SiparisOdemeBildir").click(function () {
+                var siparisid = $(this).data("siparisid");
+                var dekont = document.getElementById('DekontYukle');
+                var OdemeBildirData = new FormData();
+                OdemeBildirData.append("SiparisId", siparisid);
+                OdemeBildirData.append("Aciklama", $('#Aciklama').val());
+                for (i = 0; i < dekont.files.length; i++) {
+                    //Appending each file to FormData object
+                    OdemeBildirData.append(dekont.files[i].name, dekont.files[i]);
+                }
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: OdemeBildirData,
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/SatinAl/OdemeBildirim/",
+                    success: function (data) {
+                        $('#OdemeBildirModal').modal('hide');
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 8);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 8);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#dtsiparisler").on('click', '.OdemeBildir', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                document.getElementById("OdemeBildirSiparisId").innerHTML = $(this).data("siparisid");
+                document.getElementById("OdemeBildirSiparisNo").innerHTML = $(this).data("siparisno");
+                document.getElementById("OdemeBildirPaketAdi").innerHTML = $(this).data("paketadi");
+                document.getElementById("OdemeBildirPaketTutar").innerHTML = ParaFormat($(this).data("pakettutar"));
+
+                $("#SiparisOdemeBildir").data("siparisid", $(this).data("siparisid"));
+                $("#SiparisOdemeBildir").data("siparisno", $(this).data("siparisno"));
+                $("#SiparisOdemeBildir").data("paketadi", $(this).data("paketadi"));
+                $("#SiparisOdemeBildir").data("pakettutar", $(this).data("pakettutar"));
+            });
+            $("#dtsiparisler").on('click', '.TekrarOde', function () {
+                var paketadi = $(this).data("paketadi");
+                var siparisno = $(this).data("siparisno");
+                var siparisid = $(this).data("siparisid");
+                window.location.replace("/Otomasyon/SatinAl/Odeme/" + siparisno);
+            });
+            $("#dtsiparisler").on('click', '.IptalEt', function () {
+                var siparisid = $(this).data("siparisid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/SatinAl/SiparisIptal/" + siparisid,
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 8);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 8);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#dtsiparisler").on('click', '.OdemeOnay', function () {
+                var siparisid = $(this).data("siparisid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/SatinAl/OdemeOnay/" + siparisid,
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 8);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 8);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+
+            $.fn.dataTableExt.afnFiltering.push(
+              function (Settings, Data, DataIndex) {
+                  var ilktarih = parseDateValue($("#IlkTarih").val());
+                  var sontarih = parseDateValue($("#SonTarih").val());
+                  var islemtip = $("#IslemTip").val();
+                  var durumtip = $("#DurumTip").val();
+                
+                  var tarih, islem, durum;
+                  if (islemtip == undefined) {
+                      islemtip = "0";
+                  }
+                 // DURUM:  0: Onay Bekliyor, 1: Onaylandı, 2: Tamamlandı, 3: İptal Edildi 4: Ödeme Başarısız
+                  if (durumtip == undefined) {
+                      durumtip = "0";
+                  }
+                  else if (durumtip == "1") durumtip = "Onay Bekliyor"; // Onay Bekliyor
+                  else if (durumtip == "2") durumtip = "Onaylandı"; // Onaylandı
+                  else if (durumtip == "3") durumtip = "Tamamlandı"; // Tamamlandı
+                  else if (durumtip == "4") durumtip = "İptal Edildi"; // İptal Edildi
+                  else if (durumtip == "5") durumtip = "Ödeme Başarısız"; // Ödeme Başarısız
+                  else if (durumtip == "6") durumtip = "Ödeme Bekliyor"; // Ödeme Bekliyor
+
+                  tarih = parseDateValue(Data[0]);
+                  //islem = Data[3]; // PaketAdi
+                  durum = Data[8];
+                  console.log("Seçilen Durum: " + durumtip)
+                  console.log("Satır Durum: " + durum)
+                  console.log("ilkTarih: " + ilktarih)
+                  console.log("sonTarih: " + sontarih)
+                  if (ilktarih == null && sontarih == null) return true;
+                  if (ilktarih == null && tarih <= sontarih) return true;
+                  if (sontarih == null && tarih >= ilktarih) return true;
+                  if (tarih <= sontarih && tarih >= ilktarih) {
+                      if (islemtip == "0" && durumtip == "0") {
+                          return true;
+                      }
+                      if (islemtip == "0" && durumtip == durum) {
+                          return true;
+                      }
+                      if (islemtip == "1" && durumtip == "0") {
+                          //if (islem == "Basit Lisans (60 TL/Ay)" || islem == "Standart Lisans (75 TL/Ay)" || islem == "Profesyonel Lisans (90 TL/Ay)") {
+                          //    return true;
+                          //}
+                          //else
+                          //{
+                          //    return false;
+                          //}
+                          return true;
+                      }
+                      if (islemtip == "2" && durumtip == "0") {
+                          //if (islem == "1.000 SMS" || islem == "5.000 SMS" || islem == "10.000 SMS" || islem == "25.000 SMS") {
+                          //    return true;
+                          //}
+                          //else {
+                          //    return false;
+                          //}
+                          return true;
+                      }
+                      if (islemtip == "1" && durumtip == durum) {
+                          //if (islem == "Basit Lisans (60 TL/Ay)" || islem == "Standart Lisans (75 TL/Ay)" || islem == "Profesyonel Lisans (90 TL/Ay)") {
+                          //    return true;
+                          //}
+                          //else {
+                          //    return false;
+                          //}
+                          return true;
+                      }
+                      if (islemtip == "2" && durumtip == durum) {
+                          //if (islem == "1.000 SMS" || islem == "5.000 SMS" || islem == "10.000 SMS" || islem == "25.000 SMS") {
+                          //    return true;
+                          //}
+                          //else {
+                          //    return false;
+                          //}
+                          return true;
+                      }
+                      else
+                          return false;
+                  }
+                  return false;
+                  //return true;
+              });
+
+            dt = $('#dtsiparisler').dataTable(
+                    {
+                        responsive: true,
+                        "destroy": true,
+                        "order": [[0, "asc"]],
+                        "createdRow": function (row, data, dataIndex) {
+                            if (data["Odendi"] == true && data["Durum"]=="2") {
+                                $('td', row).addClass('bg-success-600');
+                                $('a', row).addClass('text-white');
+                            }
+                            if (data["Iptal"] == true) {
+                                $('td', row).addClass('bg-danger-600');
+                                $('a', row).addClass('text-white');
+                            }
+                        },
+                        //"columnDefs": [{ "targets": 11, "type": "date-eu" }],
+                        "columns": [
+                             { "data": "Tarih", "autowidth": true, "className": "align-middle", "visible": false },
+                             { "data": "SiparisNo", "autowidth": true, "className": "align-middle" },
+                             { "data": "Tarih", "autowidth": true, "className": "align-middle" },
+                             { "data": "PaketAdi", "autowidth": true, "className": "align-middle" },
+                             { "data": "PaketDetay", "autowidth": true, "className": "align-middle" },
+                             { // Tutar
+                                 "data": null,
+                                 "autowidth": true,
+                                 "className": "align-middle",
+                                 "render": function (data, type, row) {
+                                     return ParaFormat(row.PaketTutar)
+                                 }
+                             },
+                             {   // Lisans Süresi -> 0: Tek Kullanımlık 1: 1AY, 2: 3AY, 3: 6AY, 4: 12AY(1YIL), 5: 24AY(2YIL), 6: 36AY(3YIL)
+                                 "data": null, "autowidth": true, "className": "align-middle",
+                                 "render": function (data, type, row) {
+                                     if (row.LisansSuresi == "0") {
+                                         return "Tek Kullanımlık";
+                                     }
+                                     else if (row.LisansSuresi == "1") {
+                                         return "1 AY";
+                                     }
+                                     else if (row.LisansSuresi == "3") {
+                                         return "3 AY";
+                                     }
+                                     else if (row.LisansSuresi == "6") {
+                                         return "6 AY";
+                                     }
+                                     else if (row.LisansSuresi == "12") {
+                                         return "12 AY";
+                                     }
+                                     else if (row.LisansSuresi == "24") {
+                                         return "24 AY";
+                                     }
+                                     else if (row.LisansSuresi == "36") {
+                                         return "36 AY";
+                                     }
+
+                                 }
+                             },
+                             {   // ÖDEME TÜRÜ:  0: Kredi Kartı, 1: Banka Havale/Eft
+                                 "data": null, "autowidth": true, "className": "align-middle",
+                                 "render": function (data, type, row) {
+                                     if (row.OdemeTuru == "0") {
+                                         return "Kredi Kartı";
+                                     }
+                                     else if (row.OdemeTuru == "1") {
+                                         return "Banka Havale/Eft";
+                                     }
+                                 }
+                             },
+                             {   // DURUM:  0: Onay Bekliyor, 1: Onaylandı, 2: Tamamlandı, 3: İptal Edildi 4: Ödeme Başarısız 5: Ödeme Bekliyor
+                                 "data": null, "autowidth": true, "className": "align-middle",
+                                 "render": function (data, type, row) {
+                                     if (row.Durum == "0") {
+                                         return "<h5><span class='badge badge-info text-white'>Onay Bekliyor</span></h5>";
+                                     }
+                                     else if (row.Durum == "1") {
+                                         return "<h5><span class='badge badge-primary text-white'>Onaylandı</span></h5>";
+                                     }
+                                     else if (row.Durum == "2") {
+                                         return "<h5><span class='badge badge-success text-white'>Tamamlandı</span></h5>";
+                                     }
+                                     else if (row.Durum == "3") {
+                                         return "<h5><span class='badge badge-danger text-white'>İptal Edildi</span></h5>";
+                                     }
+                                     else if (row.Durum == "4") {
+                                         return "<h5><span class='badge badge-warning text-white'>Ödeme Başarısız</span></h5>";
+                                     }
+                                     else if (row.Durum == "5") {
+                                         return "<h5><span class='badge badge-warning text-white'>Ödeme Bekliyor</span></h5>";
+                                     }
+                                 }
+                             },
+                            {
+                                "data": null,
+                                "className": "align-middle",
+                                "render": function (data, type, row) {
+                                    islem = "";
+                                    if (KullaniciId == "1" && row.OdemeTuru == "1" && row.OdemeBildirim == true) {
+                                        islem = islem + "<a href='https://www.fotografcitakip.com" + row.Dosya + "'class='btn btn-xs btn-info btn-icon mr-1 Dosya'" +
+                                                            "title='Dosya'>" +
+                                                        "<i class='fal fa-file-download'></i>" +
+                                                        "</a>"
+                                        islem = islem + "<a href='#'class='btn btn-xs btn-success btn-icon mr-1 OdemeOnay' data-siparisid='" + row.Id + "' data-siparisno='" + row.SiparisNo + "' data-paketadi='" + row.PaketAdi + "' data-pakettutar='" + row.PaketTutar + "'" +
+                                                            "title='Ödeme Onay'>" +
+                                                        "<i class='fal fa-check-square'></i>" +
+                                                        "</a>"
+                                    }
+                                    else if (DuzenleYetki == "True") {
+                                        if (row.OdemeTuru == "1" && row.OdemeBildirim == false) {
+                                            islem = islem + "<a href='#'class='btn btn-xs btn-warning btn-icon text-white mr-1 OdemeBildir' data-siparisid='" + row.Id + "' data-siparisno='" + row.SiparisNo + "' data-paketadi='" + row.PaketAdi + "' data-pakettutar='" + row.PaketTutar + "'" +
+                                                                "data-toggle='modal' data-target='#OdemeBildirModal' title='Odeme Bildir'>" +
+                                                            "<i class='fal fa-money-bill-alt'></i>" +
+                                                            "</a>"
+                                        }
+                                        if (row.OdemeTuru == "0" && row.Odendi == false) {
+                                            if (row.Iptal == false) {
+                                                islem = islem + "<a href='#'class='btn btn-xs btn-primary btn-icon mr-1 TekrarOde' data-siparisid='" + row.Id + "' data-siparisno='" + row.SiparisNo + "' data-paketadi='" + row.PaketAdi + "' data-pakettutar='" + row.PaketTutar + "'" +
+                                                    "title='Odemeyi Tekrar Dene'>" +
+                                                    "<i class='fal fa-sync-alt'></i>" +
+                                                    "</a>"
+                                                islem = islem + "<a href='#'class='btn btn-xs btn-danger btn-icon mr-1 IptalEt' data-siparisid='" + row.Id + "' data-siparisno='" + row.SiparisNo + "' data-paketadi='" + row.PaketAdi + "' data-pakettutar='" + row.PaketTutar + "'" +
+                                                    "title='Siparişi İptal Et'>" +
+                                                    "<i class='fal fa-times-circle'></i>" +
+                                                    "</a>"
+                                            }
+                                            
+                                        }
+                                    }
+                                   
+                                    return islem
+                                }
+                            },
+                        ],
+                        "processing": true,
+                        "ajax": {
+                            "url": "/Otomasyon/SatinAl/SiparisListesi/",
+                            "contentType": 'application/json; charset=utf-8',
+                            'type': 'POST',
+                            'data': function (data) { return data = JSON.stringify(data); }
+                        },
+                        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                        "oLanguage": {
+                            "sSearchPlaceholder": "Tabloda Ara",
+                            "sZeroRecords": "Kayıt yok.",
+                            "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                            "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                            "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                            "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                            "processing": "Yükleniyor... Lütfen Bekleyin",
+                            "oPaginate": {
+                                "sPrevious": "Önceki",
+                                "sNext": "Sonraki",
+                                "sFirst": "İlk",
+                                "sLast": "Son"
+                            }
+                        }
+                    });
+            $("#IlkTarih").keyup(function () { dt.fnDraw(); });
+            $("#IlkTarih").change(function () { dt.fnDraw(); });
+            $("#SonTarih").keyup(function () { dt.fnDraw(); });
+            $("#SonTarih").change(function () { dt.fnDraw(); });
+            $("#IslemTip").change(function () { dt.fnDraw(); });
+            $("#DurumTip").change(function () { dt.fnDraw(); });
+            $("input[type='search']").keydown(function () {
+                alinanodemetoplam = 0; gelecekodemetoplam = 0;
+            });
+        });
+    </script>
+}

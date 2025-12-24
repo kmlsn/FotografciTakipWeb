@@ -1,0 +1,36 @@
+﻿@using FotografciTakipWeb.Models
+@model List<Sube>
+<div class="btn-group p-2">
+    <button type="button" class="btn btn-outline-primary dropdown-toggle waves-effect waves-themed" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Şube Değiştir
+    </button>
+    <div class="dropdown-menu fadeinup">
+        @foreach (var item in Model)
+        {
+            @*<a href="#" class="app-list-item text-white border-0 m-0 SubeDegistir" data-id="@item.Id">
+                @*<a href="~/Otomasyon/Default/SubeDegistir/@item.Id" class="app-list-item text-white border-0 m-0">
+                <div class='icon-stack'>
+                    <i class="base base-7 icon-stack-1x opacity-5 color-info-300"></i>
+                    <i class="base base-16 icon-stack-1x opacity-100 color-primary-500"></i>
+                    <i class="fal fa-camera icon-stack-1x opacity-100 color-white "></i>
+                </div>
+                <span class="app-list-name">
+                    @item.SubeAdi
+                </span>
+            </a>*@
+
+
+            <button class="dropdown-item SubeDegistir" type="button" data-id="@item.Id">
+                <i class="fal fa-camera-alt fa-2x pr-1"></i>
+                @item.SubeAdi
+            </button>
+        }
+        @if (ViewBag.KullaniciYetki)
+        {
+        <button class="dropdown-item SubeDegistir" type="button" data-id="0">
+            <i class="fal fa-camera-alt fa-2x pr-1"></i>
+            Tüm Şubeler
+        </button>
+        }
+    </div>
+</div>

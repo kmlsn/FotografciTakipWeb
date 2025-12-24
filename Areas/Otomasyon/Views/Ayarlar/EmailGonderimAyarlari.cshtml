@@ -1,0 +1,2306 @@
+﻿
+@{
+    ViewBag.Title = "Email Gönderim Ayarlari";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+
+@using FotografciTakipWeb.Models;
+@model AyarlarMailGonderim
+@{
+    List<MailMetinleri> MailMetinleri = ViewBag.MailMetinleri;
+}
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h3> Email Gönderim Ayarları</h3>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <form action="/Otomasyon/Ayarlar/EmailGonderimAyarlari" method="post" enctype="multipart/form-data">
+                        @if (Model != null)
+                        {
+                            <table class="table table-sm table-bordered table-hover m-0">
+                                <thead class="thead-themed">
+                                    <tr>
+                                        <th></th>
+                                        <th>Gönderim Süresi</th>
+                                        <th>Göderilecek Email İçeriği</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="CariAlacakHatirlatmaMaili">Cari Alacak Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="CariAlacakHatirlatmaGonderimSuresi" name="CariAlacakHatirlatmaGonderimSuresi">
+                                                @switch (Model.CariAlacakHatirlatmaGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6" selected>Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="CariAlacakHatirlatmaMaili" name="CariAlacakHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.CariAlacakHatirlatmaMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="CariTahsilatBilgiMaili">Cariden Yapılan Tahsilat Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="CariTahsilatBilgiGonderimSuresi" name="CariTahsilatBilgiGonderimSuresi">
+                                                @switch (Model.CariTahsilatBilgiGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1" selected>Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2" selected>1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3" selected>2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4" selected>3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5" selected>1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>*@
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6" selected>Kayıt Yapıldığında</option>
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="CariTahsilatBilgiMaili" name="CariTahsilatBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.CariTahsilatBilgiMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="CariyeYapilanOdemeBilgiMaili">Cariye Yapılan Ödeme Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="CariyeYapilanOdemeBilgiGonderimSuresi" name="CariyeYapilanOdemeBilgiGonderimSuresi">
+                                                @switch (Model.CariyeYapilanOdemeBilgiGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6" selected>Kayıt Yapıldığında</option>
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="CariyeYapilanOdemeBilgiMaili" name="CariyeYapilanOdemeBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.CariyeYapilanOdemeBilgiMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="EvlilikYildonumuTebrikMaili">Evlilik Yıldönümü Tebrik Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="EvlilikYildonumuTebrikGonderimSuresi" name="EvlilikYildonumuTebrikGonderimSuresi">
+                                                @switch (Model.EvlilikYildonumuTebrikGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6" selected>Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="EvlilikYildonumuTebrikMaili" name="EvlilikYildonumuTebrikMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.EvlilikYildonumuTebrikMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="FotografSecimiBilgiMailiFirma">Fotoğraf Seçimi Bilgi Emaili (Firma)</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="FotografSecimiBilgiMailiFirmaGonderimSuresi" name="FotografSecimiBilgiMailiFirmaGonderimSuresi">
+                                                @switch (Model.FotografSecimiBilgiMailiFirmaGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3" selected>2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4" selected>3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5" selected>1 hafta sonra</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        <option value="6" selected>Kayıt Yapıldığında</option>
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="FotografSecimiBilgiMailiFirma" name="FotografSecimiBilgiMailiFirma">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.FotografSecimiBilgiMailiFirma)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="FotografSecimiBilgiMailiMusteri">Fotoğraf Seçimi Bilgi Emaili (Müşteri)</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="FotografSecimiBilgiMailiMusteriGonderimSuresi" name="FotografSecimiBilgiMailiMusteriGonderimSuresi">
+                                                @switch (Model.FotografSecimiBilgiMailiMusteriGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3" selected>2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4" selected>3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5" selected>1 hafta sonra</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        <option value="6" selected>Kayıt Yapıldığında</option>
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="FotografSecimiBilgiMailiMusteri" name="FotografSecimiBilgiMailiMusteri">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.FotografSecimiBilgiMailiMusteri)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="FotografSecimiHatirlatmaMaili">Fotoğraf Seçimi Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="FotografSecimiHatirlatmaGonderimSuresi" name="FotografSecimiHatirlatmaGonderimSuresi">
+                                                @switch (Model.FotografSecimiHatirlatmaGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3" selected>2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4" selected>3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5" selected>1 hafta sonra</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün sonra</option>
+                                                        <option value="3">2 gün sonra</option>
+                                                        <option value="4">3 gün sonra</option>
+                                                        <option value="5">1 hafta sonra</option>
+                                                        @*<option value="6" selected>Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="FotografSecimiHatirlatmaMaili" name="FotografSecimiHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.FotografSecimiHatirlatmaMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="GunlukIsOdemeBilgiMaili">Günlük İş Ödeme Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="GunlukIsOdemeBilgiGonderimSuresi" name="GunlukIsOdemeBilgiGonderimSuresi">
+                                                @switch (Model.GunlukIsOdemeBilgiGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1" selected>Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2" selected>1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3" selected>2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4" selected>3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5" selected>1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6" selected>Kayıt Yapıldığında</option>
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="GunlukIsOdemeBilgiMaili" name="GunlukIsOdemeBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.GunlukIsOdemeBilgiMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="MusteriCekimRandevusuBilgiMaili">Müşteri Çekim Randevusu Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriCekimRandevusuBilgiGonderimSuresi" name="MusteriCekimRandevusuBilgiGonderimSuresi">
+                                                @switch (Model.MusteriCekimRandevusuBilgiGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6" selected>Kayıt Yapıldığında</option>
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriCekimRandevusuBilgiMaili" name="MusteriCekimRandevusuBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.MusteriCekimRandevusuBilgiMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="MusteriCekimRandevusuHatirlatmaMaili">Müşteri Çekim Randevusu Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriCekimRandevusuHatirlatmaGonderimSuresi" name="MusteriCekimRandevusuHatirlatmaGonderimSuresi">
+                                                @switch (Model.MusteriCekimRandevusuHatirlatmaGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6" selected>Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriCekimRandevusuHatirlatmaMaili" name="MusteriCekimRandevusuHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.MusteriCekimRandevusuHatirlatmaMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="MusteriOdemeBilgiMaili">Müşteri Ödeme Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriOdemeBilgiGonderimSuresi" name="MusteriOdemeBilgiGonderimSuresi">
+                                                @switch (Model.MusteriOdemeBilgiGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6" selected>Kayıt Yapıldığında</option>
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriOdemeBilgiMaili" name="MusteriOdemeBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.MusteriOdemeBilgiMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="MusteriOdemeHatirlatmaMaili">Müşteri Ödeme Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriOdemeHatirlatmaGonderimSuresi" name="MusteriOdemeHatirlatmaGonderimSuresi">
+                                                @switch (Model.MusteriOdemeHatirlatmaGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6" selected>Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriOdemeHatirlatmaMaili" name="MusteriOdemeHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.MusteriOdemeHatirlatmaMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="OpsiyonTarihiBilgiMaili">Opsiyon Tarihi Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="OpsiyonTarihiBilgiGonderimSuresi" name="OpsiyonTarihiBilgiGonderimSuresi">
+                                                @switch (Model.OpsiyonTarihiBilgiGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6" selected>Kayıt Yapıldığında</option>
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="OpsiyonTarihiBilgiMaili" name="OpsiyonTarihiBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.OpsiyonTarihiBilgiMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="OpsiyonTarihiHatirlatmaMaili">Opsiyon Tarihi Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="OpsiyonTarihiHatirlatmaGonderimSuresi" name="OpsiyonTarihiHatirlatmaGonderimSuresi">
+                                                @switch (Model.OpsiyonTarihiHatirlatmaGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6" selected>Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="OpsiyonTarihiHatirlatmaMaili" name="OpsiyonTarihiHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.OpsiyonTarihiHatirlatmaMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="PersonelRandevuBilgiMaili">Personel Randevu Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="PersonelRandevuBilgiGonderimSuresi" name="PersonelRandevuBilgiGonderimSuresi">
+                                                @switch (Model.PersonelRandevuBilgiGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6" selected>Kayıt Yapıldığında</option>
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="PersonelRandevuBilgiMaili" name="PersonelRandevuBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.PersonelRandevuBilgiMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="PersonelRandevuHatirlatmaMaili">Personel Randevu Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="PersonelRandevuHatirlatmaGonderimSuresi" name="PersonelRandevuHatirlatmaGonderimSuresi">
+                                                @switch (Model.PersonelRandevuHatirlatmaGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6" selected>Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="PersonelRandevuHatirlatmaMaili" name="PersonelRandevuHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.PersonelRandevuHatirlatmaMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="RezervasyonTarihiBilgiMaili">Rezervasyon Tarihi Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="RezervasyonTarihiBilgiGonderimSuresi" name="RezervasyonTarihiBilgiGonderimSuresi">
+                                                @switch (Model.RezervasyonTarihiBilgiGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        <option value="6" selected>Kayıt Yapıldığında</option>
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="RezervasyonTarihiBilgiMaili" name="RezervasyonTarihiBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.RezervasyonTarihiBilgiMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="RezervasyonTarihiHatirlatmaMaili">Rezervasyon Tarihi Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="RezervasyonTarihiHatirlatmaGonderimSuresi" name="RezervasyonTarihiHatirlatmaGonderimSuresi">
+                                                @switch (Model.RezervasyonTarihiHatirlatmaGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1" selected>Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2" selected>1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3" selected>2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4" selected>3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5" selected>1 hafta önce</option>
+                                                        @*<option value="6">Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        <option value="1">Tarih ile aynı gün</option>
+                                                        <option value="2">1 gün önce</option>
+                                                        <option value="3">2 gün önce</option>
+                                                        <option value="4">3 gün önce</option>
+                                                        <option value="5">1 hafta önce</option>
+                                                        @*<option value="6" selected>Kayıt Yapıldığında</option>*@
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="RezervasyonTarihiHatirlatmaMaili" name="RezervasyonTarihiHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.RezervasyonTarihiHatirlatmaMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="SurecDegisiklikBilgiMaili">Süreç Değişikliği Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="SurecDegisiklikBilgiGonderimSuresi" name="SurecDegisiklikBilgiGonderimSuresi">
+                                                @switch (Model.SurecDegisiklikBilgiGonderimSuresi)
+                                                {
+                                                    case 0:
+                                                        <option value="0" selected>Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 1:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1" selected>Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 2:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2" selected>1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 3:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3" selected>2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 4:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4" selected>3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 5:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5" selected>1 hafta önce</option>*@
+                                                        <option value="6">Kayıt Yapıldığında</option>
+                                                        break;
+                                                    case 6:
+                                                        <option value="0">Hiçbir Zaman Gönderme</option>
+                                                        @*<option value="1">Tarih ile aynı gün</option>
+                            <option value="2">1 gün önce</option>
+                            <option value="3">2 gün önce</option>
+                            <option value="4">3 gün önce</option>
+                            <option value="5">1 hafta önce</option>*@
+                                                        <option value="6" selected>Kayıt Yapıldığında</option>
+                                                        break;
+                                                    default:
+                                                        break;
+                                                }
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="SurecDegisiklikBilgiMaili" name="SurecDegisiklikBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    if (metin.Id == Model.SurecDegisiklikBilgiMaili)
+                                                    {
+                                                        <option value="@metin.Id" selected>@metin.MetinAdi</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@metin.Id">@metin.MetinAdi</option>
+                                                    }
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <input type="text" id="Id" class="form-control" name="Id" maxlength="50" style="display:none" value="@Model.Id">
+                        }
+                        else
+                        {
+                            <table class="table table-sm table-bordered table-hover m-0">
+                                <thead class="thead-themed">
+                                    <tr>
+                                        <th></th>
+                                        <th>Gönderim Süresi</th>
+                                        <th>Göderilecek Email İçeriği</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="CariAlacakHatirlatmaMaili">Cari Alacak Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="CariAlacakHatirlatmaGonderimSuresi" name="CariAlacakHatirlatmaGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                @*<option value="6">Kayıt Yapıldığında</option>*@
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="CariAlacakHatirlatmaMaili" name="CariAlacakHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="CariTahsilatBilgiMaili">Cariden Yapılan Tahsilat Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="CariTahsilatBilgiGonderimSuresi" name="CariTahsilatBilgiGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                @*<option value="1">Tarih ile aynı gün</option>
+                    <option value="2">1 gün önce</option>
+                    <option value="3">2 gün önce</option>
+                    <option value="4">3 gün önce</option>
+                    <option value="5">1 hafta önce</option>*@
+                                                <option value="6">Kayıt Yapıldığında</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="CariTahsilatBilgiMaili" name="CariTahsilatBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="CariyeYapilanOdemeBilgiMaili">Cariye Yapılan Ödeme Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="CariyeYapilanOdemeBilgiGonderimSuresi" name="CariyeYapilanOdemeBilgiGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                <option value="6">Kayıt Yapıldığında</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="CariyeYapilanOdemeBilgiMaili" name="CariyeYapilanOdemeBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="EvlilikYildonumuTekbikMaili">Evlilik Yıldönümü Tebrik Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="EvlilikYildonumuTekbikGonderimSuresi" name="EvlilikYildonumuTekbikGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                @*<option value="6">Kayıt Yapıldığında</option>*@
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="EvlilikYildonumuTekbikMaili" name="EvlilikYildonumuTekbikMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="FotografSecimiBilgiMailiFirma">Fotoğraf Seçimi Bilgi Emaili (Firma)</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="FotografSecimiBilgiMailiFirmaGonderimSuresi" name="FotografSecimiBilgiMailiFirmaGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                @*<option value="1">Tarih ile aynı gün</option>
+                    <option value="2">1 gün önce</option>
+                    <option value="3">2 gün önce</option>
+                    <option value="4">3 gün önce</option>
+                    <option value="5">1 hafta önce</option>*@
+                                                <option value="6">Kayıt Yapıldığında</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="FotografSecimiBilgiMailiFirma" name="FotografSecimiBilgiMailiFirma">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="FotografSecimiBilgiMailiMusteri">Fotoğraf Seçimi Bilgi Emaili (Müşteri)</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="FotografSecimiBilgiMailiMusteriGonderimSuresi" name="FotografSecimiBilgiMailiMusteriGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün sonra</option>
+                                                <option value="3">2 gün sonra</option>
+                                                <option value="4">3 gün sonra</option>
+                                                <option value="5">1 hafta sonra</option>
+                                                <option value="6">Kayıt Yapıldığında</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="FotografSecimiBilgiMailiMusteri" name="FotografSecimiBilgiMailiMusteri">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="FotografSecimiHatirlatmaMaili">Fotoğraf Seçimi Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="FotografSecimiHatirlatmaGonderimSuresi" name="FotografSecimiHatirlatmaGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün sonra</option>
+                                                <option value="3">2 gün sonra</option>
+                                                <option value="4">3 gün sonra</option>
+                                                <option value="5">1 hafta sonra</option>
+                                                @*<option value="6">Kayıt Yapıldığında</option>*@
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="FotografSecimiHatirlatmaMaili" name="FotografSecimiHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="GunlukIsOdemeBilgiMaili">Günlük İş Ödeme Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="GunlukIsOdemeBilgiGonderimSuresi" name="GunlukIsOdemeBilgiGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                @*<option value="1">Tarih ile aynı gün</option>
+                    <option value="2">1 gün önce</option>
+                    <option value="3">2 gün önce</option>
+                    <option value="4">3 gün önce</option>
+                    <option value="5">1 hafta önce</option>*@
+                                                <option value="6">Kayıt Yapıldığında</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="GunlukIsOdemeBilgiMaili" name="GunlukIsOdemeBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="MusteriCekimRandevusuBilgiMaili">Müşteri Çekim Randevusu Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriCekimRandevusuBilgiGonderimSuresi" name="MusteriCekimRandevusuBilgiGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                <option value="6">Kayıt Yapıldığında</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriCekimRandevusuBilgiMaili" name="MusteriCekimRandevusuBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="MusteriCekimRandevusuHatirlatmaMaili">Müşteri Çekim Randevusu Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriCekimRandevusuHatirlatmaGonderimSuresi" name="MusteriCekimRandevusuHatirlatmaGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                @*<option value="6">Kayıt Yapıldığında</option>*@
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriCekimRandevusuHatirlatmaMaili" name="MusteriCekimRandevusuHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="MusteriOdemeBilgiMaili">Müşteri Ödeme Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriOdemeBilgiGonderimSuresi" name="MusteriOdemeBilgiGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                <option value="6">Kayıt Yapıldığında</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriOdemeBilgiMaili" name="MusteriOdemeBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="MusteriOdemeHatirlatmaMaili">Müşteri Ödeme Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriOdemeHatirlatmaGonderimSuresi" name="MusteriOdemeHatirlatmaGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                @*<option value="6">Kayıt Yapıldığında</option>*@
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="MusteriOdemeHatirlatmaMaili" name="MusteriOdemeHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="OpsiyonTarihiBilgiMaili">Opsiyon Tarihi Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="OpsiyonTarihiBilgiGonderimSuresi" name="OpsiyonTarihiBilgiGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                <option value="6">Kayıt Yapıldığında</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="OpsiyonTarihiBilgiMaili" name="OpsiyonTarihiBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="OpsiyonTarihiHatirlatmaMaili">Opsiyon Tarihi Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="OpsiyonTarihiHatirlatmaGonderimSuresi" name="OpsiyonTarihiHatirlatmaGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                @*<option value="6">Kayıt Yapıldığında</option>*@
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="OpsiyonTarihiHatirlatmaMaili" name="OpsiyonTarihiHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="PersonelRandevuBilgiMaili">Personel Randevu Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="PersonelRandevuBilgiGonderimSuresi" name="PersonelRandevuBilgiGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                <option value="6">Kayıt Yapıldığında</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="PersonelRandevuBilgiMaili" name="PersonelRandevuBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="PersonelRandevuHatirlatmaMaili">Personel Randevu Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="PersonelRandevuHatirlatmaGonderimSuresi" name="PersonelRandevuHatirlatmaGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                @*<option value="6">Kayıt Yapıldığında</option>*@
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="PersonelRandevuHatirlatmaMaili" name="PersonelRandevuHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="RezervasyonTarihiBilgiMaili">Rezervasyon Tarihi Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="RezervasyonTarihiBilgiGonderimSuresi" name="RezervasyonTarihiBilgiGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                <option value="6">Kayıt Yapıldığında</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="RezervasyonTarihiBilgiMaili" name="RezervasyonTarihiBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="RezervasyonTarihiHatirlatmaMaili">Rezervasyon Tarihi Hatırlatma Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="RezervasyonTarihiHatirlatmaGonderimSuresi" name="RezervasyonTarihiHatirlatmaGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                <option value="1">Tarih ile aynı gün</option>
+                                                <option value="2">1 gün önce</option>
+                                                <option value="3">2 gün önce</option>
+                                                <option value="4">3 gün önce</option>
+                                                <option value="5">1 hafta önce</option>
+                                                @*<option value="6">Kayıt Yapıldığında</option>*@
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="RezervasyonTarihiHatirlatmaMaili" name="RezervasyonTarihiHatirlatmaMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <label class="form-label mt-1" for="SurecDegisiklikBilgiMaili">Süreç Değişikliği Bilgi Emaili</label>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="SurecDegisiklikBilgiGonderimSuresi" name="SurecDegisiklikBilgiGonderimSuresi">
+                                                <option value="0" selected="">Hiçbir Zaman Gönderme</option>
+                                                @*<option value="1">Tarih ile aynı gün</option>
+                    <option value="2">1 gün önce</option>
+                    <option value="3">2 gün önce</option>
+                    <option value="4">3 gün önce</option>
+                    <option value="5">1 hafta önce</option>*@
+                                                <option value="6">Kayıt Yapıldığında</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <select class="custom-select custom-select-sm form-control" id="SurecDegisiklikBilgiMaili" name="SurecDegisiklikBilgiMaili">
+                                                <option selected="" value="0">Email Gönderme</option>
+                                                @foreach (var metin in MailMetinleri)
+                                                {
+                                                    <option value="@metin.Id">@metin.MetinAdi</option>
+                                                }
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <input type="text" id="Id" class="form-control" name="Id" maxlength="50" style="display:none" value="0">
+                        }
+                        @if (ViewBag.KullaniciYetki)
+                        {
+                            <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                                <button type="submit" class="btn btn-primary ml-auto waves-effect waves-themed"><i class="fal fa-save mr-2"></i> Kaydet</button>
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

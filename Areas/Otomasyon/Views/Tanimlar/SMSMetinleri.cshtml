@@ -1,0 +1,603 @@
+﻿
+@{
+    ViewBag.Title = "Tanımlar - Sms İçerikleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+@section Head
+{
+-    <style>
+        .modal {
+            overflow: auto !important; /*Açılan ikinci modal ekranda kaymadığı için eklendi*/
+        }
+    </style>
+}
+
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni SMS Metni Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-danger" role="alert">
+                                    Lütfen metin içerisinde (!),(^),(+),(%),(#),($),(&),(/\),({}),([]),() karakterlerini kullanmayınız. Bu karakterler parametre ayarları için kullanılmaktadır.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-12" id="MetinAdiHata">
+                                <label class="form-label" for="MetinAdi">Metin Adı</label>
+                                <input type="text" id="MetinAdi" class="form-control form-control-sm" name="MetinAdi" maxlength="100">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-12" id="SMSMetniHata">
+                                <label class="form-label" for="SMSMetni">SMS Metni</label>
+                                <textarea class="form-control form-control-sm" id="SMSMetni" rows="4" name="SMSMetni" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="Durum">Durum</label>
+                                <div class="frame-wrap">
+                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                        <input type="checkbox" class="custom-control-input" id="Durum" checked>
+                                        <label class="custom-control-label" for="Durum">Aktif</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion accordion-outline" id="js_demo_accordion-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <a href="javascript:void(0);" class="card-title" data-toggle="collapse" data-target="#js_demo_accordion-3a" aria-expanded="false">
+                                        <i class="fal fa-random width-2 fs-xl"></i>
+                                        Parametreler
+                                        <span class="ml-auto">
+                                            <span class="collapsed-reveal">
+                                                <i class="fal fa-minus fs-xl"></i>
+                                            </span>
+                                            <span class="collapsed-hidden">
+                                                <i class="fal fa-plus fs-xl"></i>
+                                            </span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="js_demo_accordion-3a" class="collapse" data-parent="#js_demo_accordion-3">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <span class="text-primary">Firma Adı: </span> <span class="text-danger">{FirmaAdi}</span><br />
+                                                <span class="text-primary">Gelin Ad Soyad: </span> <span class="text-danger">{GelinAdSoyad}</span><br />
+                                                <span class="text-primary">Damat Ad Soyad:</span> <span class="text-danger">{DamatAdSoyad}</span><br />
+                                                <span class="text-primary">Yetkili Ad Soyad:</span> <span class="text-danger">{YetkiliAdSoyad}</span><br />
+                                                <span class="text-primary">Ad Soyad(Cari/Müşteri):</span> <span class="text-danger">{AdSoyad}</span><br />
+                                                <span class="text-primary">Müşteri Kodu:</span> <span class="text-danger">{MusteriKodu}</span><br />
+                                                <span class="text-primary">Personel Ad-Soyad:</span> <span class="text-danger">{Personel}</span><br />
+                                                <span class="text-primary">Randevu Tarihi:</span> <span class="text-danger">{RandevuTarihi}</span><br />
+                                                <span class="text-primary">Süreç Adı:</span> <span class="text-danger">{Surec}</span><br />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <span class="text-primary">Ödeme Tarihi:</span> <span class="text-danger">{OdemeTarihi}</span><br />
+                                                <span class="text-primary">Tarih (İşlem Tarihi):</span> <span class="text-danger">{Tarih}</span><br />
+                                                <span class="text-primary">Tutar:</span> <span class="text-danger">{Tutar}</span><br />
+                                                <span class="text-primary">Sözleşme No:</span> <span class="text-danger">{SozlesmeNo}</span><br />
+                                                <span class="text-primary">Makbuz No:</span> <span class="text-danger">{MakbuzNo}</span><br />
+                                                <span class="text-primary">Opsiyon Tarihi:</span> <span class="text-danger">{OpsiyonTarihi}</span><br />
+                                                <span class="text-primary">Rezervasyon Türü:</span> <span class="text-danger">{RezervasyonTuru}</span><br />
+                                                <span class="text-primary">Çekim Randevusu Bilgileri:</span> <span class="text-danger">{CekimRandevuBilgileri}</span><br />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Kaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitGuncelleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    SMS Metni Düzenle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="alert alert-danger" role="alert">
+                                    Lütfen metin içerisinde (!),(^),(+),(%),(#),($),(&),(/\),({}),([]),() karakterlerini kullanmayınız. Bu karakterler parametre ayarları için kullanılmaktadır.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-12" id="MetinAdiDuzenleHata">
+                                <label class="form-label" for="MetinAdiDuzenle">Başlık</label>
+                                <input type="text" id="MetinAdiDuzenle" class="form-control form-control-sm" name="MetinAdiDuzenle" maxlength="100">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-12" id="SMSMetniDuzenleHata">
+                                <label class="form-label" for="SMSMetniDuzenle">SMS Metni</label>
+                                <textarea class="form-control form-control-sm" id="SMSMetniDuzenle" rows="4" name="SMSMetniDuzenle" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="DurumDuzenle">Durum</label>
+                                <div class="frame-wrap">
+                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                        <input type="checkbox" class="custom-control-input" id="DurumDuzenle" checked>
+                                        <label class="custom-control-label" for="DurumDuzenle">Aktif</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion accordion-outline" id="js_demo_accordion-3">
+                            <div class="card">
+                                <div class="card-header">
+                                    <a href="javascript:void(0);" class="card-title" data-toggle="collapse" data-target="#js_demo_accordion-3a" aria-expanded="false">
+                                        <i class="fal fa-random width-2 fs-xl"></i>
+                                        Parametreler
+                                        <span class="ml-auto">
+                                            <span class="collapsed-reveal">
+                                                <i class="fal fa-minus fs-xl"></i>
+                                            </span>
+                                            <span class="collapsed-hidden">
+                                                <i class="fal fa-plus fs-xl"></i>
+                                            </span>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div id="js_demo_accordion-3a" class="collapse" data-parent="#js_demo_accordion-3">
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <span class="text-primary">Firma Adı: </span> <span class="text-danger">{FirmaAdi}</span><br />
+                                                <span class="text-primary">Gelin Ad Soyad: </span> <span class="text-danger">{GelinAdSoyad}</span><br />
+                                                <span class="text-primary">Damat Ad Soyad:</span> <span class="text-danger">{DamatAdSoyad}</span><br />
+                                                <span class="text-primary">Yetkili Ad Soyad:</span> <span class="text-danger">{YetkiliAdSoyad}</span><br />
+                                                <span class="text-primary">Ad Soyad(Cari/Müşteri):</span> <span class="text-danger">{AdSoyad}</span><br />
+                                                <span class="text-primary">Müşteri Kodu:</span> <span class="text-danger">{MusteriKodu}</span><br />
+                                                <span class="text-primary">Personel Ad-Soyad:</span> <span class="text-danger">{Personel}</span><br />
+                                                <span class="text-primary">Randevu Tarihi:</span> <span class="text-danger">{RandevuTarihi}</span><br />
+                                            </div>
+                                            <div class="col-md-6">
+                                                <span class="text-primary">Ödeme Tarihi:</span> <span class="text-danger">{OdemeTarihi}</span><br />
+                                                <span class="text-primary">Tarih (İşlem Tarihi):</span> <span class="text-danger">{Tarih}</span><br />
+                                                <span class="text-primary">Tutar:</span> <span class="text-danger">{Tutar}</span><br />
+                                                <span class="text-primary">Sözleşme No:</span> <span class="text-danger">{SozlesmeNo}</span><br />
+                                                <span class="text-primary">Makbuz No:</span> <span class="text-danger">{MakbuzNo}</span><br />
+                                                <span class="text-primary">Opsiyon Tarihi:</span> <span class="text-danger">{OpsiyonTarihi}</span><br />
+                                                <span class="text-primary">Çekim Randevusu Bilgileri:</span> <span class="text-danger">{CekimRandevuBilgileri}</span><br />
+                                                <span class="text-primary">Süreç Adı:</span> <span class="text-danger">{Surec}</span><br /> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Guncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                @if (KullaniciYetki.KayitEkle)
+                {
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle"> Yeni SMS Metni Ekle </button>
+                }
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="tb-smsmetinler" class="table table-sm table-bordered table-hover table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th class="w-25">Metin Adı</th>
+                                <th>SMS Metni</th>
+                                <th class="w-10">Durum</th>
+                                <th class="w-5">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="kullanici-satir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            var SubeListesi = new Array();
+            var durum = "Aktif", durumduzenle = "Aktif", metinduzelt = "";
+            $(":input").inputmask();
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            $("#Durum").on('click', function () {
+                if ($(this).is(':checked')) {
+                    durum = "Aktif";
+                }
+                else {
+                    durum = "Pasif";
+                }
+            });
+            $("#DurumDuzenle").on('click', function () {
+                if ($(this).is(':checked')) {
+                    durumduzenle = "Aktif";
+                }
+                else {
+                    durumduzenle = "Pasif";
+                }
+            }); // Kişi yada Firma olarak cari seçeneği
+            $("#YeniEkle").click(function () {
+                $("#MetinAdi").val("");
+                $("#SMSMetni").val("");
+                $("#Durum").attr("checked", "checked");
+            });
+            $("#Kaydet").click(function () {
+                if (($("#MetinAdi").val() == "")) {
+                    $("#MetinAdi").focus();
+                    $("#MetinAdiHata").append("<div class='hata' style='color:red'>Sms Metni için bir ad giriniz.</div>");
+                }
+                else if (($("#SMSMetni").val() == "")) {
+                    $("#SMSMetni").focus();
+                    $("#SMSMetniHata").append("<div class='hata' style='color:red'>Sms Metnini giriniz.</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var SMSMetinData = new FormData();
+                    var MetinAdi = $("#MetinAdi").val();
+                    SMSMetinData.append("MetinAdi", $("#MetinAdi").val());
+                    SMSMetinData.append("Metin", $("#SMSMetni").val());
+                    SMSMetinData.append("Durum", durum);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: SMSMetinData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/MetinAdiVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: SMSMetinData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Tanimlar/SMSMetinEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                            $("#MetinAdi").val("");
+                                            $("#Metin").val("");
+                                            $("#Durum").attr("checked", "checked");
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else {
+                                Swal.fire(
+                               {
+                                   title: "Varolan Kayıt",
+                                   html: "<p><h2 style='font-size:16px; color:red'><strong>Metin Adı : </strong>" + MetinAdi + "</h2></p><h2> Böyle bir SMS Metni zaten var! Bu kaydı güncellemek istermisiniz?</h2>",
+                                   type: "warning",
+                                   showCancelButton: true,
+                                   confirmButtonText: "Güncelle"
+                               }).then(function (result) {
+                                   if (result.value) {
+                                       $.ajax({
+                                           type: "POST",
+                                           datatype: 'json',
+                                           data: SMSMetinData,
+                                           contentType: false,
+                                           processData: false,
+                                           url: "/Otomasyon/Tanimlar/SMSMetinGuncelle/" + data, // data: controller dan dönen varolan kaydın ID si
+                                           success: function (data) {
+                                               if (data.Sonuc == false) {
+                                                   alertify.set('notifier', 'delay', 5);
+                                                   alertify.set('notifier', 'position', 'top-center');
+                                                   alertify.error(data.Mesaj);
+                                               }
+                                               else if (data.Sonuc == true) {
+                                                   alertify.set('notifier', 'delay', 3);
+                                                   alertify.set('notifier', 'position', 'top-center');
+                                                   alertify.success(data.Mesaj);
+                                                   dt.api().ajax.reload();
+                                               }
+                                           },
+                                           error: function (err) {
+                                               alert("HATA");
+                                           }
+                                       });
+                                   }
+                               });
+                            }
+
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            $("#tb-smsmetinler").on('click', '.durumdegistir', function () {
+                var id = $(this).data("smsmetinid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/SMSMetinDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#tb-smsmetinler").on('click', '.duzenle', function () {
+                $("#MetinAdiDuzenle").val($(this).data("metinadi"));
+                $("#SMSMetniDuzenle").val($(this).data("metin"));
+                $("#Guncelle").val($(this).data("smsmetinid"));
+                if ($(this).data("durum")) {
+                    $("#DurumDuzenle").attr("checked", "checked");
+                    durumduzenle = "Aktif";
+                }
+                else {
+                    $("#DurumDuzenle").removeAttr("checked");
+                    durumduzenle = "Pasif";
+                }
+            }); // Düzenle butonuna basılınca Düzenleme Penceresi açılarak bilgiler dolduruluyor.
+            $("#Guncelle").click(function () {
+                if (($("#MetinAdiDuzenle").val() == "")) {
+                    $("#MetinAdiDuzenle").focus();
+                    $("#MetinAdiDuzenleleHata").append("<div class='hata' style='color:red'>Sms Metni için bir ad giriniz.</div>");
+                }
+                else if (($("#SMSMetniDuzenle").val() == "")) {
+                    $("#SMSMetniDuzenle").focus();
+                    $("#SMSMetniDuzenleHata").append("<div id='hata' style='color:red'>Sms Metnini giriniz.</div>");
+                }
+                else {
+                    var id = $(this).val();
+                    var SMSMetinData = new FormData();
+                    SMSMetinData.append("MetinAdi", $("#MetinAdiDuzenle").val());
+                    SMSMetinData.append("Metin", $("#SMSMetniDuzenle").val());
+                    SMSMetinData.append("Durum", durumduzenle);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: SMSMetinData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/SMSMetinGuncelle/" + id,
+                        success: function (data) {
+                            $('#KayitGuncelleModal').modal('hide');
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            $("#tb-smsmetinler").on('click', '.sil', function () {
+                var id = $(this).data("smsmetinid");
+                var MetinAdi = $(this).data("metinadi");
+                Swal.fire(
+                {
+                    title: "Kayıt Silinecek",
+                    html: "<p><h2 style='font-size:16px; color:red'><strong>Başlık : </strong>" + MetinAdi + " </br></h2></p><h2> SMS Metni silinsin mi?</h2>",
+                    type: "error",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Silinsin!",
+                    cancelButtonText: "İptal"
+                }).then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Tanimlar/SMSMetinSil/" + id,
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            });
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            var dt;
+            var islem;
+            dt = $('#tb-smsmetinler').dataTable(
+              {
+                  responsive: true,
+                  "destroy": true,
+                  "searching": false, // arama kaldır
+                  "lengthChange": false, // sayfa başına göster kaldır
+                  "columns": [
+                              { "data": "MetinAdi", "autowidth": true, "className": "align-middle" },
+                              { "data": "Metin", "autowidth": true, "className": "align-middle" },
+                              {
+                                  "data": null,
+                                  "className": "align-middle text-center ",
+                                  "render": function (data, type, row) {
+                                      islem = "";
+                                      if (row.KilitBit == false) {
+                                          if (DuzenleYetki == "True") {
+                                              if (row.Aktif == true) {
+                                                  //islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                  islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Aktif</button>"
+                                              }
+                                              else {
+                                                  //islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                  islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Pasif</button>"
+                                              }
+                                          }
+                                          else {
+                                              if (row.Aktif == true) {
+                                                  islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                  //islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Aktif</button>"
+                                              }
+                                              else {
+                                                  islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                  //islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Pasif</button>"
+                                              }
+                                          }
+                                      }
+                                      return islem
+                                  }
+                              },
+                              {
+                                  "data": null,
+                                  "className": "align-middle text-center ",
+                                  "render": function (data, type, row) {
+                                      islem = "";
+                                      metinduzelt = row.Metin;
+                                      metinduzelt = metinduzelt.replace(/'/g, "&#39;");
+                                      metinduzelt = metinduzelt.replace(/"/g, "&#34;");
+                                      if (row.KilitBit == false) {
+                                          if (DuzenleYetki == "True") {
+                                              islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon mr-1 duzenle' title='Sms Metnini Düzenle' data-smsmetinid='" + row.Id + "' data-metinadi='" + row.MetinAdi + "'" +
+                                                                    "data-metin='" + metinduzelt + "' data-durum='" + row.Aktif + "' data-toggle='modal' data-target='#KayitGuncelleModal'>" +
+                                                                    "<i class='fal fa-edit'></i>" +
+                                                                "</a>"
+                                          }
+                                          if (SilYetki == "True") {
+                                              islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon mr-1 sil' title='Sms Metnini Sil'data-smsmetinid='" + row.Id + "' data-metinadi='" + row.MetinAdi + "'>" +
+                                                                "<i class='fal fa-trash-alt'></i>" +
+                                                            "</a>"
+                                          }
+                                      }
+                                      return islem
+                                  }
+                              }
+                  ],
+                  "processing": true,
+                  "ajax": {
+                      "url": "/Otomasyon/Tanimlar/SMSMetinListesi/",
+                      "contentType": 'application/json; charset=utf-8',
+                      'type': 'POST',
+                      'data': function (data) { return data = JSON.stringify(data); }
+                  },
+                  "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                  "oLanguage": {
+                      "sSearchPlaceholder": "Tabloda Ara",
+                      "sZeroRecords": "Kayıt yok.",
+                      "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                      "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                      "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                      "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                      "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                      "oPaginate": {
+                          "sPrevious": "Önceki",
+                          "sNext": "Sonraki",
+                          "sFirst": "İlk",
+                          "sLast": "Son"
+                      }
+                  }
+              });
+        });
+    </script>
+}

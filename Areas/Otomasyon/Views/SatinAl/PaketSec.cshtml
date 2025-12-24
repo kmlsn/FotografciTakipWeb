@@ -1,0 +1,1003 @@
+﻿
+@{
+    ViewBag.Title = "Paket Seç";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    List<SatisFiyatlari> SatisFiyatlari = ViewBag.SatisFiyatlari;
+    List<SatisFiyatlari> LisansSatisFiyatlari = SatisFiyatlari.Where(x => x.PaketTip == "Lisans" && x.Aktif == true).ToList();
+    string PaketDetayBaslik = "";
+}
+@section Head
+{
+    <link href="~/Areas/Otomasyon/Content/css/SatinAlStyle.css" rel="stylesheet" />
+    <link href="~/Areas/Otomasyon/Content/css/SMSSatinAl.css" rel="stylesheet" />
+    <style type="text/css">
+        td {
+            text-align: center;
+        }
+
+        tr.collapse.in {
+            display: table-row;
+        }
+    </style>
+
+}
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="border-bottom"></div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <div class="price_table">
+                        <section>
+                            <div class="container">
+                                <div class="row">
+                                    @foreach (var paket in SatisFiyatlari)
+                                    {
+                                        if (paket.PaketTip == "Lisans")
+                                        {
+                                            if (SatisFiyatlari.Count(x => x.PaketTip == "Lisans" && x.Aktif == true) == 1)
+                                            {
+                                                <div class="col-md-4"></div>
+                                                <div class="col-md-4">
+                                                    <div class="mypricing_content clearfix">
+                                                        <div class="mypricing_head_price clearfix">
+                                                            <div class="mypricing_head_content clearfix">
+                                                                <div class="head_bg"></div>
+                                                                <div class="head"> <span>@paket.PaketAdi</span> </div>
+                                                            </div>
+                                                            <div class="mypricing_price_tag clearfix">
+                                                                <span class="price">
+                                                                    <span class="currency">@paket.SatisFiyati.ToString("C").Replace("₺", "") </span>
+                                                                    <span class="cent"></span>
+                                                                    <span class="sign">TL</span>
+                                                                    <span class="month">/Ay</span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mypricing_feature_list">
+                                                            @Html.Raw(paket.PaketDetayi)
+                                                            @*<ul>
+                                                                    <li><span>10 Şube</span> Tanımlama</li>
+                                                                    <li><span>Sınırsız Kullanıcı</span> Tanımlama</li>
+                                                                    <li><span>Sınırsız Personel</span> Tanımlama</li>
+                                                                    <li><span>Sınırsız Randevu</span> Oluşturma</li>
+                                                                    <li><span>Sınırsız Müşteri</span> Kaydı</li>
+                                                                    <li><span>200 SMS</span> Bakiyesi </li>
+                                                                </ul>*@
+                                                        </div>
+                                                        <div class="mypricing_price_btn clearfix">
+                                                            <a class="" href="~/Otomasyon/SatinAl/Odeme/@paket.Id" id="Baslangic">Satın Al</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4"></div>
+                                            }
+                                            else if (SatisFiyatlari.Count(x => x.PaketTip == "Lisans" && x.Aktif == true) == 2)
+                                            {
+                                                <div class="col-md-6">
+                                                    <div class="mypricing_content clearfix">
+                                                        <div class="mypricing_head_price clearfix">
+                                                            <div class="mypricing_head_content clearfix">
+                                                                <div class="head_bg"></div>
+                                                                <div class="head"> <span>@paket.PaketAdi</span> </div>
+                                                            </div>
+                                                            <div class="mypricing_price_tag clearfix">
+                                                                <span class="price">
+                                                                    <span class="currency">@paket.SatisFiyati.ToString("C").Replace("₺", "") </span>
+                                                                    <span class="cent"></span>
+                                                                    <span class="sign">TL</span>
+                                                                    <span class="month">/Ay</span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mypricing_feature_list">
+                                                            @Html.Raw(paket.PaketDetayi)
+                                                            @*<ul>
+                                                                    <li><span>10 Şube</span> Tanımlama</li>
+                                                                    <li><span>Sınırsız Kullanıcı</span> Tanımlama</li>
+                                                                    <li><span>Sınırsız Personel</span> Tanımlama</li>
+                                                                    <li><span>Sınırsız Randevu</span> Oluşturma</li>
+                                                                    <li><span>Sınırsız Müşteri</span> Kaydı</li>
+                                                                    <li><span>200 SMS</span> Bakiyesi </li>
+                                                                </ul>*@
+                                                        </div>
+                                                        <div class="mypricing_price_btn clearfix">
+                                                            <a class="" href="~/Otomasyon/SatinAl/Odeme/@paket.Id" id="Baslangic">Satın Al</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                            else if (SatisFiyatlari.Count(x => x.PaketTip == "Lisans" && x.Aktif == true) == 3)
+                                            {
+                                                <div class="col-md-4">
+                                                    <div class="mypricing_content clearfix">
+                                                        <div class="mypricing_head_price clearfix">
+                                                            <div class="mypricing_head_content clearfix">
+                                                                <div class="head_bg"></div>
+                                                                <div class="head"> <span>@paket.PaketAdi</span> </div>
+                                                            </div>
+                                                            <div class="mypricing_price_tag clearfix">
+                                                                <span class="price">
+                                                                    <span class="currency">@paket.SatisFiyati.ToString("C").Replace("₺", "") </span>
+                                                                    <span class="cent"></span>
+                                                                    <span class="sign">TL</span>
+                                                                    <span class="month">/Ay</span>
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mypricing_feature_list">
+                                                            @Html.Raw(paket.PaketDetayi)
+                                                            @*<ul>
+                                                                    <li><span>10 Şube</span> Tanımlama</li>
+                                                                    <li><span>Sınırsız Kullanıcı</span> Tanımlama</li>
+                                                                    <li><span>Sınırsız Personel</span> Tanımlama</li>
+                                                                    <li><span>Sınırsız Randevu</span> Oluşturma</li>
+                                                                    <li><span>Sınırsız Müşteri</span> Kaydı</li>
+                                                                    <li><span>200 SMS</span> Bakiyesi </li>
+                                                                </ul>*@
+                                                        </div>
+                                                        <div class="mypricing_price_btn clearfix">
+                                                            <a class="" href="~/Otomasyon/SatinAl/Odeme/@paket.Id" id="Baslangic">Satın Al</a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="panel-tag">
+                        Paketde bulunan Sms bakiyesi 1 aylıktır. Abone olunan ay oranında artmaktadır. 200 Sms Bakiyesi x 12 ay abonelik = yıllık 2400 SMS bakiyesi
+                    </div>
+                    <div class="accordion accordion-hover" id="js_demo_accordion-5">
+                        <div class="card" style="border: 2px solid rgba(0, 0, 0, 0.08) !important; border-radius: 4px !important;">
+                            <div class="card-header">
+                                <a href="javascript:void(0);" class="card-title collapsed" data-toggle="collapse" data-target="#js_demo_accordion-5c" aria-expanded="false">
+                                    <i class="fal fa-cog width-2 fs-xl"></i>
+                                    @if (SatisFiyatlari.Count(x => x.PaketTip == "Lisans" && x.Aktif == true) == 1)
+                                    {
+                                        PaketDetayBaslik = "Paket Detayı";
+                                    }
+                                    else
+                                    {
+                                        PaketDetayBaslik = "Paketleri Karşılatır";
+                                    }
+                                    @PaketDetayBaslik
+                                    <span class="ml-auto">
+                                        <span class="collapsed-reveal">
+                                            <i class="fal fa-chevron-up fs-xl"></i>
+                                        </span>
+                                        <span class="collapsed-hidden">
+                                            <i class="fal fa-chevron-down fs-xl"></i>
+                                        </span>
+                                    </span>
+                                </a>
+                            </div>
+                            <div id="js_demo_accordion-5c" class="collapse" data-parent="#js_demo_accordion-5">
+                                <div class="card-body">
+                                    <table class="table table-sm table-bordered m-0">
+                                        <thead>
+                                            <tr>
+                                                <th>MODÜL</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    <th style="text-align:center">@paket.PaketAdi</th>
+                                                }
+                                                @*<th style="text-align:center">BASİT</th>*@
+                                                @*<th style="text-align:center">STANDART</th>*@
+                                                @*<th style="text-align:center">PROFESYONEL</th>*@
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <!-- Rezervasyon İşlemleri Menüsü  -->
+                                            <tr class="bg-primary-100">
+                                                <th scope="row">
+                                                    <span class="mr-2 float-left">
+                                                        <span class="collapsed-reveal">
+                                                            <i class="fal fa-minus fs-xl"></i>
+                                                        </span>
+                                                    </span>
+                                                    <span>Rezervasyon İşlemleri</span>
+                                                </th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.RezervasyonIslemleri)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Rezervasyon Takvimi</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.RezervasyonIslemleri_RezervasyonTakvimi)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Rezervasyon Listesi</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.RezervasyonIslemleri_RezervasyonListesi)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Rezervasyon Teklifleri</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.RezervasyonIslemleri_RezervasyonTeklifleri)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Randevular</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.RezervasyonIslemleri_Randevular)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <!-- Rezervasyon İşlemleri Menüsü  -->
+                                            <!-- Muhasebe Menüsü  -->
+                                            <tr class="bg-success-100">
+                                                <th scope="row">
+                                                    <span class="mr-2 float-left">
+                                                        <span class="collapsed-reveal">
+                                                            <i class="fal fa-minus fs-xl"></i>
+                                                        </span>
+                                                    </span>
+                                                    <span>Muhasebe</span>
+                                                </th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Muhasebe)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-success-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Günlük İşler</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Muhasebe_GunlukIsler)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-success-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Gelir-Giderler</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Muhasebe_GelirGiderler)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-success-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Alınan-Gelecek Ödemeler</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Muhasebe_AlinanGelecekOdemeler)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-success-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Kalan Bakiyeler</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Muhasebe_KalanBakiyeler)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-success-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Kasa</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Muhasebe_Kasa)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-success-100">
+                                                <th scope="row" class="pl-4">
+                                                    <span class="mr-2 float-left">
+                                                        <span class="collapsed-reveal">
+                                                            <i class="fal fa-minus fs-xl"></i>
+                                                        </span>
+                                                    </span>
+                                                    <span>Cariler</span>
+                                                </th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Muhasebe_Cariler)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-success-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2 pl-3"></i>Cari Listesi</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Muhasebe_Cariler_CariListesi)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-success-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2 pl-3"></i>Cari Hesap Takibi</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Muhasebe_Cariler_CariHesapTakibi)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <!-- Muhasebe Menüsü  -->
+                                            <!-- Müşteriler Menüsü  -->
+                                            <tr class="bg-primary-100">
+                                                <th scope="row">
+                                                    <span class="mr-2 float-left">
+                                                        <span class="collapsed-reveal">
+                                                            <i class="fal fa-minus fs-xl"></i>
+                                                        </span>
+                                                    </span>
+                                                    <span>Müşteriler</span>
+                                                </th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Musteriler)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4">Müşteri Listesi</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Musteriler_MusteriListesi)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4">Müşteri Mesajları</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Musteriler_MusteriListesi)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4">Fotoğraf Yükle</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Musteriler_FotografYukle)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4">Müşteri Hesap Takibi</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Musteriler_MusteriHesapTakibi)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <!-- Müşteriler Menüsü  -->
+                                            <!-- Stok Menüsü  -->
+                                            <tr class="bg-success-100">
+                                                <th scope="row">
+                                                    <span class="pl-4">Stok</span>
+                                                </th>
+                                                <td class="bg-warning-100" colspan="@LisansSatisFiyatlari.Count.ToString()">HAZIRLANIYOR</td>
+                                            </tr>
+                                            @*<tr class="bg-success-100">
+            <th scope="row">
+                <span class="mr-2 float-left">
+                    <span class="collapsed-reveal">
+                        <i class="fal fa-minus fs-xl"></i>
+                    </span>
+                </span>
+                <span>Stok</span>
+            </th>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+        </tr>
+        <tr class="bg-success-100">
+            <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Stok Kartları</th>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+        </tr>
+        <tr class="bg-success-100">
+            <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Stok Girişi</th>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+        </tr>
+        <tr class="bg-success-100">
+            <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Stok Çıkışı</th>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+        </tr>
+        <tr class="bg-success-100">
+            <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Stok Hareketleri</th>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+        </tr>
+        <tr class="bg-success-100">
+            <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>İade</th>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+        </tr>
+        <tr class="bg-success-100">
+            <th scope="row" class="pl-4">
+                <span class="mr-2 float-left">
+                    <span class="collapsed-hidden">
+                        <i class="fal fa-plus fs-xl"></i>
+                    </span>
+                </span>
+                <span> Depo İşlemleri</span>
+            </th>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+        </tr>
+        <tr class="bg-success-100">
+            <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2 pl-3"></i>Depo Listesi</th>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+        </tr>
+        <tr class="bg-success-100">
+            <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2 pl-3"></i>Depolar Arası Transfer</th>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+        </tr>
+        <tr class="bg-success-100">
+            <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2 pl-3"></i>Depo Stok Durumu</th>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+        </tr>
+        <tr class="bg-success-100">
+            <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2 pl-3"></i>Depoya Yapılmış Girişler</th>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+        </tr>
+        <tr class="bg-success-100">
+            <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2 pl-3"></i>Depodan Yapılmış Çıkışlar</th>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+            <td><i class="fal fa-check width-2 fs-xl"></i></td>
+        </tr>*@
+                                            <!-- Stok Menüsü  -->
+                                            <!-- Raporlar Menüsü  -->
+                                            <tr class="bg-primary-100">
+                                                <th scope="row">
+                                                    <span class="mr-2 float-left">
+                                                        <span class="collapsed-reveal">
+                                                            <i class="fal fa-minus fs-xl"></i>
+                                                        </span>
+                                                    </span>
+                                                    <span>Raporlar</span>
+                                                </th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Raporlar)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Rezervasyon İşlem Adetleri</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Raporlar_RezervasyonIslemAdetleriRaporu)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Gelir-Gider Raporları</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Raporlar_GelirGiderRaporlari)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Rezervasyon Türleri Raporu</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Raporlar_RezervasyonTurleriRaporu)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Gelecek Ödemeler Raporu</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Raporlar_GelecekOdemelerRaporu)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <!-- Raporlar Menüsü  -->
+                                            <!-- Telefon Rehberi Menüsü  -->
+                                            <tr class="bg-success-100">
+                                                <th scope="row">Telefon Rehberi</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.TelefonRehberi)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <!-- Telefon Rehberi Menüsü  -->
+                                            <!-- Personeller Menüsü  -->
+                                            <tr class="bg-primary-100">
+                                                <th scope="row">
+                                                    <span class="mr-2 float-left">
+                                                        <span class="collapsed-reveal">
+                                                            <i class="fal fa-minus fs-xl"></i>
+                                                        </span>
+                                                    </span>
+                                                    <span>Perosneller</span>
+                                                </th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Personeller)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Personel Listesi</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Personeller_PersonelListesi)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Personel İzinleri</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Personeller_PersonelIzinleri)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Personel Odemeleri</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Personeller_PersonelOdemeleri)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row" class="pl-4"><i class="fal fa-arrow-alt-from-left mx-2"></i>Personel İş Takibi</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Personeller_PersonelIsTakibi)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <!-- Personeller Menüsü  -->
+                                            <!-- Tanımlar Menüsü  -->
+                                            <tr class="bg-success-100">
+                                                <th scope="row">Tanımlar</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Tanimlar)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <!-- Tanımlar Menüsü  -->
+                                            <!-- Ayarlar Menüsü  -->
+                                            <tr class="bg-primary-100">
+                                                <th scope="row">Ayarlar</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.Ayarlar)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <!-- Ayarlar Menüsü  -->
+                                            <tr class="bg-success-100">
+                                                <th scope="row">Firma-Şube İşlemleri</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.FirmaSubeIslemleri)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <!-- Ayarlar Menüsü  -->
+                                            <!-- Kulanıcı Menüsü  -->
+                                            <tr class="bg-primary-100">
+                                                <th scope="row">Kullanıcı-Yetki İşlemleri</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.KullaniciYetkiIslemleri)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <!-- Kulanıcı Menüsü  -->
+                                            <!-- Hızlı Sms Gönder Menüsü  -->
+                                            <tr class="bg-success-100">
+                                                <th scope="row">Hızlı SMS Gönder</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.SmsGonder)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <!-- Hızlı Sms Gönder Menüsü  -->
+                                            <!-- Satın Alma İşlemleri Menüsü  -->
+                                            <tr class="bg-primary-100">
+                                                <th scope="row">Satın Al</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    if (paket.SatinAl)
+                                                    {
+                                                        <td><i class="fal fa-check width-2 fs-xl"></i></td>
+                                                    }
+                                                    else
+                                                    {
+                                                        <td class="bg-danger-100"><i class="fal fa-times width-2 fs-xl"></i></td>
+                                                    }
+                                                }
+                                            </tr>
+                                            <!-- Satın Alma İşlemleri Menüsü  -->
+
+                                            <tr class="bg-success-100">
+                                                <th scope="row">Şube Limiti</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    <td>@paket.SubeLimit Şube Tanımlama</td>
+                                                }
+                                            </tr>
+                                            <tr class="bg-primary-100">
+                                                <th scope="row">Kullanıcı Limiti</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    <td>@paket.KullaniciLimit Kullanıcı Tanımlama</td>
+                                                }
+                                            </tr>
+                                            <tr class="bg-success-100">
+                                                <th scope="row">Personel Limiti</th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    <td>@paket.PersonelLimit Personel Tanımlama</td>
+                                                }
+                                            </tr>
+
+                                            <tr>
+                                                <th scope="row"></th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    <td><div class="h3">@paket.SatisFiyati.ToString("C").Replace("₺", "") TL /Ay</div></td>
+                                                }
+                                            </tr>
+                                            <tr>
+                                                <th scope="row"></th>
+                                                @foreach (var paket in LisansSatisFiyatlari)
+                                                {
+                                                    <td><div> <a class="btn btn-outline-primary" href="~/Otomasyon/SatinAl/Odeme/@paket.Id" id="Profesyonel2">Satın Al</a> </div></td>
+                                                }
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="border-bottom"></div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <section class="pricing-table mb-4">
+                        <div class="container">
+                            <div class="block-heading">
+                                <h2>SMS Bakiyesi Satın Al</h2>
+                            </div>
+                            <div class="row justify-content-md-center">
+                                @foreach (var paket in SatisFiyatlari)
+                                {
+                                    if (paket.PaketTip == "SMS")
+                                    {
+                                        <div class="col-md-4 col-lg-4 mb-4">
+                                            <div class="item">
+                                                <div class="heading">
+                                                    <h3>@paket.PaketAdi</h3>
+                                                </div>
+
+                                                <div class="price">
+                                                    <h4>@paket.SatisFiyati.ToString("C").Replace("₺", "") TL</h4>
+                                                </div>
+                                                <a class="btn btn-block btn-outline-primary" href="~/Otomasyon/SatinAl/Odeme/@paket.Id" id="BinSMS">Satın Al</a>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                @*<div class="col-md-4 col-lg-3">
+                                        <div class="item">
+                                            <div class="heading">
+                                                <h3>1.000 SMS</h3>
+                                            </div>
+
+                                            <div class="price">
+                                                <h4>40 TL</h4>
+                                            </div>
+                                            <a class="btn btn-block btn-outline-primary" href="~/Otomasyon/SatinAl/Odeme/4" id="BinSMS">Satın Al</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-lg-3">
+                                        <div class="item">
+                                            <div class="heading">
+                                                <h3>5.000 SMS</h3>
+                                            </div>
+                                            <div class="price">
+                                                <h4>175 TL</h4>
+                                            </div>
+                                            <a class="btn btn-block btn-outline-primary" href="~/Otomasyon/SatinAl/Odeme/5" id="BesbinSMS">Satın Al</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-lg-3">
+                                        <div class="item">
+                                            <div class="ribbon">Avantajlı</div>
+                                            <div class="heading">
+                                                <h3>10.000</h3>
+                                            </div>
+                                            <div class="price">
+                                                <h4>320 TL</h4>
+                                            </div>
+                                            <a class="btn btn-block btn-outline-primary" href="~/Otomasyon/SatinAl/Odeme/6" id="OnbinSMS">Satın Al</a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 col-lg-3">
+                                        <div class="item">
+                                            <div class="ribbon">Avantajlı</div>
+                                            <div class="heading">
+                                                <h3>25.000</h3>
+                                            </div>
+                                            <div class="price">
+                                                <h4>700 TL</h4>
+                                            </div>
+                                            <a class="btn btn-block btn-outline-primary" href="~/Otomasyon/SatinAl/Odeme/7" id="YirmibesbinSMS">Satın Al</a>
+                                        </div>
+                                    </div>*@
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+
+        });
+
+
+    </script>
+}

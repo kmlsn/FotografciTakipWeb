@@ -1,0 +1,483 @@
+﻿@{
+    ViewBag.Title = "Tanımlar - Çekim Paketleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Paket Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="pakethata">
+                                <label class="form-label" for="paketadi">Paket Adı <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control form-control-sm" id="paketadi" placeholder="Paket Adı" name="PaketAdi" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="form-row form-group">
+                            <div class="col-12 mb-3" id="paketdeteyhata">
+                                <label class="form-label" for="paketdetayi">Paket Detayı <span class="text-danger">*</span></label>
+                                <textarea class="form-control form-control-sm" id="paketdetayi" placeholder="Paket Detayı" rows="10" name="PaketDetayi" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label" for="fiyat">Fiyat </label>
+                                <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control form-control-sm" name="Fiyat" maxlength="50" id="fiyat">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="PaketKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="pakethataduzenle">
+                                <label class="form-label" for="paketadiduzenle">Paket Adı <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control form-control-sm" id="paketadiduzenle" placeholder="Paket Adı" name="PaketAdi" maxlength="50">
+                            </div>
+                        </div>
+                        <div class="form-row form-group">
+                            <div class="col-12 mb-3" id="paketdeteyhataduzenle">
+                                <label class="form-label" for="paketdetayiduzenle">Paket Detayı <span class="text-danger">*</span></label>
+                                <textarea class="form-control form-control-sm" id="paketdetayiduzenle" placeholder="Paket Detayı" rows="10" name="PaketDetayi" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label" for="fiyatduzenle">Fiyat </label>
+                                <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control form-control-sm" name="Fiyat" maxlength="50" id="fiyatduzenle">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="PaketGuncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            @if (KullaniciYetki.KayitEkle)
+            {
+                <div class="panel-hdr">
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle"> Yeni Paket Ekle </button>
+                </div>
+            }
+            <div class="panel-container show">
+                <div class="panel-content">
+
+                    <!-- datatable start -->
+                    <table id="dtCekimPaketleri" class="table table-bordered table-sm table-hover table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Paket Adı</th>
+                                <th>Paket Detayı</th>
+                                <th>Fiyat</th>
+                                <th class="w-10">Durum</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="paketlersatir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        function ParaFormat(fiyat) {
+            var para_sembol = "TL"
+            var format = new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: 'TRY',
+                minumumFractionDigits: 2
+            })
+            //return format.format(fiyat)
+            return format.format(fiyat).replace('TRY', para_sembol)
+        }
+        $(document).ready(function () {
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            });
+            $('#paketdetayi').on('focusout', function (e) {
+                $("#detayhata").remove();
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $("#paketadi").val("");
+                $("#paketdetayi").val("");
+                $("#fiyat").val("0");
+            });
+            $("#PaketKaydet").click(function () {
+                if ($("#paketadi").val() == "") {
+                    $("#paketadi").focus();
+                    $("#pakethata").append("<div class='hata' style='color:red'>Paket Adını Giriniz.</div>");
+                }
+                else if ($("#paketdetayi").val() == "") {
+                    $("#paketdetayi").focus();
+                    $("#paketdeteyhata").append("<div id='detayhata' style='color:red'>Paket Detayını Giriniz.</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var paketadi = $("#paketadi").val();
+                    var PaketData = new FormData();
+                    var fiyat = $("#fiyat").val().replace(" TL", "");
+                    PaketData.append("paketadi", $("#paketadi").val());
+                    PaketData.append("paketdetayi", $("#paketdetayi").val());
+                    PaketData.append("fiyat", fiyat);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: PaketData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/PaketVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: PaketData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Tanimlar/CekimPaketleriEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                            {
+                                Swal.fire(
+                                {
+                                    title: "Varolan Kayıt",
+                                    html: "<p><h2 style='font-size:16px; color:red'><strong>Paket Adı : </strong>" + paketadi + "</h2></p><h2> Paket zaten var! Bu kaydı güncellemek istermisiniz?</h2>",
+                                    type: "warning",
+                                    showCancelButton: true,
+                                    confirmButtonText: "Güncelle"
+                                }).then(function (result) {
+                                    if (result.value) {
+                                        $.ajax({
+                                            type: "POST",
+                                            datatype: 'json',
+                                            data: PaketData,
+                                            contentType: false,
+                                            processData: false,
+                                            url: "/Otomasyon/Tanimlar/CekimPaketiGuncelle/" + data,
+                                            success: function (data) {
+                                                if (data.Sonuc == false) {
+                                                    alertify.set('notifier', 'delay', 5);
+                                                    alertify.set('notifier', 'position', 'top-center');
+                                                    alertify.error(data.Mesaj);
+                                                }
+                                                else if (data.Sonuc == true) {
+                                                    alertify.set('notifier', 'delay', 3);
+                                                    alertify.set('notifier', 'position', 'top-center');
+                                                    alertify.success(data.Mesaj);
+                                                    dt.api().ajax.reload();
+                                                }
+                                            },
+                                            error: function (err) {
+                                                alert("HATA");
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            $("#dtCekimPaketleri").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#PaketGuncelle").val($(this).data("paketid"));
+                $("#paketadiduzenle").val($(this).data("paketad"));
+                var detay = $(this).data("paketdetay").replace(/\<br \/\>/g, "\r\n")  // textarea daki bilgi veri tabanına kaydedilirken "\r\n" karakterleri "<br />" tagına dönüştürülmüştü, bura da da tersi yapılıyor.
+                $("#paketdetayiduzenle").val(detay);
+                $("#fiyatduzenle").val($(this).data("paketfiyat"));
+                var ff = $(this).data("paketfiyat");
+                ff = ParaFormat(ff);
+                $("#fiyatduzenle").val(ff);
+            });
+            $("#PaketGuncelle").click(function () {
+                if ($("#paketadiduzenle").val() == "") {
+                    $("#paketadiduzenle").focus();
+                    $("#pakethataduzenle").append("<div class='hata' style='color:red'>Paket Adını Giriniz.</div>");
+                }
+                else if ($("#paketdetayiduzenle").val() == "") {
+                    $("#paketdetayiduzenle").focus();
+                    $("#paketdeteyhataduzenle").append("<div id='detayhataduzenle' style='color:red'>Paket Detayını Giriniz.</div>");
+                }
+                else {
+                    $('#KayitDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    var fiyat = $("#fiyatduzenle").val().replace(" TL", "");
+                    var PaketData = new FormData();
+                    PaketData.append("paketadi", $("#paketadiduzenle").val());
+                    PaketData.append("paketdetayi", $("#paketdetayiduzenle").val());
+                    PaketData.append("fiyat", fiyat);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: PaketData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/CekimPaketiGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            $("#dtCekimPaketleri").on('click', '.Sil', function () {
+                var id = $(this).data("paketid");
+                var paketadi = $(this).data("paketad");
+                Swal.fire(
+                {
+                    title: "Kayıt Silinecek",
+                    html: "<p><h2 style='font-size:16px; color:red'><strong>Paket Adı : </strong>" + paketadi + "</h2></p><h2> Çekim Paketi silinsin mi?</h2>",
+                    type: "error",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Silinsin!",
+                    cancelButtonText: "İptal"
+                }).then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Tanimlar/CekimPaketiSil/" + id,
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            });
+            $("#dtCekimPaketleri").on('click', '.durumdegistir', function () {
+                var id = $(this).data("paketid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/CekimPaketiDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            var dt;
+            var islem;
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            dt = $('#dtCekimPaketleri').dataTable(
+                {
+                    responsive: true,
+                    "destroy": true,
+                    //"searching": false, // arama kaldır
+                    //"lengthChange": false, // sayfa başına göster kaldır
+                    "columns": [
+                                { "data": "PaketAdi", "autowidth": true, "className": "align-middle" },
+                                { "data": "PaketDetayi", "autowidth": true, "className": "align-middle" },
+                                { // Fiyat
+                                    "data": null,
+                                    "autowidth": true,
+                                    "className": "align-middle",
+                                    "render": function (data, type, row) {
+                                        return ParaFormat(row.Fiyat)
+                                    }
+                                },
+                                {
+                                    "data": null,
+                                    "className": "align-middle text-center ",
+                                    "render": function (data, type, row) {
+                                        islem = "";
+                                        if (row.KilitBit==false) {
+                                            if (DuzenleYetki == "True") {
+                                                if (row.Aktif == true) {
+                                                    //islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                    islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-paketid='" + row.Id + "'>Aktif</button>"
+                                                }
+                                                else {
+                                                    //islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                    islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-paketid='" + row.Id + "'>Pasif</button>"
+                                                }
+                                            }
+                                            else {
+                                                if (row.Aktif == true) {
+                                                    islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                    //islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Aktif</button>"
+                                                }
+                                                else {
+                                                    islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                    //islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Pasif</button>"
+                                                }
+                                            }
+                                        }
+                                        return islem
+                                    }
+                                },
+                                {
+                                    "data": null,
+                                    "className": "align-middle",
+                                    "render": function (data, type, row) {
+                                        islem = "";
+                                        if (DuzenleYetki == "True") {
+                                            islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon mr-1 Duzenle' title='Paket Bilgilerini Düzenle' data-paketid='" + row.Id + "' data-paketad='" + row.PaketAdi + "' data-paketdetay='" + row.PaketDetayi + "' data-paketfiyat='" + row.Fiyat + "' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                                       "<i class='fal fa-edit'></i>" +
+                                                       "</a>"
+                                        }
+                                        if (SilYetki == "True") {
+                                            islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon mr-1 Sil' title='Peket Sil' data-paketid='" + row.Id + "' data-paketad='" + row.PaketAdi + "'>" +
+                                                       "<i class='fal fa-trash-alt'></i>" +
+                                                       "</a>"
+                                        }
+                                        return islem
+                                    }
+                                }
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Otomasyon/Tanimlar/CekimPaketleriListesi/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'type': 'POST',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+            $("#fiyatduzenle").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#fiyat").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+        });
+
+    </script>
+}

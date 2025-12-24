@@ -1,0 +1,597 @@
+﻿
+@{
+    ViewBag.Title = "Tanımlar - Gelir/Gider Türleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Gelir/Gider Türü Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="ggturhata">
+                                <label class="form-label" for="gelirgidertur">Gelir/Gider Türü <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control" id="gelirgidertur" placeholder="Gelir/Gider Türü" name="GelirGiderTur" maxlength="50" required>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="GelirGiderKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="gelirgiderduzenlehata">
+                                <label class="form-label" for="gelirgiderturduzenle">Gelir/Gider Türü <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control" id="gelirgiderturduzenle" placeholder="Gelir/Gider Türü" maxlength="50" name="GelirGiderTur" required>
+                                <div class="invalid-feedback">
+                                    Gelir/Gider Türünü giriniz!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="GelirGiderGuncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<!-- Varsayılan Geğerleri Ekle Modal Penceresi -->
+<div class="modal fade" id="VarsayilanEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Varsayılan Gelir/Gider Türülerini Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content" id="varsayilandegerler">
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-3" checked data-deger="Çek Ödemesi">
+                                    <label class="custom-control-label" for="varsayilan-3">Çek Ödemesi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-4" checked data-deger="Çiçekçi">
+                                    <label class="custom-control-label" for="varsayilan-4">Çiçekçi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-21" checked data-deger="Personel Sigortası(SGK)">
+                                    <label class="custom-control-label" for="varsayilan-21">Personel Sigortası(SGK)</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-24" checked data-deger="Su Faturası">
+                                    <label class="custom-control-label" for="varsayilan-24">Su Faturası</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-5" checked data-deger="Doğal Gaz Faturası">
+                                    <label class="custom-control-label" for="varsayilan-5">Doğal Gaz Faturası</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-6" checked data-deger="Elektrik Faturası">
+                                    <label class="custom-control-label" for="varsayilan-6">Elektrik Faturası</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-7" checked data-deger="Firma Sahibi/Ortak">
+                                    <label class="custom-control-label" for="varsayilan-7">Firma Sahibi/Ortak</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-8" checked data-deger="İnternet Faturası">
+                                    <label class="custom-control-label" for="varsayilan-8">İnternet Faturası</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-25" checked data-deger="Telefon Faturası">
+                                    <label class="custom-control-label" for="varsayilan-25">Telefon Faturası</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-11" checked data-deger="Kamera/Kameraman">
+                                    <label class="custom-control-label" for="varsayilan-11">Kamera/Kameraman</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-12" checked data-deger="Kapora">
+                                    <label class="custom-control-label" for="varsayilan-12">Kapora</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-13" checked data-deger="Kapora İadesi">
+                                    <label class="custom-control-label" for="varsayilan-13">Kapora İadesi</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-14" checked data-deger="Kira">
+                                    <label class="custom-control-label" for="varsayilan-14">Kira</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-15" checked data-deger="Kredi Kartı">
+                                    <label class="custom-control-label" for="varsayilan-15">Kredi Kartı</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-16" checked data-deger="Kredi Ödemesi">
+                                    <label class="custom-control-label" for="varsayilan-16">Kredi Ödemesi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-10" checked data-deger="Harç/Vergi">
+                                    <label class="custom-control-label" for="varsayilan-10">Harç/Vergi</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-17" checked data-deger="Kuaför Hizmeti">
+                                    <label class="custom-control-label" for="varsayilan-17">Kuaför Hizmeti</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-19" checked data-deger="Market">
+                                    <label class="custom-control-label" for="varsayilan-19">Market</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-20" checked data-deger="Mutfak">
+                                    <label class="custom-control-label" for="varsayilan-20">Mutfak</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-27" checked data-deger="Yemek">
+                                    <label class="custom-control-label" for="varsayilan-27">Yemek</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-26" checked data-deger="Temizlik Malzemesi">
+                                    <label class="custom-control-label" for="varsayilan-26">Temizlik Malzemesi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-28" checked data-deger="Diğer">
+                                    <label class="custom-control-label" for="varsayilan-28">Diğer</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="VarsayilanKaydet">Seçilenleri Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Varsayılan Geğerleri Ekle Modal Penceresi -->
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                @if (KullaniciYetki.KayitEkle)
+                {
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle">Yeni Gelir/Gider Türü Ekle</button>
+                    <div class="" id="gelirgiderturleridisable">
+                        <button class="btn btn-sm btn-default mr-auto waves-effect waves-themed" data-toggle="modal" data-target="#VarsayilanEkleModal" id="gelirgiderturlerivarsayilan">Varsayılan Değerleri Yükle</button>
+                    </div>
+                }
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtGelirGiderTurleri" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Gelir/Gider Türü</th>
+                                <th class="w-10">Durum</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+
+        $(document).ready(function () {
+            var dt;
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+
+            var islem, varsayilandeger;
+            var Varsayilanlar = new Array();
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $("#gelirgidertur").val("");
+            })
+            $("#GelirGiderKaydet").click(function () {
+                if ($("#gelirgidertur").val() == "") {
+                    $("#gelirgidertur").focus();
+                    $("#ggturhata").append("<div class='hata' style='color:red'>Gelir/Gider Türünü Giriniz.</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var gelirgidertur = $("#gelirgidertur").val();
+                    var GelirGiderData = new FormData();
+                    GelirGiderData.append("GelirGider", $("#gelirgidertur").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: GelirGiderData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/GelirGiderTurVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: GelirGiderData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Tanimlar/GelirGiderTuruEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                            {
+                                Swal.fire(
+                                    {
+                                        title: "Varolan Kayıt",
+                                        html: "<p><h2 style='font-size:16px; color:red'><strong>Gelir - Gider Türü : </strong>" + gelirgidertur + "</br><h2> Gelir - Gider Türü zaten var!</h2>",
+                                        type: "warning"
+                                    });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtGelirGiderTurleri").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#GelirGiderGuncelle").val($(this).data("ggid"))
+                $("#gelirgiderturduzenle").val($(this).data("ggtur"));
+            });
+            $("#GelirGiderGuncelle").click(function () {
+                if ($("#gelirgiderturduzenle").val() == "") {
+                    $("#gelirgiderturduzenle").focus();
+                    $("#gelirgiderduzenlehata").append("<div class='hata' style='color:red'>Gelir/Gider Türünü Giriniz.</div>");
+                }
+                else {
+                    $('#KayitDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    var GelirGiderData = new FormData();
+                    GelirGiderData.append("GelirGider", $("#gelirgiderturduzenle").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: GelirGiderData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/GelirGiderTuruGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtGelirGiderTurleri").on('click', '.Sil', function () {
+                var id = $(this).data("ggid");
+                var ggtur = $(this).data("ggtur");
+                Swal.fire(
+                    {
+                        title: "Kayıt Silinecek",
+                        html: "<p><h2 style='font-size:16px; color:red'><strong>Gelir - Gider Türü : </strong>" + ggtur + "</br><h2> Gelir - Gider Türü silinsin mi?</h2>",
+                        type: "error",
+                        showCancelButton: true,
+                        confirmButtonText: "Evet, Silinsin!",
+                        cancelButtonText: "İptal"
+                    }).then(function (result) {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                contentType: false,
+                                processData: false,
+                                url: "/Otomasyon/Tanimlar/GelirGiderTuruSil/" + id,
+                                success: function (data) {
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        dt.api().ajax.reload();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            });
+            $("#dtGelirGiderTurleri").on('click', '.durumdegistir', function () {
+                var id = $(this).data("ggid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/GelirGiderTuruDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#VarsayilanKaydet").click(function () {
+                Varsayilanlar = [];
+                $("input[type=checkbox]").each(function (i) {
+                    varsayilandeger = document.getElementById("varsayilan-" + i);
+                    if (varsayilandeger != null) {
+                        if (varsayilandeger.checked) {
+                            Varsayilanlar.push($("#varsayilan-" + i).data("deger"))
+                        }
+                    }
+                });
+                $('#VarsayilanEkleModal').modal('hide');
+                var GelirGiderData = new FormData();
+                GelirGiderData.append("VarsayilanDegerler", Varsayilanlar);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: GelirGiderData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        Swal.fire(
+                            {
+                                title: "Kayıtlar Ekleniyor!",
+                                html: "<strong>Lütfen Bekleyin.</strong>",
+                                onBeforeOpen: function onBeforeOpen() {
+                                    Swal.showLoading();
+                                }
+                            });
+                    },
+                    url: "/Otomasyon/Tanimlar/GelirGiderVarsayilanlariEkle/",
+                    success: function (data) {
+
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            swal.close();
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            dt = $('#dtGelirGiderTurleri').dataTable(
+                {
+                    ////responsive: true,
+                    "destroy": true,
+                    "columns": [
+                        { "data": "GelirGiderTur", "autowidth": true },
+                        {
+                            "data": null,
+                            "className": "align-middle text-center ",
+                            "render": function (data, type, row) {
+                                islem = "";
+                                if (row.KilitBit == false) {
+                                    if (DuzenleYetki == "True") {
+                                        if (row.Aktif == true) {
+                                            //islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                            islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-ggid='" + row.Id + "'>Aktif</button>"
+                                        }
+                                        else {
+                                            //islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                            islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-ggid='" + row.Id + "'>Pasif</button>"
+                                        }
+                                    }
+                                    else {
+                                        if (row.Aktif == true) {
+                                            islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                            //islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Aktif</button>"
+                                        }
+                                        else {
+                                            islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                            //islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Pasif</button>"
+                                        }
+                                    }
+                                }
+                                return islem
+                            }
+                        },
+                        {
+                            "data": null,
+                            "render": function (data, type, row) {
+                                islem = "";
+                                if (row.KilitBit == false) {
+                                    if (DuzenleYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle' data-ggid='" + row.Id + "' data-ggtur='" + row.GelirGiderTur + "' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                            "<i class='fal fa-edit'></i>" +
+                                            "</a>"
+                                    }
+                                    if (SilYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon Sil' data-ggid='" + row.Id + "' data-ggtur='" + row.GelirGiderTur + "' style='background-color:crimson;margin-left:5px'>" +
+                                            "<i class='fal fa-trash-alt'></i>" +
+                                            "</a>"
+                                    }
+                                }
+                                return islem;
+                            }
+                        }
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Otomasyon/Tanimlar/GelirGiderTuruListesi/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+        });
+    </script>
+}

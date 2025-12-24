@@ -1,0 +1,103 @@
+﻿    #image-preview {
+        width: 250px;
+        height: 250px;
+        position: relative;
+        overflow: hidden;
+        background-color: #ffffff;
+        color: #ecf0f1;
+    }
+
+    #image-preview-kullanici {
+        width: 150px;
+        height: 150px;
+        position: relative;
+        overflow: hidden;
+        background-color: #ffffff;
+        color: #ecf0f1;
+    }
+    #image-preview-kullanici-duzenle {
+        width: 150px;
+        height: 150px;
+        position: relative;
+        overflow: hidden;
+        background-color: #ffffff;
+        color: #ecf0f1;
+    }
+    #image-preview input {
+        line-height: 200px;
+        font-size: 200px;
+        position: absolute;
+        opacity: 0;
+        z-index: 10;
+    }
+
+    #image-preview-kullanici input {
+        line-height: 100px;
+        font-size: 100px;
+        position: absolute;
+        opacity: 0;
+        z-index: 10;
+    }
+    #image-preview-kullanici-duzenle input {
+        line-height: 100px;
+        font-size: 100px;
+        position: absolute;
+        opacity: 0;
+        z-index: 10;
+    }
+
+    #image-preview label {
+        position: absolute;
+        z-index: 5;
+        opacity: 0.8;
+        cursor: pointer;
+        background-color: #bdc3c7;
+        width: 200px;
+        height: 50px;
+        font-size: 20px;
+        line-height: 50px;
+        text-transform: uppercase;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        text-align: center;
+    }
+
+    #image-preview-kullanici label {
+        position: absolute;
+        z-index: 5;
+        opacity: 0.8;
+        cursor: pointer;
+        background-color: #bdc3c7;
+        width: 100px;
+        height: 20px;
+        font-size: 10px;
+        line-height: 20px;
+        text-transform: uppercase;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        text-align: center;
+    }
+    #image-preview-kullanici-duzenle label {
+        position: absolute;
+        z-index: 5;
+        opacity: 0.8;
+        cursor: pointer;
+        background-color: #bdc3c7;
+        width: 100px;
+        height: 20px;
+        font-size: 10px;
+        line-height: 20px;
+        text-transform: uppercase;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+        text-align: center;
+    }

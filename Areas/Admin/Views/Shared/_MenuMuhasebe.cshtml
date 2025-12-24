@@ -1,0 +1,126 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool muhasebeyetki = ky.FirstOrDefault(x => x.SayfaId == 3 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 3 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool gunlukisleryetki = ky.FirstOrDefault(x => x.SayfaId == 26 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 26 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool gelirgiderleryetki = ky.FirstOrDefault(x => x.SayfaId == 27 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 27 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool gelecekodemeleryetki = ky.FirstOrDefault(x => x.SayfaId == 28 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 28 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool kalanbakiyeleryetki = ky.FirstOrDefault(x => x.SayfaId == 29 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 29 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool carileryetki = ky.FirstOrDefault(x => x.SayfaId == 30 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 30 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool carilistesiyetki = ky.FirstOrDefault(x => x.SayfaId == 31 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 31 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool carihesaptakibiyetki = ky.FirstOrDefault(x => x.SayfaId == 32 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 32 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool kasayetki = ky.FirstOrDefault(x => x.SayfaId == 33 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 33 && x.Sil == false && x.Aktif == true).SayfaYetki;
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Muhasebe" ? "active open" : "";
+    string altmenugunlukisler = ViewBag.AltMenu == "Günlük İşler" ? "active" : "";
+    string altmenugelirgiderler = ViewBag.AltMenu == "Gelirler-Giderler" ? "active" : "";
+    string altmenugelecekodemeler = ViewBag.AltMenu == "Gelecek Ödemeler" ? "active" : "";
+    string altmenukalanbakiyeler = ViewBag.AltMenu == "Kalan Bakiyeler" ? "active" : "";
+    string altmenucariler = ViewBag.AltMenu == "Cariler" ? "active open" : "";
+    string altmenu2carilistesi = ViewBag.AltMenu == "Cari Listesi" ? "active" : "";
+    string altmenu2carihesaptakibi = ViewBag.AltMenu == "Cari Hesap Takibi" ? "active" : "";
+    string altmenukasa = ViewBag.AltMenu == "Kasa" ? "active" : "";
+}
+@if (muhasebeyetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Muhasebe" data-filter-tags="muhasebe">
+            <i class="ni ni-layers"></i>
+            <span class="nav-link-text" data-i18n="nav.muhasebe">Muhasebe</span>
+        </a>
+        <ul>
+            @if (lisans.Muhasebe_GunlukIsler)
+            {
+                if (gunlukisleryetki)
+                {
+                    <li class=@altmenugunlukisler>
+                        <a href="~/Admin/Muhasebe/GunlukIsler" title="Günlük İşler" data-filter-tags="rezervasyon işlemleri günlük işler">
+                            <span class="nav-link-text" data-i18n="nav.rezervasyon_islemleri_gunluk_isler">Günlük İşler</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Muhasebe_GelirGiderler)
+            {
+                if (gelirgiderleryetki)
+                {
+                    <li class=@altmenugelirgiderler>
+                        <a href="~/Admin/Muhasebe/GelirlerGiderler" title="Gelirler - Giderler" data-filter-tags="muhasebe gelirler giderler">
+                            <span class="nav-link-text" data-i18n="nav.muhasebe_gelirler_giderler">Gelirler - Giderler</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Muhasebe_AlinanGelecekOdemeler)
+            {
+                if (gelecekodemeleryetki)
+                {
+                    <li class=@altmenugelecekodemeler>
+                        <a href="~/Admin/Muhasebe/GelecekOdemeler" title="Gelecek Ödemeler" data-filter-tags="muhasebe gelecek ödemeler">
+                            <span class="nav-link-text" data-i18n="nav.muhasebe_gelecek_odemeler">Alınan/Gelecek Ödemeler</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Muhasebe_KalanBakiyeler)
+            {
+                if (kalanbakiyeleryetki)
+                {
+                    <li class=@altmenukalanbakiyeler>
+                        <a href="~/Admin/Muhasebe/KalanBakiyeler" title="Kalan Bakiyeler" data-filter-tags="muhasebe kalan bakiyeler">
+                            <span class="nav-link-text" data-i18n="nav.muhasebe_kalan_bakiyeler">Kalan Bakiyeler</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Muhasebe_Cariler)
+            {
+                if (carileryetki)
+                {
+                    <li class=@altmenucariler>
+                        <a href="javascript:void(0);" title="Cariler" data-filter-tags="muhasebe cariler">
+                            <span class="nav-link-text" data-i18n="nav.muhasebe_cariler">Cariler</span>
+                        </a>
+                        <ul>
+                            @if (lisans.Muhasebe_Cariler_CariListesi)
+                            {
+                                if (carilistesiyetki)
+                                {
+                                    <li class=@altmenu2carilistesi>
+                                        <a href="~/Admin/Muhasebe/CariListesi" title="Cari Listesi" data-filter-tags="muhasebe cariler cari listesi">
+                                            <span class="nav-link-text" data-i18n="nav.muhasebe_cariler_cari_listesi">Cari Listesi</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            @if (lisans.Muhasebe_Cariler_CariHesapTakibi)
+                            {
+                                if (carihesaptakibiyetki)
+                                {
+                                    <li class=@altmenu2carihesaptakibi>
+                                        <a href="~/Admin/Muhasebe/CariHesapTakibi" title="Cari Hesap Takibi" data-filter-tags="muhasebe cari hesap takibi">
+                                            <span class="nav-link-text" data-i18n="nav.cari_hesap_takibi">Cari Hesap Takibi</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </li>
+                }
+            }
+            @if (lisans.Muhasebe_Kasa)
+            {
+                if (kasayetki)
+                {
+                    <li class=@altmenukasa>
+                        <a href="~/Admin/Muhasebe/Kasa" title="Kasa" data-filter-tags="muhasebe kasa">
+                            <span class="nav-link-text" data-i18n="nav.muhasebe_kasa">Kasa</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}

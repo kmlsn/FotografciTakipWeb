@@ -1,0 +1,498 @@
+﻿
+@{
+    ViewBag.Title = "Tanımlar - Gunluk İş Kategorileri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{ 
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Günlük İş Kategorisi Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="kategorihata">
+                                <label class="form-label" for="kategoriadi"> Günlük İş Kategorisi <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control" id="kategoriadi" placeholder="Günlük İş Kategorisi" name="KategoriAdi" maxlength="50" required>
+                                <div class="invalid-feedback">
+                                    Günlük İş Kategorisini giriniz!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="KategoriKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="kategoriduzenlehata">
+                                <label class="form-label" for="kategoriadiduzenle">Günlük İş Kategorisi <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control" id="kategoriadiduzenle" placeholder="Günlük İş Kategorisi" maxlength="50" name="KategoriAdi" required>
+                                <div class="invalid-feedback">
+                                    Günlük İş Kategorisini giriniz!
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="KategoriGuncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<!-- Varsayılan Geğerleri Ekle Modal Penceresi -->
+<div class="modal fade" id="VarsayilanEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Varsayılan Günlük İş Kategorilerini Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content" id="varsayilandegerler">
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-1" checked data-deger="Albüm Satışı">
+                                    <label class="custom-control-label" for="varsayilan-1">Albüm Satışı</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-2" checked data-deger="Hediyelik Eşya">
+                                    <label class="custom-control-label" for="varsayilan-2">Hediyelik Eşya</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-3" checked data-deger="Fotoğraf Baskısı">
+                                    <label class="custom-control-label" for="varsayilan-3">Fotoğraf Baskısı</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-4" checked data-deger="Stüdyo Çekimi">
+                                    <label class="custom-control-label" for="varsayilan-4">Stüdyo Çekimi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-5" checked data-deger="Vesikalık">
+                                    <label class="custom-control-label" for="varsayilan-5">Vesikalık</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-6" checked data-deger="Diğer">
+                                    <label class="custom-control-label" for="varsayilan-6">Diğer</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="VarsayilanKaydet">Seçilenleri Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Varsayılan Geğerleri Ekle Modal Penceresi -->
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                @if(KullaniciYetki.KayitEkle)
+                {
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle">Yeni Günlük İş Kategorisi Ekle</button>
+                    <div class="" id="gunlukiskategoridisable">
+                        <button class="btn btn-sm btn-default mr-auto waves-effect waves-themed" id="gunlukisvarsayilan" data-toggle="modal" data-target="#VarsayilanEkleModal">Varsayılan Değerleri Yükle</button>
+                    </div>
+                }
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtGunlukIsKategorileri" class="table table-sm table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Günlük İş Kategorisi</th>
+                                <th class="w-10">Durum</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gissatir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+@section Script
+{
+    <script>
+
+        $(document).ready(function () {
+            var varsayilandeger;
+            var Varsayilanlar = new Array();
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $("#kategoriadi").val("");
+            })
+            $("#KategoriKaydet").click(function () {
+                if ($("#kategoriadi").val() == "") {
+                    $("#kategoriadi").focus();
+                    $("#kategorihata").append("<div class='hata' style='color:red'>Kategori Adını Giriniz.</div>");
+                }
+                else
+                {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var kategoriadi = $("#kategoriadi").val();
+                    var GunlukIsData = new FormData();
+                    GunlukIsData.append("GunlukIs", $("#kategoriadi").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: GunlukIsData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/GunlukIsVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: GunlukIsData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Tanimlar/GunlukIsKategorisiEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                            {
+                                Swal.fire(
+                                {
+                                    title: "Varolan Kayıt",
+                                    html: "<p><h2 style='font-size:16px; color:red'><strong>Günlük İş Kategorisi : </strong>" + kategoriadi + "</br><h2> Günlük İş Kategorisi zaten var!</h2>",
+                                    type: "warning"
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtGunlukIsKategorileri").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#KategoriGuncelle").val($(this).data("gisid"))
+                $("#kategoriadiduzenle").val($(this).data("giskategori"));
+            });
+            $("#KategoriGuncelle").click(function () {
+                if ($("#kategoriadiduzenle").val() == "") {
+                    $("#kategoriadiduzenle").focus();
+                    $("#kategoriduzenlehata").append("<div class='hata' style='color:red'>Kategori Adını Giriniz.</div>");
+                }
+                else
+                {
+                    $('#KayitDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    var GunlukIsData = new FormData();
+                    GunlukIsData.append("GunlukIs", $("#kategoriadiduzenle").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: GunlukIsData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/GunlukIsKategorisiGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtGunlukIsKategorileri").on('click', '.Sil', function () {
+                var id = $(this).data("gisid");
+                var giskategori = $(this).data("giskategori");
+                Swal.fire(
+                {
+                    title: "Kayıt Silinecek",
+                    html: "<p><h2 style='font-size:16px; color:red'><strong>Günlük İş Kategorisi : </strong>" + giskategori + "</br><h2> Günlük İş Kategorisi silinsin mi?</h2>",
+                    type: "error",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Silinsin!",
+                    cancelButtonText: "İptal"
+                }).then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Tanimlar/GunlukIsKategorisiSil/" + id,
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            });
+            $("#dtGunlukIsKategorileri").on('click', '.durumdegistir', function () {
+                var id = $(this).data("gisid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/GunlukIsKategorisiDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#VarsayilanKaydet").click(function () {
+                Varsayilanlar = [];
+                $("input[type=checkbox]").each(function (i) {
+                    varsayilandeger = document.getElementById("varsayilan-" + i);
+                    if (varsayilandeger != null) {
+                        if (varsayilandeger.checked) {
+                            Varsayilanlar.push($("#varsayilan-" + i).data("deger"))
+                        }
+                    }
+                });
+                $('#VarsayilanEkleModal').modal('hide');
+                var GisData = new FormData();
+                GisData.append("VarsayilanDegerler", Varsayilanlar);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: GisData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        Swal.fire(
+                        {
+                            title: "Kayıtlar Ekleniyor!",
+                            html: "<strong>Lütfen Bekleyin.</strong>",
+                            onBeforeOpen: function onBeforeOpen() {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    url: "/Otomasyon/Tanimlar/GunlukIsVarsayilanlariEkle/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            swal.close();
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            var dt;
+            var islem;
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            dt = $('#dtGunlukIsKategorileri').dataTable(
+                {
+                    responsive: true,
+                    "destroy": true,
+                    //"searching": false, // arama kaldır
+                    //"lengthChange": false, // sayfa başına göster kaldır
+                    "columns": [
+                                { "data": "KategoriAdi", "autowidth": true },
+                                {
+                                    "data": null,
+                                    "className": "align-middle text-center ",
+                                    "render": function (data, type, row) {
+                                        islem = "";
+                                        if (row.KilitBit == false) {
+                                            if (DuzenleYetki == "True") {
+                                                if (row.Aktif == true) {
+                                                    //islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                    islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-gisid='" + row.Id + "'>Aktif</button>"
+                                                }
+                                                else {
+                                                    //islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                    islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-gisid='" + row.Id + "'>Pasif</button>"
+                                                }
+                                            }
+                                            else {
+                                                if (row.Aktif == true) {
+                                                    islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                    //islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Aktif</button>"
+                                                }
+                                                else {
+                                                    islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                    //islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Pasif</button>"
+                                                }
+                                            }
+                                        }
+                                        return islem
+                                    }
+                                },
+                                {
+                                    "data": null,
+                                    "render": function (data, type, row) {
+                                        islem = "";
+                                        if (row.KilitBit == false) {
+                                            if (DuzenleYetki == "True") {
+                                                islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle' data-gisid='" + row.Id + "' data-giskategori='" + row.KategoriAdi + "' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                                                    "<i class='fal fa-edit'></i>" +
+                                                                "</a>"
+                                            }
+                                            if (SilYetki == "True") {
+                                                islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon Sil' data-gisid='" + row.Id + "' data-giskategori='" + row.KategoriAdi + "' style='background-color:crimson;margin-left:5px'>" +
+                                                                    "<i class='fal fa-trash-alt'></i>" +
+                                                                "</a>"
+                                            }
+                                        }
+                                        return islem
+                                    }
+                                }
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Otomasyon/Tanimlar/GunlukIsKategorileriListesi/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+        });
+    </script>
+}
+

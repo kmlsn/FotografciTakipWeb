@@ -1,0 +1,52 @@
+﻿<div class="demo-v-spacing" style="margin-bottom:15px">
+    <ol class="breadcrumb breadcrumb-sm breadcrumb-arrow">
+        <li>
+            <a href="/Otomasyon/Dashboard/Index">
+                <i class="fal fa-home"></i>
+            </a>
+        </li>
+        @if ((ViewBag.UstMenu != "" || ViewBag.UstMenu != null) && (ViewBag.AltMenu == "" || ViewBag.AltMenu == null))
+        {
+            <li class="active">
+                <a href="#">
+                    <span class="hidden-md-down">@ViewBag.UstMenu</span>
+                    <i class="fal fa-arrow-down"></i>
+                </a>
+            </li>
+        }
+        else if ((ViewBag.UstMenu != "" || ViewBag.UstMenu != null) && (ViewBag.AltMenu != "" || ViewBag.AltMenu != null) && (ViewBag.AltMenu2 == "" || ViewBag.AltMenu2 == null))
+        {
+            <li>
+                <a href="#">
+                    <span class="hidden-md-down">@ViewBag.UstMenu</span>
+                </a>
+            </li>
+            <li class="active">
+                <a href="#">
+                    <span class="hidden-md-down">@ViewBag.AltMenu</span>
+                    <i class="fal fa-arrow-down"></i>
+                </a>
+            </li>
+        }
+        else if ((ViewBag.UstMenu != "" || ViewBag.UstMenu != null) && (ViewBag.AltMenu != "" || ViewBag.AltMenu != null) && (ViewBag.AltMenu2 != "" || ViewBag.AltMenu2 != null))
+        {
+            <li>
+                <a href="#">
+                    <span class="hidden-md-down">@ViewBag.UstMenu</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class="hidden-md-down">@ViewBag.AltMenu</span>
+                </a>
+            </li>
+            <li class="active">
+                <a href="#">
+                    <span class="hidden-md-down">@ViewBag.AltMenu2</span>
+                    <i class="fal fa-arrow-down"></i>
+                </a>
+            </li>
+        }
+    </ol>
+
+</div>

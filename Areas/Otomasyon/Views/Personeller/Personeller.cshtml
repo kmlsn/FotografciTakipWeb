@@ -1,0 +1,1618 @@
+﻿
+@{
+    ViewBag.Title = "Personel Listesi";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@section Head
+{
+    <style>
+        .modal {
+            overflow: auto !important;
+        }
+        /*Açılan ikinci modal ekranda kaymadığı için eklendi*/
+    </style>
+
+}
+@using FotografciTakipWeb.Models
+@{
+    List<PersonelGorevleri> personelgorevleri = ViewBag.gorevler;
+    List<Sube> SubeListesi = ViewBag.SubeListesi;
+    List<SubeToKullanici> SubeKullanici = ViewBag.SubeKullanici;
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    List<Sube> subeler = ViewBag.Subeler;
+    string EkleYetki = KullaniciYetki.KayitEkle.ToString();
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string DetayYetki = KullaniciYetki.KayitDetayi.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+    bool PLimit = ViewBag.PLimit;
+}
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Personel Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="BaslamaTarihi">İşe Başlama Tarihi</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" value="07/17/2020" id="BaslamaTarihi">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-6" id="gorevIdHata">
+                                <label class="form-label" for="PersonelGorevId">Görevi</label>
+                                <select class="custom-select form-control custom-select-sm" id="PersonelGorevId" name="PersonelGorevId" required>
+                                    <option selected="" value="0" disabled>Görev Seçiniz</option>
+                                    @foreach (var gorevler in personelgorevleri)
+                                    {
+                                        <option value="@gorevler.Id">@gorevler.Gorev</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="AdSoyadhata">
+                                <label class="form-label" for="AdSoyad">Personel Adı Soyadı</label>
+                                <input type="text" id="personelid" class="form-control  form-control-sm" name="AdSoyad" maxlength="50" required style="display:none">
+                                <input type="text" id="AdSoyad" class="form-control  form-control-sm" name="AdSoyad" maxlength="50" required>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="TCKimlikNo">TC Kimlik No</label>
+                                <input type="text" id="TCKimlikNo" class="form-control  form-control-sm" name="TCKimlikNo" maxlength="11" data-inputmask="'mask': '99999999999'">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="CepTelhata">
+                                <label class="form-label">Cep Telefonu</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="CepTel" id="CepTel" required>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label">Sabit Telefon</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="SabitTel" id="SabitTel">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label">Email Adresi</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-mouse-pointer width-1 text-align-center"></i></span>
+                                    </div>
+                                    <input type="text" data-inputmask="'alias': 'email'" class="form-control form-control-sm" im-insert="true" name="Email" id="Email" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="Adres">Adres</label>
+                                <textarea class="form-control form-control-sm" id="Adres" rows="2" name="Adres" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="CalismaSekli">Çalışma Şekli</label>
+                                <select class="custom-select form-control custom-select-sm" id="CalismaSekli" name="CalismaSekli">
+                                    <option selected="" value="1">Tam Zamanlı (Full Time)</option>
+                                    <option value="2">Yarı Zamanlı (Part Time)</option>
+                                    <option value="3">Dönemsel</option>
+                                    <option value="4">Serbest (Freelance)</option>
+                                    <option value="5">Günlük (İş Başı)</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="Ucret">Ücret (Maaş) </label>
+                                <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control form-control-sm" name="Ucret" maxlength="50" id="Ucret">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-3 mb-0 mr-4">
+                                <label class="form-label" for="IzinSuresi">Yıllık İzin Süresi (Gün)</label>
+                                <input class="form-control input-sm form-control-sm" id="IzinSuresi" type="text" name="IzinSuresi" value="10">
+                            </div>
+                            <div class="form-group col-sm-2 custom-control custom-checkbox pt-4 mb-0 ml-4">
+                                <input type="checkbox" class="custom-control-input" id="SmsKabul" checked="">
+                                <label class="custom-control-label" for="SmsKabul">SMS Kabul</label>
+                            </div>
+                            <div class="form-group col-sm-2 custom-control custom-checkbox pt-4 mb-0">
+                                <input type="checkbox" class="custom-control-input" id="EmailKabul" checked="">
+                                <label class="custom-control-label" for="EmailKabul">Email Kabul</label>
+                            </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label pb-2" for="PerosnelSubeleri">Personelin Çalıştığı Şubeler</label>
+                                <div class="frame-wrap" id="PerosnelSubeleri">
+                                    @foreach (var sube in subeler)
+                                    {
+                                        <div class="custom-control custom-checkbox custom-control-inline pr-3 pb-3">
+                                            <input type="checkbox" class="custom-control-input" id="@sube.Id" data-subeid="@sube.Id" data-islem="subesec">
+                                            <label class="custom-control-label" for="@sube.Id">@sube.SubeAdi</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            @*<div class="form-group col-sm-12">
+                                    <label class="form-label" for="PerosnelSubeleri">Personelin çalıştığı şubeler</label>
+                                    <div class="frame-wrap">
+                                        <ul class="list-group" id="PerosnelSubeleri">
+                                            @foreach (var sube in subeler)
+                                            {
+                                                <li class="list-group-item-changed">
+                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                        <input type="checkbox" class="custom-control-input" id="@sube.Id" data-subeid="@sube.Id" data-islem="subesec">
+                                                        <label class="custom-control-label" for="@sube.Id">@sube.SubeAdi</label>
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>*@
+                            @*<h5 class="frame-heading">Yetkili olduğu Şubeler</h5>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="submit" class="btn btn-primary" id="Kaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Ödeme Ekle Modal Penceresi -->
+<div class="modal fade" id="OdemeEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Odeme Ekle - <b> <i id="yenieklepersoneladi"></i></b>
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="OdemeTarihi">Ödeme Tarihi</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" value="07/17/2020" id="OdemeTarihi">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="OdemeTuru">Ödeme Türü</label>
+                                <select class="custom-select form-control custom-select-sm" id="OdemeTuru" name="OdemeTuru">
+                                    <option selected="" value="1">Maaş Ödemesi</option>
+                                    <option value="2">Avans</option>
+                                    <option value="3">Prim</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="OdemeSekli">Ödeme Şekli</label>
+                                <select class="custom-select form-control custom-select-sm" id="OdemeSekli" name="OdemeSekli">
+                                    <option selected="" value="1">Banka Havalesi</option>
+                                    <option value="2">Nakit</option>
+                                    <option value="3">Kredi Kartı</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="OdemeUcret">Tutar </label>
+                                <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control form-control-sm" name="OdemeUcret" maxlength="50" id="OdemeUcret">
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label">Açıklama</label>
+                                <div class="input-group">
+                                    <textarea class="form-control" id="OdemeAciklama" placeholder="Açıklama" rows="3" name="OdemeAciklama" style="overflow:auto;resize:none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="submit" class="btn btn-primary" id="OdemeKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ödeme Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="gorevIdduzenleHata" style="margin-bottom:15px">
+                                <label class="form-label" for="PersonelGorevIdDuzenle">Görevi</label>
+                                <select class="custom-select custom-select-sm form-control custom-select-sm" id="PersonelGorevIdDuzenle" name="PersonelGorevIdDuzenle" required>
+                                    <option selected="" value="0" disabled>Görev Seçiniz</option>
+                                    @foreach (var gorevler in personelgorevleri)
+                                    {
+                                        <option value="@gorevler.Id">@gorevler.Gorev</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="BaslamaTarihiDuzenle">İşe Başlama Tarihi</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" value="07/17/2020" id="BaslamaTarihiDuzenle">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="CikisTarihiDuzenle">İşten Çıkış Tarihi</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" value="07/17/2020" id="CikisTarihiDuzenle">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="AdSoyadDuzenlehata">
+                                <label class="form-label" for="AdSoyadDuzenle">Personel Adı Soyadı</label>
+                                <input type="text" id="AdSoyadDuzenle" class="form-control form-control-sm" name="AdSoyad" maxlength="50" required>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="TCKimlikNoDuzenle">TC Kimlik No</label>
+                                <input type="text" id="TCKimlikNoDuzenle" class="form-control form-control-sm" name="TCKimlikNo" maxlength="11" data-inputmask="'mask': '99999999999'">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="CepTelDuzenlehata">
+                                <label class="form-label">Cep Telefonu</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="CepTel" id="CepTelDuzenle">
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label">Sabit Telefon</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="SabitTel" id="SabitTelDuzenle">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label">Email Adresi</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-mouse-pointer width-1 text-align-center"></i></span>
+                                    </div>
+                                    <input type="text" data-inputmask="'alias': 'email'" class="form-control form-control-sm" im-insert="true" name="Email" id="EmailDuzenle" maxlength="50">
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="Adres">Adres</label>
+                                <textarea class="form-control form-control-sm" id="AdresDuzenle" rows="2" name="Adres" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:15px">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="CalismaSekliDuzenle">Çalışma Şekli</label>
+                                <select class="custom-select custom-select-sm form-control" id="CalismaSekliDuzenle" name="CalismaSekli">
+                                    <option selected="" value="1">Tam Zamanlı (Full Time)</option>
+                                    <option value="2">Yarı Zamanlı (Part Time)</option>
+                                    <option value="3">Dönemsel</option>
+                                    <option value="4">Serbest (Freelance)</option>
+                                    <option value="5">Günlük (İş Başı)</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="UcretDuzenle">Ücret (Maaş) </label>
+                                <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control form-control-sm" name="UcretDuzenle" maxlength="50" id="UcretDuzenle">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-3 mb-0 mr-4">
+                                <label class="form-label" for="IzinSuresiDuzenle">Kalan İzin Süresi (Gün)</label>
+                                <input class="form-control input-sm form-control-sm" id="IzinSuresiDuzenle" type="text" name="IzinSuresiDuzenle" value="10">
+                            </div>
+                            <div class="form-group col-sm-2 custom-control custom-checkbox pt-4 mb-0 ml-4">
+                                <input type="checkbox" class="custom-control-input" id="SmsKabulDuzenle" checked="">
+                                <label class="custom-control-label" for="SmsKabulDuzenle">SMS Kabul</label>
+                            </div>
+                            <div class="form-group col-sm-2 custom-control custom-checkbox pt-4 mb-0">
+                                <input type="checkbox" class="custom-control-input" id="EmailKabulDuzenle" checked="">
+                                <label class="custom-control-label" for="EmailKabulDuzenle">Email Kabul</label>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label pb-2" for="PersonelSubeleriDuzenle">Personelin Çalıştığı Şubeler</label>
+                                <div class="frame-wrap" id="PersonelSubeleriDuzenle">
+                                    @foreach (var sube in subeler)
+                                    {
+                                        <div class="custom-control custom-checkbox custom-control-inline pr-3 pb-3">
+                                            <input type="checkbox" class="custom-control-input" name="subelerDuzenle" id="Duzenle-@sube.Id" data-subeidduzenle="@sube.Id" data-tip="subelerDuzenle">
+                                            <label class="custom-control-label" for="Duzenle-@sube.Id">@sube.SubeAdi</label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            @*<div class="form-group col-sm-12">
+                                    <label class="form-label" for="PersonelSubeleriDuzenle">Personelin çalıştığı şubeler</label>
+                                    <div class="frame-wrap">
+                                        <ul class="list-group" id="PersonelSubeleriDuzenle">
+                                            @foreach (var sube in subeler)
+                                            {
+                                                <li class="list-group-item-changed">
+                                                    <div class="custom-control custom-checkbox custom-control-inline">
+                                                        <input type="checkbox" class="custom-control-input" name="subeler" id="Duzenle-@sube.Id" data-subeid="@sube.Id" data-tip="subeler">
+                                                        <label class="custom-control-label" for="Duzenle-@sube.Id">@sube.SubeAdi</label>
+                                                    </div>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>*@
+                            @*<h5 class="frame-heading">Yetkili olduğu Şubeler</h5>*@
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer kilitlibilgiler" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Guncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<!-- Detay Modal Penceresi -->
+<div class="modal fade" id="DetayModal2" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header"><h4 class="modal-title" id="DetayBaslik">Personel Detay Bilgileri</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div><div class="modal-body">
+                <table class="table">
+                    <tr style="display:none"><td><b>Personel Id :</b></td> <td id="PersonelIdDetay2"></td> <td></td></tr>
+                    <tr style="display:none"><td><b>Eski İzin Süresi :</b></td> <td id="EskiIzinDetay2"></td> <td></td></tr>
+                    <tr style="display:none"><td><b>Görev Id :</b></td> <td id="GorevIdDetay2"></td> <td></td></tr>
+                    <tr style="display:none"><td><b>KilitBit :</b></td> <td id="KilitBitDetay2"></td> <td></td></tr>
+                    <tr>
+                        <td class="w-25"><b>Şube Adı :</b></td>
+                        <td id="SubeAdiDetay2"></td>
+                        <td class="w-25"><b>Görev :</b></td>
+                        <td id="GorevDetay2"></td>
+                    </tr>
+                    @*<tr><td class="w-25"><b>Görev :</b></td> <td id="GorevDetay2"></td></tr>*@
+                    <tr>
+                        <td class="w-25"><b>Ad-Soyad :</b></td>
+                        <td id="AdSoyadDetay2"></td>
+                        <td class="w-25"><b>TC Kimlik No :</b></td>
+                        <td id="TCKimlikNoDetay2"></td>
+                    </tr>
+                    @*<tr><td class="w-25"><b>TC Kimlik No :</b></td> <td id="TCKimlikNoDetay2"></td></tr>*@
+                    <tr>
+                        <td class="w-25"><b>Cep Telefonu :</b></td>
+                        <td id="CepDetay2"></td>
+                        <td class="w-25"><b>Sabit Telefon :</b></td>
+                        <td id="SabitDetay2"></td>
+                    </tr>
+                    @*<tr><td class="w-25"><b>Sabit Telefon :</b></td> <td id="SabitDetay2"></td></tr>*@
+                    <tr>
+                        <td class="w-25"><b>Email :</b></td>
+                        <td id="EmailDetay2"></td>
+                        <td class="w-25"><b>Adres :</b></td>
+                        <td id="AdresDetay2">
+                    </tr>
+                    @*<tr><td class="w-25"><b>Adres :</b></td> <td id="AdresDetay2"></td></tr>*@
+                    <tr>
+                        <td class="w-25"><b>İşe Başlama Tarihi :</b></td>
+                        <td id="BaslamaDetay2"></td>
+                        <td class="w-25"><b>İşten Ayrılış Tarihi :</b></td>
+                        <td id="BitisDetay2"></td>
+                    </tr>
+                    @*<tr><td class="w-25"><b>İşten Ayrılış Tarihis :</b></td> <td id="BitisDetay2"></td></tr>*@
+                    <tr>
+                        <td class="w-25"><b>Çalışma Şekli :</b></td>
+                        <td id="CalismaSekliDetay2"></td>
+                        <td class="w-25"><b>Ücret (Maaş) :</b></td>
+                        <td id="UcretDetay2"></td>
+                    </tr>
+                    @*<tr><td class="w-25"><b>Ücret (Maaş) :</b></td> <td id="UcretDetay2"></td></tr>*@
+                    <tr>
+                        <td class="w-25"><b>Yıllık İzin Süresi (Gün) :</b></td>
+                        <td id="IzinSuresiDetay2"></td>
+                        <td class="w-25"><b>Kalan İzin Süresi (Gün) :</b></td>
+                        <td id="ToplamIzinSuresiDetay2"></td>
+                    </tr>
+                    <tr>
+                        <td class="w-25"><b>Çalıştığı Şubeler</b></td>
+                        <td id="SubelerDetay2" colspan="3">
+                            <div class="frame-wrap" id="PerosnelSubeleriDetay">
+                                @foreach (var sube in subeler)
+                                {
+                                    <div class="custom-control custom-checkbox custom-control-inline pr-3 pb-3">
+                                        <input type="checkbox" class="custom-control-input" name="subelerdetay" id="Detay-@sube.Id" data-subeiddetay="@sube.Id" data-tip="subelerdetay" disabled>
+                                        <label class="custom-control-label" for="Detay-@sube.Id">@sube.SubeAdi</label>
+                                    </div>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    @*<tr><td class="w-25"><b>Toplam İzin Süresi (Gün) :</b></td> <td id="ToplamIzinSuresiDetay2"></td></tr>*@
+                    @*<tr>
+                            <td><b>İşlem :</b></td>
+                            <td>
+                                <div class="d-flex mt-2">
+                                    @if (KullaniciYetki.KayitSil)
+                                    {
+                                        <a href="#" class="btn btn-sm btn-outline-danger mr-2" id="Sil2" title="Kaydı Sil" data-dismiss="modal"><i class="fal fa-times"></i> Sil</a>
+                                    }
+                                    @if (KullaniciYetki.KayitDuzenle)
+                                    {
+                                        <a href="#" class="btn btn-sm btn-outline-primary mr-2" id="Duzenle2" title="Kaydı Düzenle"><i class="fal fa-edit"></i> Düzenle</a>
+                                    }
+                                </div>
+                            </td>
+                            <td></td>
+                        </tr>*@
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Detay Modal Penceresi -->
+<!-- İzin Hakkı Ekle -->
+<div class="modal fade" id="IzinHakkiEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    İzin Hakkı Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="form-group col-12" id="IzinHakkiSuresihata">
+                                <label class="form-label" for="IzinHakkiSuresi">İzin Süresi (Gün)</label>
+                                <input class="form-control input-sm form-control-sm" id="IzinHakkiSuresi" type="text" name="IzinHakkiSuresi" value="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="submit" class="btn btn-primary" id="IzinHakkiEkleKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- İzin Hakkı Ekle -->
+<input type="text" id="KullaniciYetkiKayitEkle" class="form-control" name="Id" maxlength="50" style="display:none" value="@EkleYetki">
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<input type="text" id="KullaniciYetkiKayitDetayi" class="form-control" name="Id" maxlength="50" style="display:none" value="@DetayYetki">
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="row col col-12 mt-3" id="date_filter">
+                <div class="form-group col-sm-2">
+                    <select class="custom-select form-control custom-select-sm" id="Sube" name="Sube" title="Görüntülenecek Şube">
+                        <option value="0">Tüm Şubeler</option>
+                        @foreach (var sube in SubeKullanici)
+                        {
+                            if (ViewBag.AktifSubeId == sube.SubeId && sube.Sube.Aktif == true)
+                            {
+                                <option selected="" value="@sube.SubeId">@sube.Sube.SubeAdi</option>
+                            }
+                            else if (sube.Sube.Aktif == true)
+                            {
+                                <option value="@sube.SubeId">@sube.Sube.SubeAdi</option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <div class="form-group col-sm-2">
+                    <select class="custom-select form-control custom-select-sm" id="PersonelGorev" name="PersonelGorev" title="Görüntülenecek Personel Görevi">
+                        <option selected="" value="0">Personel Görevi - Tümü</option>
+                        @foreach (var gorev in personelgorevleri)
+                        {
+                            <option value="@gorev.Gorev">@gorev.Gorev</option>
+                        }
+                    </select>
+                </div>
+                @*<div class="form-group col-sm-3">
+                        <div class="custom-control custom-checkbox mt-2">
+                            <input type="checkbox" class="custom-control-input" id="EskiGoster">
+                            <label class="custom-control-label" for="EskiGoster">İşten ayrılanları da göster</label>
+                        </div>
+                    </div>*@
+                @if (ViewBag.Ayar == true)
+                {
+                    <div class="form-group col-sm-3">
+                        <div class="custom-control custom-checkbox mt-2">
+
+                            <input type="checkbox" class="custom-control-input" id="PasifGizle" checked>
+                            <label class="custom-control-label" for="PasifGizle">Durumu PASİF Olanları Gizle</label>
+
+                        </div>
+                    </div>
+                }
+                @if (KullaniciYetki.KayitEkle && PLimit)
+                {
+                    <div class="form-group col-sm-2">
+                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" id="YeniEkle"> Yeni Personel Ekle </button>
+                    </div>
+                }
+
+            </div>
+            <div class="border-bottom mt-0"></div>
+
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtpersoneller" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Firma</th>
+                                <th>Şube</th>
+                                <th style="display:none;">Personel Adı Soyadı</th>
+                                <th>Personel Adı Soyadı</th>
+                                <th>Görevi</th>
+                                <th>Cep Telefonu</th>
+                                <th>Email</th>
+                                <th>Başlama Tarihi</th>
+                                <th>Ayrılma Tarihi</th>
+                                <th class="w-10">İzin Süresi (Gün)</th>
+                                <th style="display:none;" class="w-5">Aktif</th>
+                                <th class="w-5">Aktif</th>
+                                <th class="w-12">İşlem</th>
+                                <th style="display:none; vertical-align:central">Görevli Şubeler</th>
+                                <th style="display:none">Ayrılma Tarihi</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        var controls = {
+            leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
+            rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
+        }
+        var EkleYetki = $("#KullaniciYetkiKayitEkle").val();
+        var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+        var DetayYetki = $("#KullaniciYetkiKayitDetayi").val();
+        var SilYetki = $("#KullaniciYetkiKayitSil").val();
+        var runDatePicker = function () {
+            $('#OdemeTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#BaslamaTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#BaslamaTarihiDuzenle').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#CikisTarihiDuzenle').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                });
+        }
+
+        $(document).ready(function () {
+            runDatePicker();
+            var adres, smskabul, emailkabul;
+            var SubeListesi = new Array();
+            $(":input").inputmask();
+            function dateFormat(d) {
+                return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+            }
+            var dt;
+            $("#UcretDuzenle").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#Ucret").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#OdemeUcret").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#PersonelGorevId').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $("#gorevhata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $("#PersonelGorevId").val("0");
+                $("#AdSoyad").val("");
+                $("#TCKimlikNo").val("");
+                $("#CepTel").val("");
+                $("#SabitTel").val("");
+                $("#Email").val("");
+                $("#CalismaSekli").val("1"); $("#Ucret").val("0.00"); $("#IzinSuresi").val("10");
+                $("#Adres").val("");
+                $("#Ucret").val("0");
+            });
+            $("#Kaydet").click(function () {
+                var email = $("#Email").val();
+                if ($("#PersonelGorevId").val() == "0") {
+                    $("#PersonelGorevId").focus();
+                    $("#gorevIdHata").append("<div id='gorevhata' style='color:red'>Personel Görevini Seçiniz.</div>");
+                }
+                else if ($("#AdSoyad").val() == "") {
+                    $("#AdSoyad").focus();
+                    $("#AdSoyadhata").append("<div id='detayhata' style='color:red'>Personel Adını ve Soyadını Giriniz.</div>");
+                }
+                else if ($("#CepTel").val() == "") {
+                    $("#CepTel").focus();
+                    $("#CepTelhata").append("<div id='detayhata' style='color:red'>Personelin Cep Telefon Numarasını Giriniz.</div>");
+                }
+                else {
+                    if ($("#SmsKabul").is(':checked')) {
+                        smskabul = "Var";
+                    }
+                    else {
+                        smskabul = "Yok";
+                    }
+                    if ($("#EmailKabul").is(':checked')) {
+                        emailkabul = "Var";
+                    }
+                    else {
+                        emailkabul = "Yok";
+                    }
+                    SubeListesi = [];
+
+                    $("input[type=checkbox]").each(function (i) { // seçili checkboxlar diziye alınıyor.
+                        if ($(this).data("islem") == "subesec" && $(this).is(':checked')) {
+                            SubeListesi.push($(this).data("subeid"))
+                        }
+                    })
+
+                    var id = $("#personelid").val();
+                    var adsoyad = $("#AdSoyad").val();
+                    var PersonelData = new FormData();
+                    PersonelData.append("SubeListesi", SubeListesi);
+                    PersonelData.append("PersonelGorevId", $("#PersonelGorevId").val());
+                    PersonelData.append("AdSoyad", $("#AdSoyad").val());
+                    PersonelData.append("TCKimlikNo", $("#TCKimlikNo").val());
+                    PersonelData.append("CepTel", $("#CepTel").val());
+                    PersonelData.append("SabitTel", $("#SabitTel").val());
+                    PersonelData.append("Email", $("#Email").val());
+                    PersonelData.append("CalismaSekli", $("#CalismaSekli").val());
+                    var ucret = $("#Ucret").val().replace(" TL", "");
+                    PersonelData.append("Ucret", ucret);
+                    PersonelData.append("IzinSuresi", $("#IzinSuresi").val());
+                    PersonelData.append("Adres", $("#Adres").val());
+                    PersonelData.append("BaslamaTarihi", $("#BaslamaTarihi").val().toString());
+                    PersonelData.append("SmsKabul", smskabul);
+                    PersonelData.append("EmailKabul", emailkabul);
+                    //PersonelData.forEach((value, key) => { console.log(key + " = " + value) }); // formdata içeriğini consola yazma
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: PersonelData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Personeller/EmailKontrol/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir kullanıcı yoksa yeni kullanıcı eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: PersonelData,
+                                    contentType: false,
+                                    processData: false,
+                                    beforeSend: function () {
+                                        Swal.fire(
+                                            {
+                                                title: "Personel Ekleniyor...!",
+                                                html: "<strong>Lütfen Bekleyin.</strong>",
+                                                onBeforeOpen: function onBeforeOpen() {
+                                                    Swal.showLoading();
+                                                }
+                                            });
+                                    },
+                                    url: "/Otomasyon/Personeller/PersonelVarMi/",
+                                    success: function (data) {
+                                        if (data == "Yok") // Bu isimde aktif bir personel yoksa yeni personel eklenecek
+                                        {
+                                            $.ajax({
+                                                type: "POST",
+                                                datatype: 'json',
+                                                data: PersonelData,
+                                                contentType: false,
+                                                processData: false,
+                                                url: "/Otomasyon/Personeller/PesonelEkle/",
+                                                success: function (data) {
+                                                    if (data.Sonuc == false) {
+                                                        alertify.set('notifier', 'delay', 5);
+                                                        alertify.set('notifier', 'position', 'top-center');
+                                                        alertify.error(data.Mesaj);
+                                                        swal.close();
+                                                    }
+                                                    else if (data.Sonuc == true) {
+                                                        alertify.set('notifier', 'delay', 3);
+                                                        alertify.set('notifier', 'position', 'top-center');
+                                                        alertify.success(data.Mesaj);
+                                                        dt.api().ajax.reload();
+                                                        swal.close();
+                                                    }
+                                                },
+                                                error: function (err) {
+                                                    alert("HATA");
+                                                }
+                                            });
+                                        }
+                                        else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                                        {
+                                            Swal.fire(
+                                                {
+                                                    title: "Varolan Kayıt",
+                                                    //text: "<< " + paketadi + " >> adlı bir paket zaten var! Bu kaydı güncellemek istermisiniz?",
+                                                    html: "<p><h2 style='font-size:16px; color:red'><strong>Ad-Soyad : </strong>" + adsoyad + "</h2></p><h2> Bu isime ait bir kayıt mecut! Varolan Kayıt Güncellensin mi?</h2>",
+                                                    type: "warning",
+                                                    showCancelButton: true,
+                                                    confirmButtonText: "Güncelle"
+                                                }).then(function (result) {
+                                                    if (result.value) {
+                                                        $.ajax({
+                                                            type: "POST",
+                                                            datatype: 'json',
+                                                            data: PersonelData,
+                                                            contentType: false,
+                                                            processData: false,
+                                                            url: "/Otomasyon/Personeller/PersonelGuncelle/" + data, // data: controller dan dönen varolan kaydın ID si
+                                                            success: function (data) {
+                                                                if (data.Sonuc == false) {
+                                                                    alertify.set('notifier', 'delay', 5);
+                                                                    alertify.set('notifier', 'position', 'top-center');
+                                                                    alertify.error(data.Mesaj);
+                                                                    swal.close();
+                                                                }
+                                                                else if (data.Sonuc == true) {
+                                                                    alertify.set('notifier', 'delay', 3);
+                                                                    alertify.set('notifier', 'position', 'top-center');
+                                                                    alertify.success(data.Mesaj);
+                                                                    dt.api().ajax.reload();
+                                                                    swal.close();
+                                                                }
+                                                            },
+                                                            error: function (err) {
+                                                                alert("HATA");
+                                                            }
+                                                        });
+                                                    }
+                                                });
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                            {
+                                $('#YeniKayitEkleModal').modal('hide');
+                                Swal.fire(
+                                    {
+                                        title: "Varolan Kayıt",
+                                        html: "<p><h2 style='font-size:16px; color:red'><strong>E-mail : </strong>" + email + "</h2></p><h4> Mail adresi başka bir personel tarafından  kullanılıyor!</h4>",
+                                        type: "warning",
+                                        confirmButtonText: "Tamam"
+                                    });
+                                $("#Email").focus();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                    $('#YeniKayitEkleModal').modal('hide');
+                }
+            });
+            $("#IzinHakkiEkleKaydet").click(function () {
+                if ($("#IzinHakkiSuresi").val() == "0") {
+                    $("#IzinHakkiSuresi").focus();
+                    $("#IzinHakkiSuresihata").append("<div id='izinhata' style='color:red'>Lütfen İzin Süresini Giriniz.</div>");
+                }
+                else {
+                    var izinsuresi = $("#IzinHakkiSuresi").val();
+                    var PersonelId = $(this).val();
+                    var IzinHakkiData = new FormData();
+                    IzinHakkiData.append("PersonelId", PersonelId);
+                    IzinHakkiData.append("IzinHakkiSuresi", izinsuresi);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: IzinHakkiData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Personeller/IzinHakkiEkle/",
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                    $('#IzinHakkiEkleModal').modal('hide');
+                }
+            });
+            $("#dtpersoneller").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                var kilitbit = $(this).data("kilitbit");
+                var gorevid = $(this).data("gorevid");
+                var baslama = $(this).data("baslama");
+                var email = $(this).data("email");
+
+                $("#Guncelle").val($(this).data("personelid"));
+                $("#Guncelle").data("eskiizin", $(this).data("izinsuresi"));
+                $("#PersonelGorevIdDuzenle").val($(this).data("gorevid"));
+                $("#BaslamaTarihiDuzenle").val($(this).data("baslama"));
+                if ($(this).data("bitis") == "01.01.2500") {
+                    $("#CikisTarihiDuzenle").val("");
+                }
+                else {
+                    $("#CikisTarihiDuzenle").val($(this).data("bitis"));
+                }
+                if (kilitbit == true) {
+                    document.getElementById("PersonelGorevIdDuzenle").setAttribute("disabled", "");
+                    document.getElementById("BaslamaTarihiDuzenle").setAttribute("disabled", "");
+                    document.getElementById("CikisTarihiDuzenle").setAttribute("disabled", "");
+                    document.getElementById("EmailDuzenle").setAttribute("disabled", "");
+                }
+                else {
+                    document.getElementById("PersonelGorevIdDuzenle").removeAttribute("disabled", "");
+                    document.getElementById("BaslamaTarihiDuzenle").removeAttribute("disabled", "");
+                    document.getElementById("CikisTarihiDuzenle").removeAttribute("disabled", "");
+                    document.getElementById("EmailDuzenle").removeAttribute("disabled", "");
+                }
+                $("#PerosnelSubeleriDuzenle").next($("input[type=checkbox]").each(function (i) { // Düzenle modal daki tüm checbox ların chek leri kaldırılıyor.
+                    if ($(this).data("subeidduzenle") != undefined) {
+                        if ($(this).is(':checked')) {
+                            $(this).prop("checked", false);
+                        }
+                    }
+                }));
+                var subeler = [];
+
+                var datasubeler = $(this).data("subeler"); // tek şube yetkisi var ise split ile ayrılamıyor, bu nedenle virgül olup olmadığına bakarak yetki tek şubemi birden fazla şube mi anlaşılıyor.
+                var tek = datasubeler.toString().search(",");
+                if (tek == "-1") {
+                    $("#Duzenle-" + datasubeler).prop("checked", true);
+                }
+                else {
+                    subeler = [];
+                    subeler = $(this).data("subeler").split(',');
+                    for (var i = 0; i < subeler.length; i++) {
+                        $("#Duzenle-" + subeler[i]).prop("checked", true);
+                    }
+                }
+                $("#AdSoyadDuzenle").val($(this).data("personelad"));
+                $("#TCKimlikNoDuzenle").val($(this).data("tckimlik"));
+                $("#CepTelDuzenle").val($(this).data("ceptel"));
+                $("#SabitTelDuzenle").val($(this).data("sabittel"));
+                $("#EmailDuzenle").val($(this).data("email"));
+                if ($(this).data("calismasekli") == "Tam Zamanlı (Full Time)") { $("#CalismaSekliDuzenle").val("1"); }
+                if ($(this).data("calismasekli") == "Yarı Zamanlı (Part Time)") { $("#CalismaSekliDuzenle").val("2"); }
+                if ($(this).data("calismasekli") == "Dönemsel") { $("#CalismaSekliDuzenle").val("3"); }
+                if ($(this).data("calismasekli") == "Serbest (Freelance)") { $("#CalismaSekliDuzenle").val("4"); }
+                if ($(this).data("calismasekli") == "Günlük (İş Başı)") { $("#CalismaSekliDuzenle").val("5"); }
+                $("#UcretDuzenle").val($(this).data("ucret"));
+                $("#IzinSuresiDuzenle").val($(this).data("izinsuresi"));
+                if ($(this).data("smskabul") == true) {
+                    $("#SmsKabulDuzenle").prop("checked", true);
+                }
+                else {
+                    $("#SmsKabulDuzenle").prop("checked", false);
+                }
+                if ($(this).data("emailkabul") == true) {
+                    $("#EmailKabulDuzenle").prop("checked", true);
+                }
+                else {
+                    $("#EmailKabulDuzenle").prop("checked", false);
+                }
+                var adres = $(this).data("adres").replace(/\<br \/\>/g, "\r\n")
+                $("#AdresDuzenle").val(adres);
+                $(".kilitlibilgiler").data("kilitbit", kilitbit);
+                $(".kilitlibilgiler").data("gorevid", gorevid);
+                $(".kilitlibilgiler").data("baslama", baslama);
+                $(".kilitlibilgiler").data("email", email);
+            });
+            $("#dtpersoneller").on('click', '.OdemeEkle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#OdemeKaydet").val($(this).data("personelid"));
+                document.getElementById("yenieklepersoneladi").innerHTML = $(this).data("personelad");
+            });
+            $("#dtpersoneller").on('click', '.Detay', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                document.getElementById("KilitBitDetay2").innerHTML = $(this).data("kilitbit");
+                document.getElementById("PersonelIdDetay2").innerHTML = $(this).data("personelid");
+                document.getElementById("EskiIzinDetay2").innerHTML = $(this).data("izinsuresi");
+                document.getElementById("SubeAdiDetay2").innerHTML = $(this).data("subeadi");
+                document.getElementById("GorevIdDetay2").innerHTML = $(this).data("gorevid");
+                document.getElementById("GorevDetay2").innerHTML = $(this).data("gorev");
+                document.getElementById("AdSoyadDetay2").innerHTML = $(this).data("personelad");
+                document.getElementById("TCKimlikNoDetay2").innerHTML = $(this).data("tckimlik");
+                var ceptel = $(this).data("ceptel").replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                document.getElementById("CepDetay2").innerHTML = ceptel;
+                var sabittel = $(this).data("sabittel").replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                document.getElementById("SabitDetay2").innerHTML = sabittel;
+                document.getElementById("EmailDetay2").innerHTML = $(this).data("email");
+                document.getElementById("CalismaSekliDetay2").innerHTML = $(this).data("calismasekli");
+                document.getElementById("UcretDetay2").innerHTML = $(this).data("ucret");
+                document.getElementById("IzinSuresiDetay2").innerHTML = $(this).data("izinsuresi");
+                document.getElementById("ToplamIzinSuresiDetay2").innerHTML = $(this).data("kalanizinsuresi");
+                document.getElementById("BaslamaDetay2").innerHTML = $(this).data("baslama");
+                if ($(this).data("bitis") == "01.01.2500") {
+                    document.getElementById("BitisDetay2").innerHTML = "";
+                }
+                else {
+                    document.getElementById("BitisDetay2").innerHTML = $(this).data("bitis");
+                }
+                document.getElementById("AdresDetay2").innerHTML = $(this).data("adres");
+                adres = $(this).data("adres");
+                // Personelin çalıştığı şubeler
+                $("#PerosnelSubeleriDetay").next($("input[type=checkbox]").each(function (i) { // Düzenle modal daki tüm checbox ların chek leri kaldırılıyor.
+                    if ($(this).data("subeiddetay") != undefined) {
+                        if ($(this).is(':checked')) {
+                            $(this).prop("checked", false);
+                        }
+                    }
+                }));
+                var subeler = [];
+                var datasubeler = $(this).data("subeler"); // tek şube yetkisi var ise split ile ayrılamıyor, bu nedenle virgül olup olmadığına bakarak yetki tek şubemi birden fazla şube mi anlaşılıyor.
+                var tek = datasubeler.toString().search(",");
+                if (tek == "-1") {
+                    $("#Detay-" + datasubeler).prop("checked", true);
+                }
+                else {
+                    subeler = [];
+                    subeler = $(this).data("subeler").split(',');
+                    for (var i = 0; i < subeler.length; i++) {
+                        $("#Detay-" + subeler[i]).prop("checked", true);
+                    }
+                }
+            });
+            $("#dtpersoneller").on('click', '.IzihHakkiEkle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#IzinHakkiEkleKaydet").val($(this).data("personelid"));
+            });
+            $("#dtpersoneller").on('click', '.durumdegistir', function () {
+                var id = $(this).data("personelid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Personeller/PersonelDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#Duzenle2").click(function () { // Detay penceresindeki "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $('#DetayModal2').modal('hide');
+                $('#KayitDuzenleModal').modal('show');
+                var kilitbit = $("#KilitBitDetay2").text();
+                var gorevid = $("#GorevIdDetay2").text();
+                var baslama = $("#BaslamaDetay2").text();
+                var email = $("#EmailDetay2").text();
+                if (kilitbit == true) {
+                    document.getElementById("PersonelGorevIdDuzenle").setAttribute("disabled", "");
+                    document.getElementById("BaslamaTarihiDuzenle").setAttribute("disabled", "");
+                    document.getElementById("EmailDuzenle").setAttribute("disabled", "");
+                }
+                else {
+                    document.getElementById("PersonelGorevIdDuzenle").removeAttribute("disabled", "");
+                    document.getElementById("BaslamaTarihiDuzenle").removeAttribute("disabled", "");
+                    document.getElementById("EmailDuzenle").removeAttribute("disabled", "");
+                }
+                $("#Guncelle").val($("#PersonelIdDetay2").text());
+                $("#Guncelle").data("eskiizin", $("#EskiIzinDetay2").text());
+                $("#PersonelGorevIdDuzenle").val($("#GorevIdDetay2").text());
+                $("#BaslamaTarihiDuzenle").val($("#BaslamaDetay2").text());
+                $("#CikisTarihiDuzenle").val($("#BitisDetay2").text());
+                $("#AdSoyadDuzenle").val($("#AdSoyadDetay2").text());
+                $("#TCKimlikNoDuzenle").val($("#TCKimlikNoDetay2").text());
+                $("#CepTelDuzenle").val($("#CepDetay2").text());
+                $("#SabitTelDuzenle").val($("#SabitDetay2").text());
+                $("#EmailDuzenle").val($("#EmailDetay2").text());
+                if ($("#CalismaSekliDetay2").text() == "Tam Zamanlı (Full Time)") { $("#CalismaSekliDuzenle").val("1"); }
+                if ($("#CalismaSekliDetay2").text() == "Yarı Zamanlı (Part Time)") { $("#CalismaSekliDuzenle").val("2"); }
+                if ($("#CalismaSekliDetay2").text() == "Dönemsel") { $("#CalismaSekliDuzenle").val("3"); }
+                if ($("#CalismaSekliDetay2").text() == "Serbest (Freelance)") { $("#CalismaSekliDuzenle").val("4"); }
+                if ($("#CalismaSekliDetay2").text() == "Günlük (İş Başı)") { $("#CalismaSekliDuzenle").val("5"); }
+                $("#UcretDuzenle").val($("#UcretDetay2").text());
+                $("#IzinSuresiDuzenle").val($("#IzinSuresiDetay2").text());
+                adres = adres.replace(/\<br \/\>/g, "\r\n")
+                $("#AdresDuzenle").val(adres);
+            });
+            $("#Guncelle").click(function () {
+                if ($("#PersonelGorevIdDuzenle").val() == "0") {
+                    $("#PersonelGorevIdDuzenle").focus();
+                    $("#gorevIdduzenleHata").append("<div id='gorevhata' style='color:red'>Personel Görevini Seçiniz.</div>");
+                }
+                else if ($("#AdSoyadDuzenle").val() == "") {
+                    $("#AdSoyadDuzenle").focus();
+                    $("#AdSoyadDuzenlehata").append("<div id='detayhata' style='color:red'>Personel Adını ve Soyadını Giriniz.</div>");
+                }
+                else if ($("#CepTelDuzenle").val() == "") {
+                    $("#CepTelDuzenle").focus();
+                    $("#CepTelDuzenlehata").append("<div id='detayhata' style='color:red'>Personelin Cep Telefon Numarasını Giriniz.</div>");
+                }
+                else {
+                    $('#KayitDuzenleModal').modal('hide');
+                    if ($("#SmsKabulDuzenle").is(':checked')) {
+                        smskabul = "Var";
+                    }
+                    else {
+                        smskabul = "Yok";
+                    }
+                    if ($("#EmailKabulDuzenle").is(':checked')) {
+                        emailkabul = "Var";
+                    }
+                    else {
+                        emailkabul = "Yok";
+                    }
+                    SubeListesi = [];
+                    $("#PersonelSubeleriDuzenle").next($("input[type=checkbox]").each(function (i) { // seçili checkboxlar diziye alınıyor.
+                        if ($(this).is(':checked') && $(this).data("tip") == 'subelerDuzenle') {
+                            SubeListesi.push($(this).data("subeidduzenle"))
+                        }
+                    }));
+                    var id = $(this).val();
+                    var eskiizin = $(this).data("eskiizin");
+                    var adsoyad = $("#AdSoyad").val();
+                    var PersonelData = new FormData();
+                    PersonelData.append("SubeListesi", SubeListesi);
+                    PersonelData.append("PersonelGorevId", $("#PersonelGorevIdDuzenle").val());
+                    PersonelData.append("AdSoyad", $("#AdSoyadDuzenle").val());
+                    PersonelData.append("TCKimlikNo", $("#TCKimlikNoDuzenle").val());
+                    PersonelData.append("CepTel", $("#CepTelDuzenle").val());
+                    PersonelData.append("SabitTel", $("#SabitTelDuzenle").val());
+                    PersonelData.append("Email", $("#EmailDuzenle").val());
+                    PersonelData.append("Adres", $("#AdresDuzenle").val());
+                    PersonelData.append("CalismaSekli", $("#CalismaSekliDuzenle").val());
+                    var ucret = $("#UcretDuzenle").val().replace(" TL", "");
+                    PersonelData.append("Ucret", ucret);
+                    PersonelData.append("IzinSuresi", $("#IzinSuresiDuzenle").val());
+                    PersonelData.append("EskiIzinSuresi", eskiizin);
+                    PersonelData.append("BaslamaTarihi", $("#BaslamaTarihiDuzenle").val().toString());
+                    PersonelData.append("BitisTarihi", $("#CikisTarihiDuzenle").val().toString());
+                    PersonelData.append("SmsKabul", smskabul);
+                    PersonelData.append("EmailKabul", emailkabul);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: PersonelData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Personeller/PersonelGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            $("#dtpersoneller").on('click', '.Sil', function () {
+                var id = $(this).data("personelid");
+                var personel = $(this).data("personelad");
+                Swal.fire(
+                    {
+                        title: "Kayıt Silinecek",
+                        html: "<p><h2 style='font-size:16px; color:red'><strong>Ad-Soyad : </strong>" + personel + "</h2></p><h2> Personel silinsin mi?</h2>",
+                        type: "error",
+                        showCancelButton: true,
+                        confirmButtonText: "Evet, Silinsin!",
+                        cancelButtonText: "İptal"
+                    }).then(function (result) {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                contentType: false,
+                                processData: false,
+                                url: "/Otomasyon/Personeller/PersonelSil/" + id,
+                                success: function (data) { // Personel ile ilgili diğer tablolarda kayıt var ise silinemeyecek uyarı verecek.
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        dt.api().ajax.reload();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            });
+            $("#Sil2").click(function () {
+                var id = $("#PersonelIdDetay2").text();
+                var personel = $("#AdSoyadDetay2").text();
+                Swal.fire(
+                    {
+                        title: "Kayıt Silinecek",
+                        html: "<p><h2 style='font-size:16px; color:red'><strong>Ad-Soyad : </strong>" + personel + "</h2></p><h2> Personel silinsin mi?</h2>",
+                        type: "error",
+                        showCancelButton: true,
+                        confirmButtonText: "Evet, Silinsin!",
+                        cancelButtonText: "İptal"
+                    }).then(function (result) {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                contentType: false,
+                                processData: false,
+                                url: "/Otomasyon/Personeller/PersonelSil/" + id,
+                                success: function (data) { // Personel ile ilgili diğer tablolarda kayıt var ise silinemeyecek uyarı verecek.
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        dt.api().ajax.reload();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            });
+            $("#OdemeKaydet").click(function () {
+                var persid = $(this).val();
+                if ($("#OdemeUcret").val() == "0,00 TL") {
+                    $("#OdemeUcret").focus();
+                    $("#OdemeUcretHata").append("<div class='hata' style='color:red'>Bir Ücret giriniz!</div>");
+                }
+                else {
+                    $('#OdemeEkleModal').modal('hide');
+                    var ucret = $("#OdemeUcret").val().replace(" TL", "");
+                    var OdemeTuru = $("#OdemeTuru").find("option:selected ").text();
+                    var OdemeSekli = $("#OdemeSekli").find("option:selected ").text();
+                    var OdemeData = new FormData();
+                    OdemeData.append("PersonelId", persid);
+                    OdemeData.append("OdemeTarihi", $("#OdemeTarihi").val().toString());
+                    OdemeData.append("OdemeTuru", OdemeTuru);
+                    OdemeData.append("OdemeSekli", OdemeSekli);
+                    OdemeData.append("Ucret", ucret);
+                    OdemeData.append("Aciklama", $("#OdemeAciklama").val());
+                    //IzinData.forEach((value, key) => { console.log(key + " = " + value) });
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: OdemeData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Personeller/PersonelOdemeEkle/",
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                //dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            }); // Yeni Kayıt Modal KAYDET
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            // Tablo Filtreleme işlemleri
+            $.fn.dataTableExt.afnFiltering.push(
+                function (Settings, Data, DataIndex) {
+                    var subeadi = $("#Sube").val(); // Filtre için seçilen şube
+                    var personelgorev = $("#PersonelGorev").val();
+                    console.log(personelgorev);
+                    var pasifgizle = document.getElementById("PasifGizle");
+                    var gorev, aktif, gorevlisubeler;
+                    gorev = Data[4];
+                    aktif = Data[10];
+                    gorevlisubeler = Data[13]; // Tablodaki subeler
+                    if (!pasifgizle.checked) {
+                        if (subeadi == 0 && personelgorev == 0)
+                            return true;
+                        else if (subeadi == 0 && personelgorev == gorev)
+                            return true;
+                        else if ((gorevlisubeler.indexOf(subeadi) != "-1"))
+                            return true;
+                        else if ((gorevlisubeler.indexOf(subeadi) != "-1"))
+                            return true;
+                        else
+                            return false;
+                    }
+                    else {
+                        
+                        if (subeadi == 0 && personelgorev == 0 && aktif == "true")
+                            return true;
+                        else if (subeadi == 0 && personelgorev == gorev && aktif == "true")
+                            return true;
+                        else if ((gorevlisubeler.indexOf(subeadi) != "-1") && personelgorev == 0 && aktif == "true")
+                            return true;
+                        else if ((gorevlisubeler.indexOf(subeadi) != "-1") && personelgorev == gorev && aktif == "true")
+                            return true;
+                        else {
+                           
+                            return false;
+                        }
+                    }
+                    //if (eskigoster.checked) {
+
+                    //}
+                    //else {
+                    //    if (pasifgizle.checked) {
+                    //        if (subeadi == 0 && personelgorev == 0 && Data[7] == "" && aktif == "true")
+                    //            return true;
+                    //        else if (subeadi == 0 && personelgorev == gorev && Data[7] == "" && aktif == "true")
+                    //            return true;
+                    //        else if ((gorevlisubeler.indexOf(subeadi) != "-1") && personelgorev == 0 && Data[7] == "" && aktif == "true")
+                    //            return true;
+                    //        else if ((gorevlisubeler.indexOf(subeadi) != "-1") && personelgorev == gorev && Data[7] == "" && aktif == "true")
+                    //            return true;
+                    //        else
+                    //            return false;
+                    //    }
+                    //    else {
+                    //        if (subeadi == 0 && personelgorev == 0 && Data[7] == "")
+                    //            return true;
+                    //        else if (subeadi == 0 && personelgorev == gorev && Data[7] == "")
+                    //            return true;
+                    //        else if ((gorevlisubeler.indexOf(subeadi) != "-1") && personelgorev == 0 && Data[7] == "")
+                    //            return true;
+                    //        else if ((gorevlisubeler.indexOf(subeadi) != "-1") && personelgorev == gorev && Data[7] == "")
+                    //            return true;
+                    //        else
+                    //            return false;
+                    //    }
+                    //}
+                });
+            //Tablo Filtreleme işlemleri
+            dt = $('#dtpersoneller').dataTable(
+                {
+                    "createdRow": function (row, data, dataIndex) {
+                        if (data["Aktif"] == false) {
+                            //$(row).addClass('bg-warning-100 text-white');
+                            $('td', row).addClass('bg-danger-100');
+                        }
+                    },
+                    responsive: true,
+                    "destroy": true,
+                    "order": [[2, "asc"], [10, "desc"]],
+                    "columns": [
+                        { "data": "Firma", "autowidth": true, "visible": false },
+                        { "data": "Sube", "autowidth": true, "visible": false },
+                        { "data": "AdSoyad", "autowidth": true, "className": "align-middle", "visible": false },
+                        { "data": "AdSoyad", "autowidth": true, "className": "align-middle" },
+                        { "data": "Gorev", "autowidth": true, "className": "align-middle" },
+                        {
+                            "data": null, "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+
+                                return row.CepTel.replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                            }
+                        },
+                        { "data": "Email", "autowidth": true, "className": "align-middle" },
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                var baslamatarihi = row.BaslamaTarihi;
+                                var tarih = dateFormat(new Date(parseInt(baslamatarihi.match(/\d+/)[0])));
+                                return tarih
+                            }
+                        },
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                var bitistarihi = row.BitisTarihi;
+                                var tarih = dateFormat(new Date(parseInt(bitistarihi.match(/\d+/)[0])));
+                                if (tarih == "01.01.2500") {
+                                    return ""
+                                }
+                                else {
+                                    return tarih
+                                }
+
+                            }
+                        },
+                        { "data": "KalanIzin", "autowidth": true, "className": "align-middle" },
+                        { "data": "Aktif", "autowidth": true, "visible": false, "className": "align-middle" },
+                        {
+                            "data": null,
+                            "className": "align-middle text-center",
+                            "render": function (data, type, row) {
+                                islem = "";
+                                if (row.KilitBit == false) {
+                                    if (DuzenleYetki == "True") {
+                                        if (row.Aktif == true) {
+                                            islem = islem + "<div class='custom-control custom-checkbox custom-checkbox-circle'>" +
+                                                "<input type='checkbox' class='custom-control-input durumdegistir' id='Aktif-" + row.Id + "' data-personelid='" + row.Id + "' checked=''>" +
+                                                "<label class='custom-control-label' for='Aktif-" + row.Id + "'></label>" +
+                                                "</div>"
+                                        }
+                                        else {
+                                            islem = islem + "<div class='custom-control custom-checkbox custom-checkbox-circle'>" +
+                                                "<input type='checkbox' class='custom-control-input durumdegistir' id='Aktif-" + row.Id + "' data-personelid='" + row.Id + "'>" +
+                                                "<label class='custom-control-label' for='Aktif-" + row.Id + "'></label>" +
+                                                "</div>"
+                                        }
+                                    }
+                                    else {
+                                        if (row.Aktif == true) {
+                                            islem = islem + "<div class='custom-control custom-checkbox custom-checkbox-circle'>" +
+                                                "<input type='checkbox' class='custom-control-input' id='Aktif-" + row.Id + "' checked='' disabled>" +
+                                                "<label class='custom-control-label' for='Aktif-" + row.Id + "'></label>" +
+                                                "</div>"
+                                        }
+                                        else {
+                                            islem = islem + "<div class='custom-control custom-checkbox custom-checkbox-circle'>" +
+                                                "<input type='checkbox' class='custom-control-input' id='Aktif-" + row.Id + "' disabled>" +
+                                                "<label class='custom-control-label' for='Aktif-" + row.Id + "'></label>" +
+                                                "</div>"
+                                        }
+                                    }
+                                }
+                                return islem
+                            }
+                        }, // Aktif / Pasif
+                        {
+                            "data": null,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                var baslangic = row.BaslamaTarihi;
+                                var bitis = row.BitisTarihi;
+                                var baslangictarih = dateFormat(new Date(parseInt(baslangic.match(/\d+/)[0])));
+                                var bitistarih;
+                                if (bitis == null) {
+                                    bitistarih = "";
+                                }
+                                else {
+                                    bitistarih = dateFormat(new Date(parseInt(bitis.match(/\d+/)[0])));
+                                }
+                                islem = "";
+                                if (DetayYetki == "True") {
+                                    islem = islem + "<a href='#'class='btn btn-xs btn-success btn-icon mr-1 Detay' data-personelid='" + row.Id + "' data-subeadi='" + row.Sube + "' data-personelad='" + row.AdSoyad + "' data-gorev='" + row.Gorev + "' data-kalanizinsuresi='" + row.KalanIzin + "'" +
+                                        " data-tckimlik='" + row.TCKimlikNo + "' data-baslama='" + baslangictarih + "' data-bitis='" + bitistarih + "' data-gorevid='" + row.GorevId + "' data-calismasekli='" + row.CalismaSekli + "' data-ucret='" + row.Ucret + "' data-izinsuresi='" + row.YillikIzinHakki + "'" +
+                                        " data-sabittel='" + row.SabitTel + "' data-ceptel='" + row.CepTel + "' data-email='" + row.Email + "' data-adres='" + row.Adres + "' data-kilitbit='" + row.KilitBit + "' data-subeler='" + row.Subeler + "' data-toggle='modal' data-target='#DetayModal2' title='Detay'>" +
+                                        "<i class='fal fa-eye'></i>" +
+                                        "</a>"
+                                }
+                                if (DuzenleYetki == "True") {
+                                    if (row.KilitBit == false) {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon mr-1 Duzenle' data-personelid='" + row.Id + "' data-personelad='" + row.AdSoyad + "' data-gorev='" + row.Gorev + "' data-kilitbit='" + row.KilitBit + "' data-smskabul='" + row.SmsKabul + "' data-emailkabul='" + row.EmailKabul + "'" +
+                                            " data-tckimlik='" + row.TCKimlikNo + "' data-baslama='" + baslangictarih + "' data-bitis='" + bitistarih + "'  data-gorevid='" + row.GorevId + "' data-calismasekli='" + row.CalismaSekli + "' data-ucret='" + row.Ucret + "' data-izinsuresi='" + row.KalanIzin + "'" +
+                                            " data-sabittel='" + row.SabitTel + "' data-ceptel='" + row.CepTel + "' data-email='" + row.Email + "' data-adres='" + row.Adres + "' data-subeler='" + row.Subeler + "' data-toggle='modal' data-target='#KayitDuzenleModal' title='Düzenle'>" +
+                                            "<i class='fal fa-edit'></i>" +
+                                            "</a>"
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-warning btn-icon mr-1 IzihHakkiEkle' data-personelid='" + row.Id + "' data-personelad='" + row.AdSoyad + "' data-gorev='" + row.Gorev + "' data-kilitbit='" + row.KilitBit + "' data-smskabul='" + row.SmsKabul + "' data-emailkabul='" + row.EmailKabul + "'" +
+                                            " data-tckimlik='" + row.TCKimlikNo + "' data-baslama='" + baslangictarih + "' data-bitis='" + bitistarih + "'  data-gorevid='" + row.GorevId + "' data-calismasekli='" + row.CalismaSekli + "' data-ucret='" + row.Ucret + "' data-izinsuresi='" + row.KalanIzin + "'" +
+                                            " data-sabittel='" + row.SabitTel + "' data-ceptel='" + row.CepTel + "' data-email='" + row.Email + "' data-adres='" + row.Adres + "' data-subeler='" + row.Subeler + "' data-toggle='modal' data-target='#IzinHakkiEkleModal' title='İzin Hakkı Ekle'>" +
+                                            "<i class='fal fa-calendar-plus'></i>" +
+                                            "</a>"
+                                    }
+                                }
+                                if (EkleYetki == "True") {
+                                    islem = islem + "<a href='#'class='btn btn-xs btn-info btn-icon mr-1 OdemeEkle' data-personelid='" + row.Id + "' data-personelad='" + row.AdSoyad + "'" +
+                                        "data-toggle='modal' data-target='#OdemeEkleModal' title='Ödeme Ekle'>" +
+                                        "<i class='fal fa-lira-sign'></i>" +
+                                        "</a>"
+                                }
+                                if (row.KilitBit == false) {
+                                    if (SilYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon mr-1 Sil' data-personelid='" + row.Id + "' data-personelad='" + row.AdSoyad + "' style='background-color:crimson;' title='Sil'>" +
+                                            "<i class='fal fa-trash-alt'></i>" +
+                                            "</a>"
+                                    }
+                                }
+                                return islem
+                            }
+                        }, // İşlem
+                        { "data": "Subeler", "autowidth": true, "visible": false },
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "visible": false,
+                            "render": function (data, type, row) {
+                                var bitistarihi = row.BitisTarihi;
+                                var tarih = dateFormat(new Date(parseInt(bitistarihi.match(/\d+/)[0])));
+                                return tarih
+                            }
+                        }
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Otomasyon/Personeller/PersonelListesi/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "processing": "Yükleniyor... Lütfen Bekleyin",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+
+            $("input[name='IzinSuresi']").TouchSpin();
+            $("input[name='IzinSuresiDuzenle']").TouchSpin();
+            $("#CikisTarihiDuzenle").click(function () {
+                $('#CikisTarihiDuzenle').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+            });
+
+
+            $("#Sube").change(function () { dt.fnDraw(); });
+            $("#PersonelGorev").change(function () { dt.fnDraw(); });
+            $("#PasifGizle").change(function () { dt.fnDraw(); });
+        });
+
+    </script>
+}
+

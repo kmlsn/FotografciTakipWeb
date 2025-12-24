@@ -1,0 +1,360 @@
+﻿
+@{
+    ViewBag.Title = "Siparisler";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model List<PersonelGorevleri>
+
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <table id="tb-siparisler" class="table table-sm table-bordered table-hover table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th style="display:none">Id</th>
+                                <th>Id</th>
+                                <th>SiparisNo</th>
+                                <th>Firma</th>
+                                <th>Paket</th>
+                                <th>PaketTutar</th>
+                                <th>LisansSuresi</th>
+                                <th>Durum</th>
+                                <th>Tarih</th>
+                                <th style="display:none">İptal</th>
+                                <th style="display:none">Sil</th>
+                                <th>DosyaYol</th>
+                                <th>OdemeBildirimAciklama</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="siparis-satir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        function dateFormat(d) {
+            return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+        }
+        function dateFormat2(d) {
+            return d.getFullYear() + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + (d.getDate() + "").padStart(2, "0");
+        }
+        function ParaFormat(fiyat) {
+            var para_sembol = "TL"
+            var format = new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: 'TRY',
+                minumumFractionDigits: 2
+            })
+            //return format.format(fiyat)
+            return format.format(fiyat).replace('TRY', para_sembol)
+        }
+        $(document).ready(function () {
+            var dt;
+            var islem;
+            dt = $('#tb-siparisler').dataTable(
+                {
+                    responsive: true,
+                    "destroy": true,
+                    "order": [[0, "asc"]],
+                    "searching": true, // arama kaldır
+                    "lengthChange": true, // sayfa başına göster kaldır
+                    "createdRow": function (row, data, dataIndex) {
+                        if (data["Iptal"] == true) {
+                            $('td', row).addClass('bg-warning-700 text-white');
+                            $('a', row).addClass('text-white');
+                        }
+                        if (data["Sil"] == true || data["Durum"] == 4) {
+                            $('td', row).addClass('bg-danger-700 text-white');
+                            $('a', row).addClass('text-white');
+                        }
+                        if (data["Durum"] == 2) {
+                            $('td', row).addClass('bg-success-700 text-white');
+                            $('a', row).addClass('text-white');
+                        }
+                        if (data["Durum"] == 0) {
+                            $('td', row).addClass('bg-primary-700 text-white');
+                            $('a', row).addClass('text-white');
+                        }
+                    },
+                    "columns": [
+                        { "data": "SiparisId", "autowidth": true, "visible": false },
+                        { "data": "SiparisId", "autowidth": true },
+                        { "data": "SiparisNo", "autowidth": true },
+                        { "data": "FirmaAdi", "autowidth": true },
+                        { "data": "Paket", "autowidth": true },
+                        { // PaketTutar
+                            "data": null,
+                            "autowidth": true,
+                            "render": function (data, type, row) {
+                                return ParaFormat(row.PaketTutar)
+                            }
+                        }, // PaketTutar
+                        { // LisansSuresi
+                            "data": null,
+                            "autowidth": true,
+                            "render": function (data, type, row) {
+                                //0: Tek Kullanımlık 1: 1AY, 2: 3AY, 3: 6AY, 4: 12AY(1YIL), 5: 24AY(2YIL), 6: 36AY(3YIL)
+                                islem = "";
+                                if (row.LisansSuresi == 0) {
+                                    islem="SMS"
+                                }
+                                else if (row.LisansSuresi == 1) {
+                                    islem = "1 AY"
+                                }
+                                else if (row.LisansSuresi == 3) {
+                                    islem = "3 AY"
+                                }
+                                else if (row.LisansSuresi == 6) {
+                                    islem = "6 AY"
+                                }
+                                else if (row.LisansSuresi == 12) {
+                                    islem = "1 YIL"
+                                }
+                                else if (row.LisansSuresi == 24) {
+                                    islem = "2 YIL"
+                                }
+                                else if (row.LisansSuresi == 36) {
+                                    islem = "3 YIL"
+                                }
+                                return islem
+                            }
+                        }, // LisansSuresi
+                        {  // Durum
+                            "data": null,
+                            //"className": "text-center align-middle",
+                            "render": function (data, type, row) {
+                                islem = "";
+                                //  0: Onay Bekliyor
+                                //  1: Onaylandı
+                                //  2: Tamamlandı
+                                //  3: İptal Edildi
+                                //  4: Ödeme Başarısız
+                                //  5: Ödeme Bekliyor
+                                if (row.Durum==0) {
+                                    islem ="Onay Bekliyor"
+                                }
+                                else if (row.Durum == 1) {
+                                    islem = "Onaylandı"
+                                }
+                                else if (row.Durum == 2) {
+                                    islem = "Tamamlandı"
+                                }
+                                else if (row.Durum == 3) {
+                                    islem = "İptal Edildi"
+                                }
+                                else if (row.Durum == 4) {
+                                    islem = "Ödeme Başarısız"
+                                }
+                                else if (row.Durum == 5) {
+                                    islem = "Ödeme Bekliyor"
+                                }
+                                return islem
+                            }
+                        },  // Durum
+                        {  //Tarih
+                            "data": null,
+                            //"className": "text-center align-middle",
+                            "render": function (data, type, row) {
+                                var t = row.Tarih;
+                                var tarih = dateFormat(new Date(parseInt(t.match(/\d+/)[0])));
+                                return tarih
+                            }
+                        }, //Tarih
+                        { "data": "Iptal", "autowidth": true, "visible": false },
+                        { "data": "Sil", "autowidth": true, "visible": false },
+                        { "data": "DosyaYol", "autowidth": true },
+                        { "data": "OdemeBildirimAciklama", "autowidth": true },
+                        { // İşlem
+                            "data": null,
+                            //"className": "text-center align-middle",
+                            "render": function (data, type, row) {
+                                islem = "";
+                                if (row.Durum==0) {
+                                    islem = islem + "<a href='#' class='btn btn-sm btn-info btn-icon mr-1 siparisonay' title='Sipariş Onayla' data-siparisid='" + row.SiparisId + "' data-siparisno='" + row.SiparisNo + "' data-tutar='" + ParaFormat(row.PaketTutar) + "'>" +
+                                        "<i class='fal fa-check-circle'></i>" +
+                                        "</a>"
+                                }
+                                if (row.Iptal == 0) {
+                                    islem = islem + "<a href='#' class='btn btn-sm btn-warning btn-icon mr-1 siparisiptal' title='Sipariş İptal' data-siparisid='" + row.SiparisId + "' data-siparisno='" + row.SiparisNo + "' data-tutar='" + ParaFormat(row.PaketTutar) + "'>" +
+                                        "<i class='fal fa-times-circle'></i>" +
+                                        "</a>"
+                                }
+                                if (row.Sil==0) {
+                                    islem = islem + "<a href='#' class='btn btn-sm btn-danger btn-icon mr-1 siparissil' title='Sipariş Sil' data-siparisid='" + row.SiparisId + "' data-siparisno='" + row.SiparisNo + "' data-tutar='" + ParaFormat(row.PaketTutar) + "'>" +
+                                        "<i class='fal fa-trash-alt'></i>" +
+                                        "</a>"
+                                }
+                                return islem
+                            }
+                        } // İşlem
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Admin/Siparisler/SiparislerListesi/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'type': 'POST',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+
+            $("#tb-siparisler").on('click', '.siparissil', function () {
+                var id = $(this).data("siparisid");
+                var siparisno = $(this).data("siparisno");
+                var tutar = $(this).data("tutar");
+               
+                Swal.fire(
+                    {
+                        title: "Sipariş Silinecek",
+                        html: "<p><h2 style='font-size:16px; color:red'><strong>Sipariş No : </strong>" + siparisno + "</br><strong>Tutar : </strong>" + tutar + "</br></h2></p><h2> Sipariş silinsin mi?</h2>",
+                        type: "error",
+                        showCancelButton: true,
+                        confirmButtonText: "Evet, Silinsin!",
+                        cancelButtonText: "İptal"
+                    }).then(function (result) {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                contentType: false,
+                                processData: false,
+                                url: "/Admin/Siparisler/SiparisSil/" + id,
+                                success: function (data) {
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        dt.api().ajax.reload();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            });
+
+            $("#tb-siparisler").on('click', '.siparisiptal', function () {
+                var id = $(this).data("siparisid");
+                var siparisno = $(this).data("siparisno");
+                var tutar = $(this).data("tutar");
+
+                Swal.fire(
+                    {
+                        title: "Sipariş İptal Edilecek",
+                        html: "<p><h2 style='font-size:16px; color:red'><strong>Sipariş No : </strong>" + siparisno + "</br><strong>Tutar : </strong>" + tutar + "</br></h2></p><h2> Sipariş iptal edilsin mi?</h2>",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Evet, İptal Et!",
+                        cancelButtonText: "İptal"
+                    }).then(function (result) {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                contentType: false,
+                                processData: false,
+                                url: "/Admin/Siparisler/SiparisIptal/" + id,
+                                success: function (data) {
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        dt.api().ajax.reload();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            });
+
+            $("#tb-siparisler").on('click', '.siparisonay', function () {
+                var id = $(this).data("siparisid");
+                var siparisno = $(this).data("siparisno");
+                var tutar = $(this).data("tutar");
+
+                Swal.fire(
+                    {
+                        title: "Sipariş Onay",
+                        html: "<p><h2 style='font-size:16px; color:red'><strong>Sipariş No : </strong>" + siparisno + "</br><strong>Tutar : </strong>" + tutar + "</br></h2></p><h2> Sipariş onaylansın mı?</h2>",
+                        type: "info",
+                        showCancelButton: true,
+                        confirmButtonText: "Evet, Onayla!",
+                        cancelButtonText: "İptal"
+                    }).then(function (result) {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                contentType: false,
+                                processData: false,
+                                url: "/Admin/Siparisler/SiparisOnay/" + id,
+                                success: function (data) {
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        dt.api().ajax.reload();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            });
+        });
+
+
+    </script>
+
+    }
+
+

@@ -1,0 +1,59 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool personelleryetki = ky.FirstOrDefault(x => x.SayfaId == 8 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 8 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool personellistesiyetki = ky.FirstOrDefault(x => x.SayfaId == 68 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 68 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool personelizinleryetki = ky.FirstOrDefault(x => x.SayfaId == 69 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 69 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool personeltakibiyetki = ky.FirstOrDefault(x => x.SayfaId == 70 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 70 && x.Sil == false && x.Aktif == true).SayfaYetki;
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Personeller" ? "active open" : "";
+    string altmenupersonellistesi = ViewBag.AltMenu == "Personel Listesi" ? "active" : "";
+    string altmenupersonelizinleri = ViewBag.AltMenu == "Personel İzinleri" ? "active" : "";
+    string altmenupersoneltakibi = ViewBag.AltMenu == "Personel Takibi" ? "active" : "";
+}
+@if (personelleryetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Personeller" data-filter-tags="personeller">
+            <i class="fal fa-id-card-alt"></i>
+            <span class="nav-link-text" data-i18n="nav.personeller">Personeller</span>
+        </a>
+        <ul>
+            @if (lisans.Personeller_PersonelListesi)
+            {
+                if (personellistesiyetki)
+                {
+                    <li class=@altmenupersonellistesi>
+                        <a href="~/Admin/Personeller/Personeller" title="Personeller" data-filter-tags="personeller personel listesi">
+                            <span class="nav-link-text" data-i18n="nav.personeller_personel_listesi">Personel Listesi</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Personeller_PersonelIzinleri)
+            {
+                if (personelizinleryetki)
+                {
+                    <li class=@altmenupersonelizinleri>
+                        <a href="~/Admin/Personeller/PersonelIzinleri" title="Personel İzinleri" data-filter-tags="personeller personel izinleri">
+                            <span class="nav-link-text" data-i18n="nav.personeller_personel_izinleri">Personel İzinleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Personeller_PersonelTakibi)
+            {
+                if (personeltakibiyetki)
+                {
+                    <li class=@altmenupersoneltakibi>
+                        <a href="~/Admin/Personeller/PersonelTakibi" title="Personel Takibi" data-filter-tags="personeller personel takibi">
+                            <span class="nav-link-text" data-i18n="nav.personeller_personel_takibi">Personel Takibi</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}

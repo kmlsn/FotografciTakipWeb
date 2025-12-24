@@ -1,0 +1,73 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool rezervasyonyetki = ky.FirstOrDefault(x => x.SayfaId == 2 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 2 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rezervasyontakvimiyetki = ky.FirstOrDefault(x => x.SayfaId == 20 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 20 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rezervasyonlistesiyetki = ky.FirstOrDefault(x => x.SayfaId == 21 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 21 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rezervasyonteklifleriyetki = ky.FirstOrDefault(x => x.SayfaId == 22 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 22 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool randevularyetki=ky.FirstOrDefault(x => x.SayfaId == 23 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 23 && x.Sil == false && x.Aktif == true).SayfaYetki;
+
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Rezervasyon İşlemleri" ? "active open" : "";
+    string altmenurezervasyontakvimi = ViewBag.AltMenu == "Rezervasyon Takvimi" ? "active" : "";
+    string altmenurezervasyonlistesi = ViewBag.AltMenu == "Rezervasyon Listesi" ? "active" : "";
+    string altmenurezervasyonteklifleri = ViewBag.AltMenu == "Rezervasyon Teklifleri" ? "active" : "";
+    string altmenurandevular = ViewBag.AltMenu == "Randevular" ? "active" : "";
+}
+@if (rezervasyonyetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Rezervasyon İşlemleri" data-filter-tags="rezervasyon işlemleri">
+            <i class="fal fa-calendar-alt"></i>
+            <span class="nav-link-text" data-i18n="nav.rezervasyon_islemleri">Rezervasyon İşlemleri</span>
+        </a>
+        <ul>
+            @if (lisans.RezervasyonIslemleri_RezervasyonTakvimi)
+            {
+                if (rezervasyontakvimiyetki)
+                {
+                    <li class=@altmenurezervasyontakvimi>
+                        <a href="~/Admin/RezervasyonIslemleri/RezervasyonTakvimi" title="Rezervasyon Takvimi" data-filter-tags="rezervasyon işlemleri rezervasyon takvimi">
+                            <span class="nav-link-text" data-i18n="nav.rezervasyon_islemleri_rezervasyon_takvimi">Rezervasyon Takvimi</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.RezervasyonIslemleri_RezervasyonListesi)
+            {
+                if (rezervasyonlistesiyetki)
+                {
+                    <li class=@altmenurezervasyonlistesi>
+                        <a href="~/Admin/RezervasyonIslemleri/RezervasyonListesi" title="Rezervasyon Listesi" data-filter-tags="rezervasyon işlemleri rezervasyon listesi">
+                            <span class="nav-link-text" data-i18n="nav.rezervasyon_islemleri_rezervasyon_listesi">Rezervasyon Listesi</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.RezervasyonIslemleri_RezervasyonTeklifleri)
+            {
+                if (rezervasyonteklifleriyetki)
+                {
+                    <li class=@altmenurezervasyonteklifleri>
+                        <a href="~/Admin/RezervasyonIslemleri/RezervasyonTeklifleri" title="Rezervasyon Teklifleri" data-filter-tags="rezervasyon işlemleri rezervasyon teklifleri">
+                            <span class="nav-link-text" data-i18n="nav.rezervasyon_islemleri_rezervasyon_teklifleri">Rezervasyon Teklifleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.RezervasyonIslemleri_Randevular)
+            {
+                if (randevularyetki)
+                {
+                    <li class=@altmenurandevular>
+                        <a href="~/Admin/RezervasyonIslemleri/Randevular" title="Randevular" data-filter-tags="rezervasyon işlemleri randevular">
+                            <span class="nav-link-text" data-i18n="nav.rezervasyon_islemleri_randevular">Randevular</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}

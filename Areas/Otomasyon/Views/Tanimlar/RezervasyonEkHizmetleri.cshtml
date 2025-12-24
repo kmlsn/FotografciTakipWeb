@@ -1,0 +1,452 @@
+﻿
+@{
+    ViewBag.Title = "Tanımlar - Rezervasyon Ek Hizmetleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Rezervasyon Ek Hizmeti Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="ekhizmethata">
+                                <label class="form-label" for="ekhizmet">Ek Hizmet Adı <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control" id="ekhizmet" placeholder="Ek Hizmet Adı" name="EkHizmetAdi" maxlength="50" required>
+                                <div class="invalid-feedback">
+                                    Ek Hizmet Adını giriniz!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row form-group">
+                            <div class="col-12 mb-3">
+                                <label class="form-label" for="aciklama">Açıklama <span class="text-danger"></span></label>
+                                <textarea class="form-control" id="aciklama" placeholder="Açıklama" rows="10" name="Aciklama" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label" for="fiyat">Fiyat </label>
+                                <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control" name="Fiyat" maxlength="50" id="fiyat">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="HizmetKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="ekhizmetduzenlehata">
+                                <label class="form-label" for="ekhizmetduzenle">Ek Hizmet Adı <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control" id="ekhizmetduzenle" placeholder="Ek Hizmet Adı" name="EkHizmetAdi" maxlength="50" required>
+                                <div class="invalid-feedback">
+                                    Ek Hizmet Adını giriniz!
+                                </div>
+                            </div>
+                            <div class="form-row form-group">
+                                <div class="col-12 mb-3">
+                                    <label class="form-label" for="aciklama">Açıklama <span class="text-danger"></span></label>
+                                    <textarea class="form-control" id="aciklamaduzenle" placeholder="Açıklama" rows="10" name="Aciklama" style="overflow:auto;resize:none"></textarea>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label" for="fiyat">Fiyat </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control" name="Fiyat" maxlength="50" id="fiyatduzenle">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="HizmetGuncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            @if (KullaniciYetki.KayitEkle)
+            {
+                <div class="panel-hdr">
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle">Yeni Rezervasyon Ek Hizmeti Ekle</button>
+                </div>
+            }
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtEkHizmetler" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Ek Hizmet Adı</th>
+                                <th>Açıklama</th>
+                                <th>Fiyat</th>
+                                <th class="w-10">Durum</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ekhizmetlersatir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        function ParaFormat(fiyat) {
+            var para_sembol = "TL"
+            var format = new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: 'TRY',
+                minumumFractionDigits: 2
+            })
+            //return format.format(fiyat)
+            return format.format(fiyat).replace('TRY', para_sembol)
+        }
+        $(document).ready(function () {
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $("#ekhizmet").val("");
+                $("#aciklama").val("");
+                $("#fiyat").val("0");
+            })
+            $("#HizmetKaydet").click(function () {
+                if ($("#ekhizmet").val() == "") {
+                    $("#ekhizmet").focus();
+                    $("#ekhizmethata").append("<div class='hata' style='color:red'>Rezervasyon Ek Hizmeti Adını Giriniz.</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var ekhizmet = $("#ekhizmet").val();
+                    var fiyat = $("#fiyat").val().replace(" TL", "");
+                    var HizmetData = new FormData();
+                    HizmetData.append("EkHizmetAdi", $("#ekhizmet").val());
+                    HizmetData.append("Aciklama", $("#aciklama").val());
+                    HizmetData.append("Fiyat", fiyat);
+                    HizmetData.forEach((value, key) => { console.log(key + " = " + value) });
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: HizmetData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/RezervasyonEkHizmetiVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: HizmetData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Tanimlar/RezervasyonEkHizmetiEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                            {
+                                Swal.fire(
+                                {
+                                    title: "Varolan Kayıt",
+                                    html: "<p><h2 style='font-size:16px; color:red'><strong>Rezervasyon Ek Hizmeti : </strong>" + ekhizmet + "</br><h2> Rezervasyon Ek Hizmeti zaten var!</h2>",
+                                    type: "warning"
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtEkHizmetler").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#HizmetGuncelle").val($(this).data("hizmetid"))
+                $("#ekhizmetduzenle").val($(this).data("ekhizmet"));
+                var aciklama = $(this).data("aciklama").replace(/\<br \/\>/g, "\r\n")  // textarea daki bilgi veri tabanına kaydedilirken "\r\n" karakterleri "<br />" tagına dönüştürülmüştü, bura da da tersi yapılıyor.
+                $("#aciklamaduzenle").val(aciklama);
+                var ff = $(this).data("fiyat");
+                ff = ParaFormat(ff);
+                $("#fiyatduzenle").val(ff);
+
+            });
+            $("#HizmetGuncelle").click(function () {
+                if ($("#ekhizmetduzenle").val() == "") {
+                    $("#ekhizmetduzenle").focus();
+                    $("#ekhizmetduzenlehata").append("<div class='hata' style='color:red'>Rezervasyon Ek Hizmeti Adını Giriniz.</div>");
+                }
+                else {
+                    $('#KayitDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    var fiyat = $("#fiyatduzenle").val().replace(" TL", "");
+                    var HizmetData = new FormData();
+                    HizmetData.append("EkHizmetAdi", $("#ekhizmetduzenle").val());
+                    HizmetData.append("Aciklama", $("#aciklamaduzenle").val());
+                    HizmetData.append("Fiyat", fiyat);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: HizmetData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/RezervasyonEkHizmetiGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtEkHizmetler").on('click', '.Sil', function () {
+                var id = $(this).data("hizmetid");
+                var ekhizmet = $(this).data("ekhizmet");
+                Swal.fire(
+                {
+                    title: "Kayıt Silinecek",
+                    html: "<p><h2 style='font-size:16px; color:red'><strong>Rezervasyon Ek Hizmeti : </strong>" + ekhizmet + "</br><h2> Rezervasyon Ek Hizmeti silinsin mi?</h2>",
+                    type: "error",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Silinsin!",
+                    cancelButtonText: "İptal"
+                }).then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Tanimlar/RezervasyonEkHizmetiSil/" + id,
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            });
+            $("#dtEkHizmetler").on('click', '.durumdegistir', function () {
+                var id = $(this).data("hizmetid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/RezervasyonEkHizmetiDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.7
+            var dt;
+            var islem;
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            dt = $('#dtEkHizmetler').dataTable(
+                    {
+                        responsive: true,
+                        "destroy": true,
+                        "columns": [
+                                    { "data": "EkHizmetAdi", "autowidth": true, "className": "align-middle" },
+                                    { "data": "Aciklama", "autowidth": true },
+                                     {
+                                         "data": null,
+                                         "autowidth": true,
+                                         "className": "align-middle",
+                                         "render": function (data, type, row) {
+                                             return ParaFormat(row.Fiyat)
+                                         }
+                                     },
+                                     {
+                                         "data": null,
+                                         "className": "align-middle text-center ",
+                                         "render": function (data, type, row) {
+                                             islem = "";
+                                             if (row.KilitBit==false) {
+                                                 if (DuzenleYetki == "True") {
+                                                     if (row.Aktif == true) {
+                                                         //islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                         islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-hizmetid='" + row.Id + "'>Aktif</button>"
+                                                     }
+                                                     else {
+                                                         //islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                         islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-hizmetid='" + row.Id + "'>Pasif</button>"
+                                                     }
+                                                 }
+                                                 else {
+                                                     if (row.Aktif == true) {
+                                                         islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                         //islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Aktif</button>"
+                                                     }
+                                                     else {
+                                                         islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                         //islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Pasif</button>"
+                                                     }
+                                                 }
+                                             }
+                                             return islem
+                                         }
+                                     },
+                                    {
+                                        "data": null,
+                                        "className": "align-middle",
+                                        "render": function (data, type, row) {
+                                            islem = ""
+                                            if (row.KilitBit == false) {
+                                                if (DuzenleYetki == "True") {
+                                                    islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle' data-hizmetid='" + row.Id + "' data-ekhizmet='" + row.EkHizmetAdi + "' data-aciklama='" + row.Aciklama + "' data-fiyat='" + row.Fiyat + "' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                                                        "<i class='fal fa-edit'></i>" +
+                                                                     "</a>"
+                                                }
+                                                if (SilYetki == "True") {
+                                                    islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon Sil' data-hizmetid='" + row.Id + "' data-ekhizmet='" + row.EkHizmetAdi + "' style='background-color:crimson;margin-left:5px'>" +
+                                                                       "<i class='fal fa-trash-alt'></i>" +
+                                                                     "</a>"
+                                                }
+                                            }
+                                            return islem 
+                                        }
+                                    }
+                        ],
+                        "processing": true,
+                        "ajax": {
+                            "url": "/Otomasyon/Tanimlar/RezervasyonEkHizmetleriListesi/",
+                            "contentType": 'application/json; charset=utf-8',
+                            'data': function (data) { return data = JSON.stringify(data); }
+                        },
+                        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                        "oLanguage": {
+                            "sSearchPlaceholder": "Tabloda Ara",
+                            "sZeroRecords": "Kayıt yok.",
+                            "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                            "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                            "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                            "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                            "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                            "oPaginate": {
+                                "sPrevious": "Önceki",
+                                "sNext": "Sonraki",
+                                "sFirst": "İlk",
+                                "sLast": "Son"
+                            }
+                        }
+                    });
+            $("#fiyatduzenle").inputmask("currency",
+               {
+                   placeholder: "0.00", // Varsayılan değer
+                   prefix: "", // öndeki değer
+                   suffix: " TL", // sondaki değer
+                   rightAlign: false, // sağa-sola yaslama
+                   radixPoint: ",", // kuruş ayıracı
+                   groupSeparator: "." // binlik ayıracı
+               });
+            $("#fiyat").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+        });
+    </script>
+}
+

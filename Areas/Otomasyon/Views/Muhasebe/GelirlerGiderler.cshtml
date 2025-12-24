@@ -1,0 +1,1055 @@
+﻿
+@{
+    ViewBag.Title = "Gelirler - Giderler";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model List<GelirGider>
+@{
+    List<Firma> FirmaListesi = ViewBag.FirmaListesi;
+    List<Sube> SubeListesi = ViewBag.SubeListesi;
+    List<SubeToKullanici> SubeKullanici = ViewBag.SubeKullanici;
+    List<GelirGiderTurleri> GGTur = ViewBag.GGTur;
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+@section Head
+{
+    <style type="text/css">
+        a {
+            color: black;
+        }
+    </style>
+}
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Gelir - Gider Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="GGTip">Tip</label>
+                                    <select class="select2 custom-select form-control custom-select-sm" id="GGTip" name="GGTip" title="Gelir - Gider Tipini Seçiniz">
+                                        <option selected="" value="0">Gelir</option>
+                                        <option value="1">Gider</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="Tarih">Tarih</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="Tarih">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="GGTurIdHata">
+                                    <label class="form-label" for="GGTurId">Gelir - Gider Türü</label>
+                                    <select class="select2 custom-select form-control custom-select-sm" id="GGTurId" name="GGTurId" title="Gelir - Gider Türünü Seçiniz">
+                                        <option selected="" value="0">Gelir - Gider Türü Seçiniz</option>
+                                        @foreach (var ggtur in GGTur)
+                                        {
+                                            if (ggtur.GelirGiderTur != "Cari İşlem Ödemesi" && ggtur.GelirGiderTur != "Sözleşme Ödemesi")
+                                            {
+                                                <option value="@ggtur.Id">@ggtur.GelirGiderTur</option>
+                                            }
+
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="OdemeSekliHata">
+                                    <label class="form-label" for="OdemeSekli">Ödeme Şekli</label>
+                                    <select class="custom-select form-control custom-select-sm" id="OdemeSekli" name="OdemeSekli" title="Ödeme Şeklini Seçiniz.">
+                                        <option selected="" value="0">Nakit</option>
+                                        <option value="1">Kredi Kartı</option>
+                                        <option value="2">Banka Havalesi</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-6" id="TutarHata">
+                                    <label class="form-label" for="Tutar">Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control bg-success-50" name="Tutar" maxlength="50" id="Tutar">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <label class="form-label" for="Aciklama">Açıklama</label>
+                                    <input type="text" id="Aciklama" class="form-control form-control-sm" name="Aciklama" maxlength="250">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Kaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="DuzenleGGTip">Tip</label>
+                                    <select class="select2 custom-select form-control custom-select-sm" id="DuzenleGGTip" name="DuzenleGGTip" disabled title="Gelir - Gider Tipini Seçiniz">
+                                        <option selected="" value="0">Gelir</option>
+                                        <option value="1">Gider</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="DuzenleTarih">Tarih</label>
+                                    <input type="text" id="DuzenleGGId" class="form-control form-control-sm" name="DuzenleGGId" maxlength="50" style="display:none">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="DuzenleTarih">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="DuzenleGGTurIdHata">
+                                    <label class="form-label" for="DuzenleGGTurId">Gelir - Gider Türü</label>
+                                    <select class="select2 custom-select form-control custom-select-sm" id="DuzenleGGTurId" name="DuzenleGGTurId" title="Gelir - Gider Türünü Seçiniz" disabled>
+                                        <option selected="" value="0">Gelir - Gider Türü Seçiniz</option>
+                                        @foreach (var ggtur in GGTur)
+                                        {
+                                            <option value="@ggtur.Id" disabled>@ggtur.GelirGiderTur</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="DuzenleOdemeSekli">Ödeme Şekli</label>
+                                    <select class="custom-select form-control custom-select-sm" id="DuzenleOdemeSekli" name="DuzenleOdemeSekli" title="Ödeme Şeklini Seçiniz.">
+                                        <option selected="" value="0">Nakit</option>
+                                        <option value="1">Kredi Kartı</option>
+                                        <option value="2">Banka Havalesi</option>
+                                    </select>
+                                </div>
+                                <div class="form-group col-sm-6" id="DuzenleTutarHata">
+                                    <label class="form-label" for="DuzenleTutar">Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control bg-success-50" name="DuzenleTutar" maxlength="50" id="DuzenleTutar">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <label class="form-label" for="DuzenleAciklama">Açıklama</label>
+                                    <input type="text" id="DuzenleAciklama" class="form-control form-control-sm" name="DuzenleAciklama" maxlength="250">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="GGGuncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<!-- Gelir - Gider Tolapamları Satırı -->
+<div class="row">
+    <div class="col-sm-6 col-xl-3">
+        <div class="p-3 bg-primary-500 rounded overflow-hidden position-relative text-white mb-g">
+            <div class="">
+                <h3 class="display-4 d-block l-h-n m-0 fw-500" id="GelirlerToplam">
+
+                    <small class="m-0 l-h-n">Gelirler Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-plus-circle position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1" style="font-size:6rem"></i>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="p-3 bg-warning-500 rounded overflow-hidden position-relative text-white mb-g">
+            <div class="">
+                <h3 class="display-4 d-block l-h-n m-0 fw-500" id="GiderlerToplam">
+
+                    <small class="m-0 l-h-n">Giderler Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-minus-circle position-absolute pos-right pos-bottom opacity-15  mb-n1 mr-n2" style="font-size: 6rem;"></i>
+        </div>
+    </div>
+</div>
+<!-- Gelir - Gider Tolapamları Satırı -->
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<input type="text" id="FiltreAyar" style="display:none" data-filtreayar="@ViewBag.FiltreAyar">
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <form id="FiltreForm">
+                <div class="row col col-12 mt-3" id="date_filter">
+                    <div class="form-group col-sm-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" value="07/17/2020" id="IlkTarih" name="IlkTarih">
+                            <div class="input-group-append">
+                                <span class="input-group-text fs-sm">
+                                    <i class="fal fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" value="07/17/2020" id="SonTarih" name="SonTarih">
+                            <div class="input-group-append">
+                                <span class="input-group-text fs-sm">
+                                    <i class="fal fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <select class="custom-select form-control custom-select-sm" id="Sube" name="Sube" title="Görüntülenecek Şube">
+                            <option value="0">Tüm Şubeler</option>
+                            @foreach (var sube in SubeKullanici)
+                            {
+                                if (Convert.ToInt64(Session["AktifSubeId"]) == sube.SubeId && sube.Sube.Aktif == true)
+                                {
+                                    <option selected="" value="@sube.Sube.Id">@sube.Sube.SubeAdi</option>
+                                }
+                                else if (sube.Sube.Aktif == true)
+                                {
+                                    <option value="@sube.Sube.Id">@sube.Sube.SubeAdi</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <select class="custom-select form-control custom-select-sm" id="GoruntuleTip" name="GoruntuleTip" title="Görüntülenecek Gelir - Gider Tipi">
+                            <option selected="" value="0">--TÜMÜ--</option>
+                            <option value="1">Gelirler</option>
+                            <option value="2">Giderler</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-3">
+                        <select class="custom-select form-control custom-select-sm" id="GoruntuleGGTur" name="GoruntuleGGTur" title="Görüntülenecek Gelir - Gider Türü">
+                            <option selected="" value="0">--TÜMÜ-- Gelir - Gider Türü Seç </option>
+                            @foreach (var ggtur in GGTur)
+                            {
+                                <option value="@ggtur.Id">@ggtur.GelirGiderTur</option>
+                            }
+                        </select>
+                    </div>
+                    @if (KullaniciYetki.KayitEkle)
+                    {
+                        <div class="form-group col-sm-2">
+                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" id="YeniEkle"> Gelir - Gider Ekle </button>
+                        </div>
+                    }
+                </div>
+            </form>
+            <div class="border-bottom mt-3"></div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="tb-dtgelirgider" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th style="display:none">Şube</th> @*//0*@
+                                <th style="display:none">Tarih Sıralama</th> @*//0*@
+                                <th>Tarih</th> @*//1*@
+                                <th>Gelir-Gider Türü</th> @*//2*@
+                                <th>Tip</th> @*//3*@
+                                <th>Tutar</th> @*//4*@
+                                <th>Açıklama</th>
+                                <th class="w-5">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        var dt;
+        var filtreayar = $('#FiltreAyar').data("filtreayar");
+        var controls = {
+            leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
+            rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
+        }
+        function dateFormat(d) {
+            return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+        }
+        function dateFormat2(d) {
+            return d.getFullYear() + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + (d.getDate() + "").padStart(2, "0"); 
+        }
+        var runDatePicker = function () {
+            $('#Tarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#DuzenleTarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            if (filtreayar == "0") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+            } // 1 Gün
+            else if (filtreayar == "1") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() + 7)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() - 7)));
+            } // 1 Hafta Öncesi - 1 Hafta Sonrası
+            else if (filtreayar == "2") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() - 1)));
+            } // 1 Ay Öncesi - 1 Ay Sonrası
+            else if (filtreayar == "3") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
+            } // 1 Yıl Öncesi - 1 Yıl Sonrası
+            else if (filtreayar == "4") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+            } // Ayın başından bu güne
+            else if (filtreayar == "5") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), 0, 1));
+            } // Yılın başından bu güne
+        }
+        function ParaFormat(fiyat) {
+            var para_sembol = "TL"
+            var format = new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: 'TRY',
+                minumumFractionDigits: 2
+            })
+            //return format.format(fiyat)
+            return format.format(fiyat).replace('TRY', para_sembol)
+        }
+        $(document).ready(function () {
+            $(function () {
+                $('#GoruntuleGGTur').select2({
+                    //dropdownParent: $('#YeniKayitEkleModal')
+                });
+                $('#GGTurId').select2({
+                    dropdownParent: $('#YeniKayitEkleModal')
+                    //dropdownParent: $('#KayitDuzenleModal')
+                });
+            });
+
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+
+            $(":input").inputmask();
+            $("#Tutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#DuzenleTutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+       
+            runDatePicker();
+            $('#GGTurIdHata').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.ggturhata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#OdemeSekli').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.odemesekhata").remove();
+                }
+                console.log($("#OdemeSekli").Text);
+            }); // Validation hata kaldırma
+            $('#DuzenleGGTurIdHata').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.duzenleggturhata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            $("#YeniEkle").click(function () {
+                $("#GGTip").val("0");
+                $("#GGTurId").val("0");
+                $("#OdemeSekli").val("0");
+                $("#Tutar").val("0");
+                $("#Aciklama").val("");
+            });
+            $("#Kaydet").click(function () {
+                //Zorunlu Alan Kotrolü
+                var odemesekli, ggtip;
+                if ($("#OdemeSekli").Text != "0") {
+                    $("#OdemeSekli").focus();
+                    $("#OdemeSekliHata").append("<div class='odemesekhata' style='color:red'>Ödeme Şeklini seçiniz!</div>");
+                }
+                if ($("#OdemeSekli").val() == "0") {
+                    odemesekli = "Nakit";
+                }
+                else if ($("#OdemeSekli").val() == "1") {
+                    odemesekli = "Kredi Kartı";
+                }
+                else if ($("#OdemeSekli").val() == "2") {
+                    odemesekli = "Banka Havalesi";
+                }
+                if ($("#GGTip").val() == "0") {
+                    ggtip = "Gelir";
+                }
+                else if ($("#GGTip").val() == "1") {
+                    ggtip = "Gider";
+                }
+                // Zorunlu alan kontrolü
+                if ($("#GGTurId").val() == "0") {
+                    $("#GGTurId").focus();
+                    $("#GGTurIdHata").append("<div class='ggturhata' style='color:red'>Gelir - Gider Türünü seçiniz!</div>");
+                }
+                else if ($("#Tutar").val() == "0,00 TL") {
+                    $("#Tutar").focus();
+                    $("#TutarHata").append("<div class='hata' style='color:red'>Bir Tutar giriniz!</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var Tutar = $("#Tutar").val().replace(" TL", "");
+                    var GGData = new FormData();
+                    GGData.append("Tarih", $("#Tarih").val());
+                    GGData.append("GGTip", ggtip);
+                    GGData.append("GGTur", $("#GGTurId").val())
+                    GGData.append("Tutar", Tutar);
+                    GGData.append("Aciklama", $("#Aciklama").val());
+                    GGData.append("OdemeSekli", odemesekli);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: GGData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Muhasebe/GelirGiderEkle/",
+                        success: function (data) {
+                            gelirlertoplam = 0; giderlertoplam = 0;
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            $("#tb-dtgelirgider").on('click', '.ggduzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#DuzenleGGId").val($(this).data("ggid"));
+                $("#DuzenleTarih").val($(this).data("tarih"));
+                if ($(this).data("tip") == "Gelir") {
+                    $("#DuzenleGGTip").val("0").attr("selected", "selected");
+                }
+                else if ($(this).data("tip") == "Gider") {
+                    $("#DuzenleGGTip").val("1").attr("selected", "selected");
+                }
+                var turid = $(this).data("gelirgiderturid");
+                //$("#GGGuncelle").data("ggTurId") = turid;
+                $("#GGGuncelle").val(turid);
+                $("#DuzenleGGTurId").val(turid).attr("selected", "selected");
+                if ($(this).data("odemesekli") == "Nakit") {
+                    $("#DuzenleOdemeSekli").val("0");
+                }
+                else if ($(this).data("odemesekli") == "Kredi Kartı") {
+                    $("#DuzenleOdemeSekli").val("1");
+                }
+                else if ($(this).data("odemesekli") == "Banka Havalesi") {
+                    $("#DuzenleOdemeSekli").val("2");
+                }
+                $("#DuzenleTutar").val($(this).data("tutar"));
+                $("#DuzenleAciklama").val($(this).data("aciklama"));
+            });
+            $("#GGGuncelle").click(function () {
+                var odemesekli;
+                if ($("#DuzenleOdemeSekli").val() == "0") {
+                    odemesekli = "Nakit";
+                }
+                else if ($("#DuzenleOdemeSekli").val() == "1") {
+                    odemesekli = "Kredi Kartı";
+                }
+                else if ($("#DuzenleOdemeSekli").val() == "2") {
+                    odemesekli = "Banka Havalesi";
+                }
+                if ($("#DuzenleGGTip").val() == "0") {
+                    ggtip = "Gelir";
+                }
+                else if ($("#DuzenleGGTip").val() == "1") {
+                    ggtip = "Gider";
+                }
+                if ($("#DuzenleGGTurId").val() == "0") {
+                    $("#DuzenleGGTurId").focus();
+                    $("#DuzenleGGTurIdHata").append("<div class='duzenleggturhata' style='color:red'>Gelir - Gider Türünü seçiniz!</div>");
+                }
+                else if ($("#DuzenleTutar").val() == "0,00 TL") {
+                    $("#DuzenleTutar").focus();
+                    $("#DuzenleTutarHata").append("<div class='hata' style='color:red'>Bir Tutar giriniz!</div>");
+                }
+                else {
+                    $('#KayitDuzenleModal').modal('hide');
+                    id = $("#DuzenleGGId").val();
+                    var Tutar = $("#DuzenleTutar").val().replace(" TL", "");
+                    var GGData = new FormData();
+                    GGData.append("Tarih", $("#DuzenleTarih").val());
+                    GGData.append("GGTip", ggtip);
+                    GGData.append("GGTur", $(this).val());
+                    GGData.append("Tutar", Tutar);
+                    GGData.append("Aciklama", $("#DuzenleAciklama").val());
+                    GGData.append("OdemeSekli", odemesekli);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: GGData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Muhasebe/GelirGiderGuncelle/" + id,
+                        success: function (data) {
+                            gelirlertoplam = 0; giderlertoplam = 0;
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            $("#tb-dtgelirgider").on('click', '.durumdegistir', function () {
+                var id = $(this).data("ggid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Muhasebe/GelirGiderDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            gelirlertoplam = 0; giderlertoplam = 0;
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#tb-dtgelirgider").on('click', '.ggsil', function () {
+                var id = $(this).data("ggid");
+                var ggtur = $(this).data("gelirgidertur");
+                var tutar = $(this).data("tutar");
+                var detaysil = "";
+                Swal.fire(
+                    {
+                        title: "Kayıt Silinecek",
+                        html: "<p><h2 style='font-size:16px; color:red'><strong>Gelir - Gider Türü : </strong>" + ggtur + "</br><strong>Tutar : </strong>" + tutar + "</h2></p><h2> Gelir - Gider silinsin mi?</h2>",
+                        type: "error",
+                        showCancelButton: true,
+                        confirmButtonText: "Evet, Silinsin!",
+                        cancelButtonText: "İptal"
+                    }).then(function (result) {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                contentType: false,
+                                processData: false,
+                                url: "/Otomasyon/Muhasebe/GelirGiderDetayKontrol/" + id,
+                                success: function (data) { // Personel ile ilgili diğer tablolarda kayıt var ise silinemeyecek uyarı verecek.
+                                    if (data.Sonuc == true) {
+                                        Swal.fire(
+                                            {
+                                                title: "Kayıt Silinecek",
+                                                html: data.Mesaj,
+                                                type: "error",
+                                                width: 800,
+                                                showCancelButton: true,
+                                                confirmButtonText: "Evet, Silinsin!",
+                                                cancelButtonText: "İptal"
+                                            }).then(function (result) { // Detay Kayıt varsa, Detaylar ile birlikte silinsin mi? EVET
+                                                if (result.value) {
+                                                    detaysil = "Evet";
+                                                    var GGData = new FormData();
+                                                    GGData.append("DetaySil", detaysil);
+                                                    $.ajax({
+                                                        type: "POST",
+                                                        datatype: 'json',
+                                                        data: GGData,
+                                                        contentType: false,
+                                                        processData: false,
+                                                        url: "/Otomasyon/Muhasebe/GelirGiderSil/" + id,
+                                                        success: function (data) { // Personel ile ilgili diğer tablolarda kayıt var ise silinemeyecek uyarı verecek.
+                                                            if (data.Sonuc == false) {
+                                                                alertify.set('notifier', 'delay', 5);
+                                                                alertify.set('notifier', 'position', 'top-center');
+                                                                alertify.error(data.Mesaj);
+                                                            }
+                                                            else if (data.Sonuc == true) {
+                                                                alertify.set('notifier', 'delay', 3);
+                                                                alertify.set('notifier', 'position', 'top-center');
+                                                                alertify.success(data.Mesaj);
+                                                                dt.api().ajax.reload();
+                                                            }
+                                                        },
+                                                        error: function (err) {
+                                                            alert("HATA");
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                    }
+                                    else { // Detay Kayıt yok, doğrudan sil
+                                        detaysil = "Hayır";
+                                        var GGData = new FormData();
+                                        GGData.append("DetaySil", detaysil);
+                                        $.ajax({
+                                            type: "POST",
+                                            datatype: 'json',
+                                            data: GGData,
+                                            contentType: false,
+                                            processData: false,
+                                            url: "/Otomasyon/Muhasebe/GelirGiderSil/" + id,
+                                            success: function (data) { // Personel ile ilgili diğer tablolarda kayıt var ise silinemeyecek uyarı verecek.
+                                                if (data.Sonuc == false) {
+                                                    alertify.set('notifier', 'delay', 5);
+                                                    alertify.set('notifier', 'position', 'top-center');
+                                                    alertify.error(data.Mesaj);
+                                                }
+                                                else if (data.Sonuc == true) {
+                                                    alertify.set('notifier', 'delay', 3);
+                                                    alertify.set('notifier', 'position', 'top-center');
+                                                    alertify.success(data.Mesaj);
+                                                    dt.api().ajax.reload();
+                                                }
+                                            },
+                                            error: function (err) {
+                                                alert("HATA");
+                                            }
+                                        });
+                                    }
+
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            });
+
+            $("#GGTip").change(function () {
+                if ($(this).val() == "0") {
+                    tip = "Gelir";
+                    $("#Tutar").removeClass("bg-warning-50");
+                    $("#Tutar").addClass("bg-success-50");
+
+
+                }
+                else if ($(this).val() == "1") {
+                    tip = "Gider";
+                    $("#Tutar").removeClass("bg-success-50");
+                    $("#Tutar").addClass("bg-warning-50");
+
+                }
+            });
+            $("#DuzenleGGTip").change(function () {
+                if ($(this).val() == "0") {
+                    tip = "Gelir";
+                    $("#DuzenleTutar").removeClass("bg-warning-50");
+                    $("#DuzenleTutar").addClass("bg-success-50");
+
+
+                }
+                else if ($(this).val() == "1") {
+                    tip = "Gider";
+                    $("#DuzenleTutar").removeClass("bg-success-50");
+                    $("#DuzenleTutar").addClass("bg-warning-50");
+
+                }
+            });
+
+            function parseDateValue(rawDate) {
+                var dateArray = rawDate.split(".");
+                var parsedDate = dateArray[2] + dateArray[1] + dateArray[0];
+                return parsedDate;
+            }
+            var islem, gelirlertoplam, gelirtutar, giderlertoplam, gidertutar;
+
+            gelirlertoplam = 0;
+            giderlertoplam = 0;
+
+            $.fn.dataTableExt.afnFiltering.push(
+                function (Settings, Data, DataIndex) {
+                    var tip = $("#GoruntuleTip").val();
+                    var ggtip;
+                    if (Data[4] == "Gelir") {
+                        ggtip = 1;
+                        gelirtutar = Data[5];
+                        gelirtutar = gelirtutar.replace("TL", "");
+                        gelirtutar = gelirtutar.replace(".", "");
+                        gelirtutar = gelirtutar.replace(",", ".");
+                    }
+                    if (Data[4] == "Gider") {
+                        ggtip = 2;
+                        gidertutar = Data[5];
+                        gidertutar = gidertutar.replace("TL", "");
+                        gidertutar = gidertutar.replace(".", "");
+                        gidertutar = gidertutar.replace(",", ".");
+                    }
+                    if (ggtip == 1) {
+                        gelirlertoplam = parseFloat(gelirlertoplam) + parseFloat(gelirtutar);
+                    }
+                    else if (ggtip == 2) {
+                        giderlertoplam = parseFloat(giderlertoplam) + parseFloat(gidertutar);
+                    }
+                    $("#GelirlerToplam").html(accounting.formatMoney(gelirlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelirler Toplamı</small>");
+                    $("#GiderlerToplam").html(accounting.formatMoney(giderlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Giderler Toplamı</small>");
+                    return true;
+                });
+
+
+            $("#GelirlerToplam").html(accounting.formatMoney(gelirlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelirler Toplamı</small>");
+            $("#GiderlerToplam").html(accounting.formatMoney(giderlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Giderler Toplamı</small>");
+            dt = $('#tb-dtgelirgider').dataTable(
+                {
+                    responsive: true,
+                    "destroy": true,
+                    "createdRow": function (row, data, dataIndex) {
+                        if (data["Tip"] == "Gider") {
+                            $('td', row).addClass('bg-warning-50');
+                        }
+                        if (data["Tip"] == "Gelir") {
+                            $('td', row).addClass('bg-primary-50');
+                        }
+                    },
+                    //"searching": false, // arama kaldır
+                    //"lengthChange": false, // sayfa başına göster kaldır
+                    "order": [[1, "desc"], [3, "asc"]],
+                    "columnDefs": [{ "targets": 1, "type": "date-eu" }],
+                    "columns": [
+                        { "data": "SubeAdi", "autowidth": true, "visible": false },
+                        //{ "data": "Tarih", "autowidth": true, "visible": false },
+                        { // Tarih
+                            "data": null,
+                            "autowidth": true,
+                            "visible": false,
+                            "render": function (data, type, row) {
+                                var t = row.Tarih;
+                                var tarih = dateFormat2(new Date(parseInt(t.match(/\d+/)[0])));
+                                return tarih
+                            }
+                        },
+                        { // Tarih
+                            "data": null,
+                            "autowidth": true,
+                            "render": function (data, type, row) {
+                                var t = row.Tarih;
+                                var tarih = dateFormat(new Date(parseInt(t.match(/\d+/)[0])));
+                                return tarih
+                            }
+                        },
+                        //{ "data": "Tarih", "autowidth": true },
+                        { "data": "GelirGiderTur", "autowidth": true },
+                        { "data": "Tip", "autowidth": true },
+                        { // Tutar
+                            "data": null,
+                            "autowidth": true,
+                            "render": function (data, type, row) {
+                                return ParaFormat(row.Tutar)
+                            }
+                        },
+                        { "data": "Aciklama", "autowidth": true },
+                        {
+                            "data": null,
+                            "render": function (data, type, row) {
+                                islem = "";
+                                var t = row.Tarih;
+                                var tarih = dateFormat(new Date(parseInt(t.match(/\d+/)[0])));
+
+                                if (row.GelirGiderTur != "Sözleşme Ödemesi" && row.GelirGiderTur != "Cari İşlem Ödemesi") {
+                                    if (DuzenleYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon mr-1 ggduzenle' title='Gelir - Gider Kaydını Düzenle' data-ggid='" + row.Id + "' data-firmaadi='" + row.FirmaAdi + "' data-subeadi='" + row.SubeAdi + "'" +
+                                            "data-tarih='" + tarih + "' data-tip='" + row.Tip + "' data-gelirgidertur='" + row.GelirGiderTur + "' data-gelirgiderturid='" + row.GelirGiderTurId + "'" +
+                                            "data-tutar='" + ParaFormat(row.Tutar) + "' data-odemesekli='" + row.OdemeSekli + "' data-aciklama='" + row.Aciklama + "'" +
+                                            "data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                            "<i class='fal fa-edit'></i>" +
+                                            "</a>"
+                                    }
+                                    if (SilYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon mr-1 ggsil' title='Gelir - Gider Kaydını Sil' data-ggid='" + row.Id + "' data-gelirgidertur='" + row.GelirGiderTur + "' data-tutar='" + ParaFormat(row.Tutar) + "' data-tip='" + row.Tip + "'>" +
+                                            "<i class='fal fa-trash-alt'></i>" +
+                                            "</a>"
+                                    }
+
+                                }
+                                else {
+                                    if (row.GelirGiderTur == "Sözleşme Ödemesi") {
+                                        //islem = "<i class='fal fa-info-circle color-primary-600' title='Sözleşme Düzenleden işlem yapabilirsiniz.'></i>"
+                                        islem = "<a href='/Otomasyon/RezervasyonIslemleri/RezervasyonDuzenle/" + row.SozlesmeId + "' class='btn btn-info btn-icon btn-xs rounded-circle waves-effect waves-themed' title='Sözleşme Düzenleden işlem yapabilirsiniz.'>" +
+                                            "<i class='fal fa-info-circle'></i>" +
+                                            "</a>"
+                                    }
+                                    else if (row.GelirGiderTur == "Cari İşlem Ödemesi") {
+                                        //islem = "<i class='fal fa-info-circle color-primary-600' title='Cari İşlem Düzenleden işlem yapabilirsiniz.'></i>"
+                                        islem = "<a href='/Otomasyon/Muhasebe/CariHesapTakibi' class='btn btn-info btn-icon btn-xs rounded-circle waves-effect waves-themed' title='Cari İşlem Düzenleden işlem yapabilirsiniz.'>" +
+                                            "<i class='fal fa-info-circle'></i>" +
+                                            "</a>"
+                                    }
+                                }
+                                return islem
+                            }
+
+                        }
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Otomasyon/Muhasebe/GelirGiderListesi/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'type': 'POST',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        'sProcessing': 'Yükleniyor... Lütfen Bekleyin',
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+
+            $("#IlkTarih").keyup(function () {
+                gelirlertoplam = 0; giderlertoplam = 0;
+                $("#GelirlerToplam").html(accounting.formatMoney(gelirlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelirler Toplamı</small>");
+                $("#GiderlerToplam").html(accounting.formatMoney(giderlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Giderler Toplamı</small>");
+                dt.api().ajax.url('/Muhasebe/GelirGiderFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#IlkTarih").change(function () {
+                gelirlertoplam = 0; giderlertoplam = 0;
+                $("#GelirlerToplam").html(accounting.formatMoney(gelirlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelirler Toplamı</small>");
+                $("#GiderlerToplam").html(accounting.formatMoney(giderlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Giderler Toplamı</small>");
+                dt.api().ajax.url('/Muhasebe/GelirGiderFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#SonTarih").keyup(function () {
+                gelirlertoplam = 0; giderlertoplam = 0;
+                $("#GelirlerToplam").html(accounting.formatMoney(gelirlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelirler Toplamı</small>");
+                $("#GiderlerToplam").html(accounting.formatMoney(giderlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Giderler Toplamı</small>");
+                dt.api().ajax.url('/Muhasebe/GelirGiderFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#SonTarih").change(function () {
+                gelirlertoplam = 0; giderlertoplam = 0;
+                $("#GelirlerToplam").html(accounting.formatMoney(gelirlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelirler Toplamı</small>");
+                $("#GiderlerToplam").html(accounting.formatMoney(giderlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Giderler Toplamı</small>");
+                dt.api().ajax.url('/Muhasebe/GelirGiderFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#GoruntuleTip").change(function () {
+                gelirlertoplam = 0; giderlertoplam = 0;
+                $("#GelirlerToplam").html(accounting.formatMoney(gelirlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelirler Toplamı</small>");
+                $("#GiderlerToplam").html(accounting.formatMoney(giderlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Giderler Toplamı</small>");
+                dt.api().ajax.url('/Muhasebe/GelirGiderFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#GoruntuleGGTur").change(function () {
+                gelirlertoplam = 0; giderlertoplam = 0;
+                $("#GelirlerToplam").html(accounting.formatMoney(gelirlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelirler Toplamı</small>");
+                $("#GiderlerToplam").html(accounting.formatMoney(giderlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Giderler Toplamı</small>");
+                dt.api().ajax.url('/Muhasebe/GelirGiderFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#Firma").change(function () {
+                gelirlertoplam = 0; giderlertoplam = 0;
+                $("#GelirlerToplam").html(accounting.formatMoney(gelirlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelirler Toplamı</small>");
+                $("#GiderlerToplam").html(accounting.formatMoney(giderlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Giderler Toplamı</small>");
+                dt.api().ajax.url('/Muhasebe/GelirGiderFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#Sube").change(function () {
+                gelirlertoplam = 0; giderlertoplam = 0;
+                $("#GelirlerToplam").html(accounting.formatMoney(gelirlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelirler Toplamı</small>");
+                $("#GiderlerToplam").html(accounting.formatMoney(giderlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Giderler Toplamı</small>");
+                dt.api().ajax.url('/Muhasebe/GelirGiderFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("input[type='search']").keydown(function () {
+                gelirlertoplam = 0; giderlertoplam = 0;
+                $("#GelirlerToplam").html(accounting.formatMoney(gelirlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelirler Toplamı</small>");
+                $("#GiderlerToplam").html(accounting.formatMoney(giderlertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Giderler Toplamı</small>");
+
+            });
+        });
+    </script>
+}

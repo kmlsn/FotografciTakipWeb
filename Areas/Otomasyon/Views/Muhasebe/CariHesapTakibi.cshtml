@@ -1,0 +1,2592 @@
+﻿
+@{
+    ViewBag.Title = "Cari Hesap Takibi";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    List<Firma> FirmaListesi = ViewBag.FirmaListesi;
+    List<Sube> SubeListesi = ViewBag.SubeListesi;
+    List<Cari> CariListesi = ViewBag.CariListesi;
+    List<SubeToKullanici> SubeKullanici = ViewBag.SubeKullanici;
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string DetayYetki = KullaniciYetki.KayitDetayi.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+    string EkleYetki = KullaniciYetki.KayitEkle.ToString();
+    string SMSYetki = KullaniciYetki.SmsGonder.ToString();
+    List<SmsMetinleri> Smsmetinleri = ViewBag.SmsMetinleri;
+}
+@section Head
+{
+    <style type="text/css">
+        a {
+            color: black;
+        }
+
+        .swal2-container {
+            display: -webkit-box;
+            display: flex;
+            position: fixed;
+            z-index: 300000; /*Uyarı penceresini herşeyin önüne getimek için*/
+        }
+    </style>
+    <link href="~/Areas/Otomasyon/Content/css/SMSMesajStyle.css" rel="stylesheet" />
+}
+<!-- Hareket Ekle Modal Penceresi -->
+<div class="modal fade" id="HareketEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Hareket Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="alert border border-primary bg-transparent text-primary" role="alert" id="EkleModalCariAdi">
+
+                    </div>
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="IslemTarihi">İşlem Tarihi</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="IslemTarihi">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="AlacakBorcTip">Tip</label>
+                                    <select class="custom-select form-control custom-select-sm" id="AlacakBorcTip" name="AlacakBorcTip" title="Ödeme Şeklini Seçiniz.">
+                                        <option selected="" value="0">Alacak</option>
+                                        <option value="1">Borç</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="TutarHata">
+                                    <label class="form-label" for="Tutar">Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control bg-success-50" name="Tutar" maxlength="50" id="Tutar">
+                                </div>
+                                <div class="form-group col-sm-6" id="OdemeSekliHata">
+                                    <label class="form-label" for="OdemeSekli">Ödeme Şekli</label>
+                                    <select class="custom-select form-control custom-select-sm" id="OdemeSekli" name="OdemeSekli" title="Ödeme Şeklini Seçiniz.">
+                                        <option selected value="0">---</option>
+                                        <option value="1">Nakit</option>
+                                        <option value="2">Kredi Kartı</option>
+                                        <option value="3">Banka Havalesi</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="form-group col-sm-6">
+                                    <div class="custom-control custom-checkbox" id="odemeyap" style="display:none">
+                                        <input type="checkbox" class="custom-control-input color-danger-800" id="odemechecked">
+                                        <label class="custom-control-label color-danger-800" for="odemechecked">Borcun Ödemesi Yapıldı</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox" id="tahsilatyap">
+                                        <input type="checkbox" class="custom-control-input color-success-800" id="tahsilatchecked">
+                                        <label class="custom-control-label color-success-800" for="tahsilatchecked">Alacağın Tahsilatı Yapıldı.</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6" id="YeniEkleOdemeTarihiGoster">
+                                    <label class="form-label" for="YeniEkleOdemeTarihi" id="YeniEkleOdemeTarihiLabel">Ödeme Tarihi</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="YeniEkleOdemeTarihi">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row pb-3" id="OdemeYapanGoster" style="display:none">
+                                <div class="form-group col-sm-12">
+                                    <label class="form-label" for="OdemeYapan">Ödeme Yapan Ad-Soyad</label>
+                                    <input type="text" id="OdemeYapan" class="form-control form-control-sm" name="OdemeYapan" maxlength="250">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <label class="form-label" for="Aciklama">Açıklama</label>
+                                    <input type="text" id="Aciklama" class="form-control form-control-sm" name="Aciklama" maxlength="250">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Kaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Hareket Ekle Modal Penceresi -->
+<!-- Hareket Duzenle Modal Penceresi -->
+<div class="modal fade" id="HareketDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Hareket Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="alert border border-primary bg-transparent text-primary" role="alert" id="DuzenleModalCariAdi">
+
+                    </div>
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="DuzenleIslemTarihi">İşlem Tarihi</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="DuzenleIslemTarihi">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="DuzenleAlacakBorcTip">Tip</label>
+                                    <select class="custom-select form-control custom-select-sm" id="DuzenleAlacakBorcTip" name="DuzenleAlacakBorcTip" title="Ödeme Şeklini Seçiniz." disabled>
+                                        <option selected="" value="0">Alacak</option>
+                                        <option value="1">Borç</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="DuzenleTutarHata">
+                                    <label class="form-label" for="DuzenleTutar">Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control bg-success-50" name="DuzenleTutar" maxlength="50" id="DuzenleTutar">
+                                </div>
+                                <div class="form-group col-sm-6" id="DuzenleOdemeSekliHata">
+                                    <label class="form-label" for="DuzenleOdemeSekli">Ödeme Şekli</label>
+                                    <select class="custom-select form-control custom-select-sm" id="DuzenleOdemeSekli" name="DuzenleOdemeSekli" title="Ödeme Şeklini Seçiniz.">
+                                        <option selected value="0">---</option>
+                                        <option value="1">Nakit</option>
+                                        <option value="2">Kredi Kartı</option>
+                                        <option value="3">Banka Havalesi</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="form-group col-sm-6">
+                                    <div class="custom-control custom-checkbox" id="Duzenleodemeyap" style="display:none">
+                                        <input type="checkbox" class="custom-control-input color-danger-800" id="Duzenleodemechecked">
+                                        <label class="custom-control-label color-danger-800" for="Duzenleodemechecked">Borcun Ödemesi Yapıldı</label>
+                                    </div>
+                                    <div class="custom-control custom-checkbox" id="Duzenletahsilatyap">
+                                        <input type="checkbox" class="custom-control-input color-success-800" id="Duzenletahsilatchecked">
+                                        <label class="custom-control-label color-success-800" for="Duzenletahsilatchecked">Alacağın Tahsilatı Yapıldı.</label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6" id="DuzenleOdemeTarihiGoster">
+                                    <label class="form-label" for="DuzenleOdemeTarihi">Odeme Tarihi</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="DuzenleOdemeTarihi">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row pb-3" id="DuzenleOdemeYapanGoster" style="display:none">
+                                <div class="form-group col-sm-12">
+                                    <label class="form-label" for="DuzenleOdemeYapan">Ödeme Yapan Ad-Soyad</label>
+                                    <input type="text" id="DuzenleOdemeYapan" class="form-control form-control-sm" name="DuzenleOdemeYapan" maxlength="250">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <label class="form-label" for="DuzenleAciklama">Açıklama</label>
+                                    <input type="text" id="DuzenleAciklama" class="form-control form-control-sm" name="DuzenleAciklama" maxlength="250">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Guncelle">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Hareket Duzenle Modal Penceresi -->
+<!-- Tahsilat Yap Modal Penceresi -->
+<div class="modal fade" id="TahsilatYapModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Tahsilat Yap
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="alert border border-primary bg-transparent text-primary" role="alert" id="TahsilatYapModalCariAdi">
+
+                    </div>
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="TahsilatYapIslemTarihi">İşlem Tarihi</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="TahsilatYapIslemTarihi" disabled>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="TahsilatYapAlacakBorcTip">Tip</label>
+                                    <select class="custom-select form-control custom-select-sm" id="TahsilatYapAlacakBorcTip" name="TahsilatYapAlacakBorcTip" title="Ödeme Şeklini Seçiniz." disabled>
+                                        <option selected="" value="0">Alacak</option>
+                                        <option value="1">Borç</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="TahsilatYapTutarHata">
+                                    <label class="form-label" for="TahsilatYapTutar">Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control bg-success-50" name="TahsilatYapTutar" maxlength="50" id="TahsilatYapTutar">
+                                </div>
+                                <div class="form-group col-sm-6" id="TahsilatYapOdemeSekliHata">
+                                    <label class="form-label" for="TahsilatYapOdemeSekli">Ödeme Şekli</label>
+                                    <select class="custom-select form-control custom-select-sm" id="TahsilatYapOdemeSekli" name="TahsilatYapOdemeSekli" title="Ödeme Şeklini Seçiniz.">
+                                        <option selected value="0">---</option>
+                                        <option value="1">Nakit</option>
+                                        <option value="2">Kredi Kartı</option>
+                                        <option value="3">Banka Havalesi</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="TahsilatYapOdemeTarihi" id="TahsilatYapOdemeTarihiLabel">Ödeme Tarihi</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="TahsilatYapOdemeTarihi">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="TahsilatYapOdemeYapan">Ödeme Yapan Ad-Soyad</label>
+                                    <input type="text" id="TahsilatYapOdemeYapan" class="form-control form-control-sm" name="TahsilatYapOdemeYapan" maxlength="250">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <label class="form-label" for="TahsilatYapAciklama">Açıklama</label>
+                                    <input type="text" id="TahsilatYapAciklama" class="form-control form-control-sm" name="TahsilatYapAciklama" maxlength="250">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="TahsilatYapKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Tahsilat Yap Modal Penceresi -->
+<!-- Tahsilat Yap Modal Penceresi -->
+<div class="modal fade" id="OdemeYapModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Ödeme Yap
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="alert border border-primary bg-transparent text-primary" role="alert" id="OdemeYapModalCariAdi">
+
+                    </div>
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="OdemeYapIslemTarihi">İşlem Tarihi</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="OdemeYapIslemTarihi" disabled>
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="OdemeYapAlacakBorcTip">Tip</label>
+                                    <select class="custom-select form-control custom-select-sm" id="OdemeYapAlacakBorcTip" name="OdemeYapAlacakBorcTip" title="Ödeme Şeklini Seçiniz." disabled>
+                                        <option value="0">Alacak</option>
+                                        <option selected="" value="1">Borç</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="OdemeYapTutarHata">
+                                    <label class="form-label" for="OdemeYapTutar">Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control bg-success-50" name="OdemeYapTutar" maxlength="50" id="OdemeYapTutar">
+                                </div>
+                                <div class="form-group col-sm-6" id="OdemeYapOdemeSekliHata">
+                                    <label class="form-label" for="OdemeYapOdemeSekli">Ödeme Şekli</label>
+                                    <select class="custom-select form-control custom-select-sm" id="OdemeYapOdemeSekli" name="OdemeYapOdemeSekli" title="Ödeme Şeklini Seçiniz.">
+                                        <option selected value="0">---</option>
+                                        <option value="1">Nakit</option>
+                                        <option value="2">Kredi Kartı</option>
+                                        <option value="3">Banka Havalesi</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row pb-3">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="OdemeYapOdemeTarihi" id="OdemeYapOdemeTarihiLabel">Ödeme Tarihi</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="OdemeYapOdemeTarihi">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="OdemeYapOdemeYapan">Ödeme Yapan Ad-Soyad</label>
+                                    <input type="text" id="OdemeYapOdemeYapan" class="form-control form-control-sm" name="OdemeYapOdemeYapan" maxlength="250">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <label class="form-label" for="OdemeYapAciklama">Açıklama</label>
+                                    <input type="text" id="OdemeYapAciklama" class="form-control form-control-sm" name="OdemeYapAciklama" maxlength="250">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="OdemeYapKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Tahsilat Yap Modal Penceresi -->
+<!-- Detay Modal Penceresi -->
+<div class="modal fade" id="CariDetayModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header"><h4 class="modal-title" id="DetayBaslik">Cari Detay Bilgileri</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div><div class="modal-body">
+                @*<table class="table table-responsive dtr-details" id="detaytablo" width="100%">*@
+                <table class="table" id="detaytablo" width="100%">
+                    <tr style="display:none"><td class="w-35"><b>Cari Id :</b></td> <td id="CariIdDetay"></td></tr>
+                    <tr id="FirmaDetayGoster"><td class="w-35"><b>Firma Adı :</b></td> <td id="FirmaAdiDetay"></td></tr>
+                    <tr id="YetkiliDetayGoster"><td class="w-35"><b>Yetkili :</b></td> <td id="YetkiliDetay"></td></tr>
+                    <tr id="VergiDairesiDetayGoster"><td class="w-35"><b>Vergi Dairesi :</b></td> <td id="VergiDairesiDetay"></td></tr>
+                    <tr id="VergiNoDetayGoster"><td class="w-35"><b>Vergi No :</b></td> <td id="VergiNoDetay"></td></tr>
+                    <tr><td class="w-35"><b>T.C. Kimlik No :</b></td> <td id="TCKimlikNoDetay"></td></tr>
+                    <tr id="AdSoyadDetayGoster"><td class="w-35"><b>Cari Adı-Soyadı :</b></td> <td id="AdSoyadDetay"></td></tr>
+                    <tr><td class="w-35"><b>Cep Telefonu :</b></td> <td id="CepDetay"></td></tr>
+                    <tr><td class="w-35"><b>Sabit Telefon :</b></td> <td id="SabitDetay"></td></tr>
+                    <tr><td class="w-35"><b>Fax :</b></td> <td id="FaxDetay"></td></tr>
+                    <tr><td class="w-35"><b>Email :</b></td> <td id="EmailDetay"></td></tr>
+                    <tr><td class="w-35"><b id="adresdata">Adres :</b></td> <td id="AdresDetay"></td></tr>
+                    <tr><td class="w-35"><b>Notlar :</b></td> <td id="NotlarDetay"></td></tr>
+                    @*<tr>
+                            <td class="w-35"><b>İşlem :</b></td>
+                            <td>
+                                <div class="d-flex mt-2">
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-danger mr-2" id="Sil2" title="Kaydı Sil" data-dismiss="modal"><i class="fal fa-times"></i> Sil</a>
+                                    <a href="javascript:void(0);" class="btn btn-sm btn-outline-primary mr-2" id="Duzenle2" title="Kaydı Düzenle" data-toggle='modal' data-dismiss="modal" data-target='#KayitDuzenleModal'><i class="fal fa-edit"></i> Düzenle</a>
+                                </div>
+                            </td>
+                        </tr>*@
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Detay Modal Penceresi -->
+<!-- Borç Bilgi SMS'i Modal Penceresi -->
+<div class="modal fade" id="BilgiSMSGonder" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Bilgi SMS'i Gönder
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="alert border border-primary bg-transparent text-primary" role="alert" id="SMSGonderModalCariAdi">
+
+                    </div>
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-12 mb-3">
+                                    <select class="custom-select form-control custom-select-sm" id="SmsMetinleri" name="SmsMetinleri" title="SMS Metini seçiniz">
+                                        <option selected="" value="0">SMS Metinini seçiniz</option>
+                                        @foreach (var smsmetin in Smsmetinleri)
+                                        {
+                                            <option value="@smsmetin.Id" data-smsmetni="@smsmetin.SMSMetni">@smsmetin.MetinAdi</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="SMSGonderTutar">Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control bg-success-50" name="SMSGonderTutar" maxlength="50" id="SMSGonderTutar" disabled>
+                                </div>
+                            </div>
+                            <div class="row mt-4" style="display:none" id="SmsBalonuGoster">
+                                <div class="bubble bubble-bottom-left mb-4" id="SMSMetni" contenteditable></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="SMSGonder">SMS Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Borç Bilgi SMS'i Modal Penceresi -->
+<!-- Filtreleme ve Tablo -->
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<input type="text" id="KullaniciYetkiKayitDetayi" class="form-control" name="Id" maxlength="50" style="display:none" value="@DetayYetki">
+<input type="text" id="KullaniciYetkiEkle" class="form-control" name="Id" maxlength="50" style="display:none" value="@EkleYetki">
+<input type="text" id="KullaniciYetkiSMS" class="form-control" name="Id" maxlength="50" style="display:none" value="@SMSYetki">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="row col col-12 mt-3" id="date_filter">
+                <div class="form-group col-sm-2">
+                    <div class="input-group mt-2">
+                        <div class="custom-control custom-switch">
+                            <input type="checkbox" class="custom-control-input" id="tarihsecim">
+                            <label class="custom-control-label" for="tarihsecim" id="tarihsecimetiket">İşlem Tarihi</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="IlkTarih">
+                        <div class="input-group-append">
+                            <span class="input-group-text fs-sm">
+                                <i class="fal fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-sm-2">
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="SonTarih">
+                        <div class="input-group-append">
+                            <span class="input-group-text fs-sm">
+                                <i class="fal fa-calendar-alt"></i>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                @*<div class="form-group col-sm-2">
+                        <select class="custom-select form-control custom-select-sm" id="Sube" name="Sube" title="Görüntülenecek Şube">
+                            <option value="0">Tüm Şubeler</option>
+                            @foreach (var sube in SubeKullanici)
+                                {
+                                    if (Convert.ToInt64(Session["AktifSubeId"]) == sube.SubeId && sube.Sube.Aktif == true)
+                                    {
+                                        <option selected="" value="@sube.Sube.SubeAdi">@sube.Sube.SubeAdi</option>
+                                    }
+                                    else if (sube.Sube.Aktif == true)
+                                    {
+                                        <option value="@sube.Sube.SubeAdi">@sube.Sube.SubeAdi</option>
+                                    }
+                                }
+                        </select>
+                    </div>*@
+
+                <div class="form-group col-sm-2">
+                    <select class="custom-select form-control custom-select-sm" id="GoruntuleTip" name="GoruntuleTip" title="Görüntülenecek Alacak - Borç Tipi">
+                        <option selected="" value="0">--TÜMÜ--</option>
+                        <option value="1">Alacaklar</option>
+                        <option value="2">Borçlar</option>
+                        <option value="3">Tahsilatı Yapılan Alacaklar</option>
+                        <option value="4">Ödemesi Yapılan Borçlar</option>
+                    </select>
+                </div>
+                @*<div class="form-group col-sm-2">
+                        <select class="custom-select form-control custom-select-sm" id="GoruntuleTip" name="GoruntuleTip" title="Görüntülenecek Alacak - Borç Tipi">
+                            <option selected="" value="0">--TÜMÜ--</option>
+                            <option value="1">Tahsilatı Yapılan Alacaklar</option>
+                            <option value="2">Ödemesi Yapılan Borçlar</option>
+                        </select>
+                    </div>*@
+                <div class="form-group col-sm-4">
+                    <select class="custom-select form-control custom-select-sm" id="Cari" name="Cari" title="Cari Seçiniz">
+                        <option selected="" value="0">Cari Seçiniz - TÜMÜ</option>
+                        @foreach (var cari in CariListesi)
+                        {
+                            if (cari.AdSoyad == "" && cari.FirmaAdi != "")
+                            {
+                                <option value="@cari.Id">@cari.FirmaAdi - @cari.Yetkili</option>
+                            }
+                            else if (cari.AdSoyad != "" && cari.FirmaAdi == "")
+                            {
+                                <option value="@cari.Id">@cari.AdSoyad</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group col-sm-3">
+                    <button type="button" class="btn btn-sm btn-primary" @*data-toggle="modal" data-target="#HareketEkleModal"*@ id="YeniEkle"> Hareket Ekle </button>
+                </div>
+            </div>
+            <div class="border-bottom mt-3"></div>
+            <input type="text" id="FiltreAyar" style="display:none" data-filtreayar="@ViewBag.FiltreAyar">
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtcarihesap" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th style="display:none">Firma</th> @* //  0   *@
+                                <th style="display:none">Şube</th> @* //  1   *@
+                                <th style="display:none">CariID</th> @* //  2   *@
+                                <th class="class=" align-middle"">Cari</th> @* //  3   *@
+                                <th class="align-middle w-10">İşlem Tarihi</th> @* //  4   *@
+                                <th class="align-middle w-10">Ödeme Tarihi</th> @* //  5   *@
+                                <th class="align-middle w-10">Alacak/Borç</th>  @* //  6   *@
+                                <th style="display:none">TahsilatOdemeBit</th>  @* //  7   *@
+                                <th class="align-middle w-10">Ödeme Şekli</th> @* //  8   *@
+                                <th class="align-middle">Tutar</th> @* //  9   *@
+                                <th class="align-middle">Açıklama</th> @* //  10   *@
+                                <th class="align-middle w-15">İşlem</th> @* //  11   *@
+                                <th style="display:none" class="align-middle w-10">İşlem Tarihi sıralama</th> @* //  12   *@
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Filtreleme ve Tablo -->
+<!-- Gelir - Gider Tolapamları Satırı -->
+<div class="row">
+    <div class="col-sm-4 col-xl-3">
+        <div class="p-3 bg-primary-500 rounded overflow-hidden position-relative text-white mb-g">
+            <div class="">
+                <h3 class="display-4 d-block l-h-n m-0 fw-500" id="AlacakToplam">
+
+                    <small class="m-0 l-h-n">Alacak Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-plus-circle position-absolute pos-right pos-bottom opacity-15 mb-n0 mr-n0" style="font-size:6rem"></i>
+        </div>
+    </div>
+    <div class="col-sm-4 col-xl-3">
+        <div class="p-3 bg-warning-500 rounded overflow-hidden position-relative text-white mb-g">
+            <div class="">
+                <h3 class="display-4 d-block l-h-n m-0 fw-500" id="BorcToplam">
+
+                    <small class="m-0 l-h-n">Borç Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-minus-circle position-absolute pos-right pos-bottom opacity-15  mb-n0 mr-n0" style="font-size: 6rem;"></i>
+        </div>
+    </div>
+    <div class="col-sm-4 col-xl-3">
+        <!-- alacak - borç  = sonuç (-) ise Kırmızı (bg-danger-500) olacak , (+) ise yeşil (bg-success-800) olacak, (0) ise gri (bg-fusion-50) olacak-->
+        <div class="p-3 bg-success-800 rounded overflow-hidden position-relative text-white mb-g" id="BakiyeRenk">
+            <div class="">
+                <h3 class="display-4 d-block l-h-n m-0 fw-500" id="Bakiye">
+
+                    <small class="m-0 l-h-n">Bakiye</small>
+                </h3>
+            </div>
+            <!-- alacak - borç  = sonuç (-) ise Simge sağa (<i class="fal fa-balance-scale-right"></i>) olacak , (+) ise simge sola(<i class="fal fa-balance-scale-left"></i>) olacak, (0) ise simge ortada (fal fa-balance-scale) olacak-->
+            <i class="fal fa-balance-scale position-absolute pos-right pos-bottom opacity-15 mb-n0 mr-n0" id="BakiyeIkon" style="font-size: 6rem;"></i>
+        </div>
+    </div>
+</div>
+<!-- Gelir - Gider Tolapamları Satırı -->
+<div class="alert alert-primary">
+    <div class="d-flex flex-start w-100">
+        <div class="mr-2 hidden-md-down">
+            <span class="icon-stack icon-stack-lg">
+                <i class="base base-6 icon-stack-3x opacity-100 color-primary-500"></i>
+                @*<i class="base base-10 icon-stack-2x opacity-100 color-primary-300 fa-flip-vertical"></i>*@
+                <i class="fal fa-info icon-stack-1x opacity-100 color-white pb-1"></i>
+            </span>
+        </div>
+        <div class="d-flex flex-fill">
+            <div class="flex-fill">
+                <span class="h5">Satır renk bilgileri</span>
+                <p> <strong class="color-warning-500">Ödemesi Yapılmış Borçlar</strong>, <strong class="color-primary-500">Tahsilatı Yapılmış Alacaklar</strong> <strong class="color-success-800">Toplama (Bakiye) </strong> dahil edilmez.</p>
+            </div>
+        </div>
+    </div>
+</div>
+@section Script
+{
+    <script src="~/Areas/Otomasyon/Content/js/tablotarihsirala.js"></script>
+    <script>
+        var filtreayar = $('#FiltreAyar').data("filtreayar");
+        var controls = {
+            leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
+            rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
+        }
+        var runDatePicker = function () {
+            if (filtreayar == "0") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+            } // 1 Gün
+            else if (filtreayar == "1") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() + 7)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() - 7)));
+            } // 1 Hafta Öncesi - 1 Hafta Sonrası
+            else if (filtreayar == "2") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() - 1)));
+            } // 1 Ay Öncesi - 1 Ay Sonrası
+            else if (filtreayar == "3") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
+            } // 1 Yıl Öncesi - 1 Yıl Sonrası
+            else if (filtreayar == "4") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+            } // Ayın başından bu güne
+            else if (filtreayar == "5") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), 0, 1));
+            } // Yılın başından bu güne
+            $('#IslemTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#DuzenleIslemTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#YeniEkleOdemeTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#DuzenleOdemeTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#TahsilatYapIslemTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#TahsilatYapOdemeTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#OdemeYapIslemTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#OdemeYapOdemeTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+        }
+        $(document).ready(function () {
+            $(":input").inputmask();
+            $("#Tutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#DuzenleTutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#TahsilatYapTutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#OdemeYapTutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#SMSGonderTutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var DetayYetki = $("#KullaniciYetkiKayitDetayi").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            var EkleYetki = $("#KullaniciYetkiEkle").val();
+            var SMSYetki = $("#KullaniciYetkiSMS").val();
+            runDatePicker();
+            function ParaFormat(fiyat) {
+                var para_sembol = "TL"
+                var format = new Intl.NumberFormat('de-DE', {
+                    style: 'currency',
+                    currency: 'TRY',
+                    minumumFractionDigits: 2
+                })
+                //return format.format(fiyat)
+                return format.format(fiyat).replace('TRY', para_sembol)
+            }
+            function parseDateValue(rawDate) {
+                var dateArray = rawDate.split(".");
+                var parsedDate = dateArray[2] + dateArray[1] + dateArray[0];
+                return parsedDate;
+            }
+            $(function () {
+                $('#Cari').select2();
+            });
+            var CariId = 0, dt, url, CariAdi,OdemeYapan, tarihsecim = "Islem", smsgondertutar = 0, odemetarihi, FirmaAdi, metin ;
+            url = "/Otomasyon/Muhasebe/CariHesapBakiyeler/" + CariId;
+            var alacaktoplam = 0, borctoplam = 0, alacak, borc, bakiye = 0;
+            var odemeislem = "yapılmadı", tahsilatislem = "yapılmadı", tip;
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#OdemeSekli').on('change', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.odemehata").remove();
+                }
+            });
+            $('#OdemeSekli').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.odemehata").remove();
+                }
+            });
+            $('#DuzenleOdemeSekli').on('change', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.duzenleodemehata").remove();
+                }
+            });
+            $('#DuzenleOdemeSekli').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.duzenleodemehata").remove();
+                }
+            });
+            $('#TahsilatYapOdemeSekli').on('change', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.tahsilatyapodemehata").remove();
+                }
+            });
+            $('#TahsilatYapOdemeSekli').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.tahsilatyapodemehata").remove();
+                }
+            });
+            $('#OdemeYapOdemeSekli').on('change', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.odemeyapodemehata").remove();
+                }
+            });
+            $('#OdemeYapOdemeSekli').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $(this).next("div.odemeyapodemehata").remove();
+                }
+            });
+            $("#odemechecked").on('click', function () {
+                if ($(this).is(':checked')) {
+                    odemeislem = "yapıldı";
+                    $("#YeniEkleOdemeTarihiGoster").attr("style", "display:none");
+                    $("#OdemeYapanGoster").removeAttr("style", "display:none");
+                    $('#YeniEkleOdemeTarihi').datepicker(
+                        {
+                            todayBtn: "linked",
+                            todayHighlight: true,
+                            templates: controls,
+                            language: 'tr',
+                        }).datepicker("setDate", new Date());
+                }
+                else {
+                    odemeislem = "yapılmadı";
+                    $("#YeniEkleOdemeTarihiGoster").removeAttr("style", "display:none");
+                    $("#OdemeYapanGoster").attr("style", "display:none");
+                    $('#YeniEkleOdemeTarihi').datepicker(
+                        {
+                            todayBtn: "linked",
+                            todayHighlight: true,
+                            templates: controls,
+                            language: 'tr',
+                        }).datepicker("setDate", new Date());
+                }
+            });
+            $("#tahsilatchecked").on('click', function () {
+                if ($(this).is(':checked')) {
+                    tahsilatislem = "yapıldı";
+                    $("#YeniEkleOdemeTarihiGoster").attr("style", "display:none");
+                    $("#OdemeYapanGoster").removeAttr("style", "display:none");
+                    $('#YeniEkleOdemeTarihi').datepicker(
+                        {
+                            todayBtn: "linked",
+                            todayHighlight: true,
+                            templates: controls,
+                            language: 'tr',
+                        }).datepicker("setDate", new Date());
+                }
+                else {
+                    tahsilatislem = "yapılmadı";
+                    $("#YeniEkleOdemeTarihiGoster").removeAttr("style", "display:none");
+                    $("#OdemeYapanGoster").attr("style", "display:none");
+                    $('#YeniEkleOdemeTarihi').datepicker(
+                        {
+                            todayBtn: "linked",
+                            todayHighlight: true,
+                            templates: controls,
+                            language: 'tr',
+                        }).datepicker("setDate", new Date());
+                }
+            });
+            $("#Duzenleodemechecked").on('click', function () {
+                if ($(this).is(':checked')) {
+                    odemeislem = "yapıldı";
+                    $("#DuzenleOdemeTarihiGoster").attr("style", "display:none");
+                    $("#DuzenleOdemeYapanGoster").removeAttr("style", "display:none");
+                }
+                else {
+                    odemeislem = "yapılmadı";
+                    $("#DuzenleOdemeTarihiGoster").removeAttr("style", "display:none");
+                    $("#DuzenleOdemeYapanGoster").attr("style", "display:none");
+                }
+            });
+            $("#Duzenletahsilatchecked").on('click', function () {
+                if ($(this).is(':checked')) {
+                    tahsilatislem = "yapıldı";
+                    $("#DuzenleOdemeTarihiGoster").attr("style", "display:none");
+                    $("#DuzenleOdemeYapanGoster").removeAttr("style", "display:none");
+                }
+                else {
+                    tahsilatislem = "yapılmadı";
+                    $("#DuzenleOdemeTarihiGoster").removeAttr("style", "display:none");
+                    $("#DuzenleOdemeYapanGoster").attr("style", "display:none");
+                }
+            });
+            $("#tarihsecim").on('click', function () {
+                if ($(this).is(':checked')) {
+                    $("#tarihsecimetiket").html("Ödeme Tarihi");
+                    tarihsecim = "Odeme";
+                }
+                else {
+                    $("#tarihsecimetiket").html("İşlem Tarihi");
+                    tarihsecim = "Islem";
+                }
+                alacaktoplam = 0; borctoplam = 0; dt.fnDraw();
+            }); // Tarih filtrelemenin hangi tarihe göre yapılacağı seçimi
+            $("#Cari").change(function () {
+                alacaktoplam = 0; borctoplam = 0; bakiye = 0;
+                CariId = $(this).val();
+                CariAdi = $("#Cari option:selected").text();
+                url = "/Otomasyon/Muhasebe/CariHesapBakiyeler/" + CariId;
+                alacaktoplam = 0; borctoplam = 0; bakiye = 0;
+                $("#AlacakToplam").html(accounting.formatMoney(alacaktoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alacaklar Toplamı</small>");
+                $("#BorcToplam").html(accounting.formatMoney(borctoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Borçlar Toplamı</small>");
+                $("#Bakiye").html(accounting.formatMoney(bakiye, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Bakiye</small>");
+                dt.api().ajax.url(url).load();
+            });
+            $("#AlacakBorcTip").change(function () {
+                if ($(this).val() == "0") {
+                    tip = "Alacak";
+                    $("#Tutar").removeClass("bg-danger-50");
+                    $("#Tutar").addClass("bg-success-50");
+                    $("#YeniEkleOdemeTarihiGoster").removeAttr("style", "display:none");
+                    $("#tahsilatyap").removeAttr("style", "display:none");
+                    $("#odemeyap").attr("style", "display:none");
+                    $("#odemechecked").prop("checked", false);
+                    $("#tahsilatchecked").prop("checked", false);
+                    odemeislem = "yapılmadı";
+                    tahsilatislem = "yapılmadı";
+                    $("#OdemeYapanGoster").attr("style", "display:none");
+                    $("#OdemeYapan").val("");
+                    $("#OdemeSekli").val("0");
+
+                }
+                else if ($(this).val() == "1") {
+                    tip = "Borç";
+                    $("#Tutar").removeClass("bg-success-50");
+                    $("#Tutar").addClass("bg-danger-50");
+                    $("#YeniEkleOdemeTarihiGoster").removeAttr("style", "display:none");
+                    $("#odemeyap").removeAttr("style", "display:none");
+                    $("#tahsilatyap").attr("style", "display:none");
+                    $("#tahsilatchecked").prop("checked", false);
+                    $("#odemechecked").prop("checked", false);
+                    odemeislem = "yapılmadı";
+                    tahsilatislem = "yapılmadı";
+                    $("#OdemeYapanGoster").attr("style", "display:none");
+                    $("#OdemeYapan").val("");
+                    $("#OdemeSekli").val("0");
+                }
+            });
+            $("#DuzenleAlacakBorcTip").change(function () {
+                if ($(this).val() == "0") {
+                    tip = "Alacak";
+                    $("#DuzenleTutar").removeClass("bg-danger-50");
+                    $("#DuzenleTutar").addClass("bg-success-50");
+                    $("#DuzenleOdemeTarihiGoster").removeAttr("style", "display:none");
+                    $("#Duzenletahsilatyap").removeAttr("style", "display:none");
+                    $("#Duzenleodemeyap").attr("style", "display:none");
+                    $("#Duzenleodemechecked").prop("checked", false);
+                    $("#Duzenletahsilatchecked").prop("checked", false);
+                    odemeislem = "yapılmadı";
+                    tahsilatislem = "yapılmadı";
+                    $("#DuzenleOdemeYapanGoster").attr("style", "display:none");
+                    $("#DuzenleOdemeYapan").val("");
+                    $("#DuzenleOdemeSekli").val("0");
+                }
+                else if ($(this).val() == "1") {
+                    tip = "Borç";
+                    $("#DuzenleTutar").removeClass("bg-success-50");
+                    $("#DuzenleTutar").addClass("bg-danger-50");
+                    $("#DuzenleYeniEkleOdemeTarihiGoster").removeAttr("style", "display:none");
+                    $("#Duzenleodemeyap").removeAttr("style", "display:none");
+                    $("#Duzenletahsilatyap").attr("style", "display:none");
+                    $("#Duzenletahsilatchecked").prop("checked", false);
+                    $("#Duzenleodemechecked").prop("checked", false);
+                    odemeislem = "yapılmadı";
+                    tahsilatislem = "yapılmadı";
+                    $("#DuzenleOdemeYapanGoster").attr("style", "display:none");
+                    $("#DuzenleOdemeYapan").val("");
+                    $("#DuzenleOdemeSekli").val("0");
+                }
+            });
+            $("#YeniEkle").click(function () {
+                if (CariId == 0) {
+                    Swal.fire(
+                        {
+                            type: "warning",
+                            title: "Lütfen bir Cari seçiniz!"
+                        });
+                }
+                else {
+                    $("#EkleModalCariAdi").html(CariAdi);
+                    $('#HareketEkleModal').modal('show');
+                    $('#IslemTarihi').datepicker(
+                        {
+                            todayBtn: "linked",
+                            todayHighlight: true,
+                            templates: controls,
+                            language: 'tr',
+                        }).datepicker("setDate", new Date());
+                    $("#AlacakBorcTip").val("0");
+                    $("#OdemeSekli").val("0");
+                    $("#Tutar").val("0");
+                    $("#Tutar").removeClass("bg-danger-50");
+                    $("#Tutar").addClass("bg-success-50");
+                    $("#tahsilatyap").removeAttr("style", "display:none");
+                    $("#YeniEkleOdemeTarihi").removeAttr("style", "display:none");
+                    $("#odemeyap").attr("style", "display:none");
+                    $("#odemechecked").prop("checked", false);
+                    $("#tahsilatchecked").prop("checked", false);
+                    $("#OdemeYapanGoster").attr("style", "display:none");
+                    $("#OdemeYapan").val("");
+                    odemeislem = "yapılmadı";
+                    tahsilatislem = "yapılmadı";
+                    $("#Aciklama").val("");
+                    $(':input').next("div.hata").remove();
+                }
+            });
+            $("#Kaydet").click(function () {
+                var odemesekli, tip;
+                if ($("#OdemeSekli").val() == "0") {
+                    odemesekli = "---";
+                }
+                else if ($("#OdemeSekli").val() == "1") {
+                    odemesekli = "Nakit";
+                }
+                else if ($("#OdemeSekli").val() == "2") {
+                    odemesekli = "Kredi Kartı";
+                }
+                else if ($("#OdemeSekli").val() == "3") {
+                    odemesekli = "Banka Havalesi";
+                }
+
+                if ($("#AlacakBorcTip").val() == "0") {
+                    tip = "Alacak";
+                }
+                else if ($("#AlacakBorcTip").val() == "1") {
+                    tip = "Borç";
+                }
+
+                if ($("#Tutar").val() == "0,00 TL") {
+                    $("#Tutar").focus();
+                    $("#TutarHata").append("<div class='hata' style='color:red'>Bir Tutar giriniz!</div>");
+                }
+                else if ($("#odemechecked").is(':checked') == true || $("#tahsilatchecked").is(':checked') == true) { //Ödeme Şekli Seçiniz
+                    if ($("#OdemeSekli").val() == "0") {
+                        $("#OdemeSekliHata").append("<div class='odemehata' style='color:red'>Ödeme şeklini seçiniz!</div>");
+                    }
+                    else {
+                        $('#HareketEkleModal').modal('hide');
+                        //id = $(this).val();
+                        var Tutar = $("#Tutar").val().replace(" TL", "");
+                        var CariHareketData = new FormData();
+                        CariHareketData.append("CariId", CariId);
+                        CariHareketData.append("IslemTarihi", $("#IslemTarihi").val());
+                        CariHareketData.append("OdemeTarihi", $("#YeniEkleOdemeTarihi").val());
+                        CariHareketData.append("Tutar", Tutar);
+                        CariHareketData.append("Tip", tip);
+                        CariHareketData.append("Aciklama", $("#Aciklama").val());
+                        CariHareketData.append("OdemeYapan", $("#OdemeYapan").val());
+                        CariHareketData.append("OdemeSekli", odemesekli);
+                        CariHareketData.append("OdemeIslem", odemeislem);
+                        CariHareketData.append("TahsilatIslem", tahsilatislem);
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            data: CariHareketData,
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Muhasebe/CariHareketEkle/",
+                            success: function (data) {
+                                alacaktoplam = 0; borctoplam = 0;
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                }
+                else {
+                    $('#HareketEkleModal').modal('hide');
+                    //id = $(this).val();
+                    var Tutar = $("#Tutar").val().replace(" TL", "");
+                    var CariHareketData = new FormData();
+                    CariHareketData.append("CariId", CariId);
+                    CariHareketData.append("IslemTarihi", $("#IslemTarihi").val());
+                    CariHareketData.append("OdemeTarihi", $("#YeniEkleOdemeTarihi").val());
+                    CariHareketData.append("Tutar", Tutar);
+                    CariHareketData.append("Tip", tip);
+                    CariHareketData.append("Aciklama", $("#Aciklama").val());
+                    CariHareketData.append("OdemeYapan", $("#OdemeYapan").val());
+                    CariHareketData.append("OdemeSekli", odemesekli);
+                    CariHareketData.append("OdemeIslem", odemeislem);
+                    CariHareketData.append("TahsilatIslem", tahsilatislem);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: CariHareketData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Muhasebe/CariHareketEkle/",
+                        success: function (data) {
+                            alacaktoplam = 0; borctoplam = 0;
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            $("#dtcarihesap").on('click', '.Detay', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                if ($(this).data("firmaadi") != "") {
+                    $("#AdSoyadDetayGoster").attr("style", "display:none");
+                    $("#FirmaDetayGoster").removeAttr("style");
+                    $("#YetkiliDetayGoster").removeAttr("style");
+                    $("#VergiDairesiDetayGoster").removeAttr("style");
+                    $("#VergiNoDetayGoster").removeAttr("style");
+                } else if ($(this).data("adsoyad") != "") {
+                    $("#AdSoyadDetayGoster").removeAttr("style");
+                    $("#FirmaDetayGoster").attr("style", "display:none");
+                    $("#YetkiliDetayGoster").attr("style", "display:none");
+                    $("#VergiDairesiDetayGoster").attr("style", "display:none");
+                    $("#VergiNoDetayGoster").attr("style", "display:none");
+                }
+                document.getElementById("FirmaAdiDetay").innerHTML = $(this).data("firmaadi");
+                document.getElementById("YetkiliDetay").innerHTML = $(this).data("yetkili");
+                document.getElementById("VergiDairesiDetay").innerHTML = $(this).data("vergidairesi");
+                document.getElementById("VergiNoDetay").innerHTML = $(this).data("vergino");
+                document.getElementById("TCKimlikNoDetay").innerHTML = $(this).data("tckimlikno");
+                document.getElementById("AdSoyadDetay").innerHTML = $(this).data("adsoyad");
+                var ceptel = $(this).data("ceptel").replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                document.getElementById("CepDetay").innerHTML = ceptel;
+                var sabittel = $(this).data("sabittel").replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                document.getElementById("SabitDetay").innerHTML = sabittel;
+                var fax = $(this).data("fax").replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                document.getElementById("FaxDetay").innerHTML = fax;
+                document.getElementById("EmailDetay").innerHTML = $(this).data("email");
+                document.getElementById("AdresDetay").innerHTML = $(this).data("adres");
+                document.getElementById("NotlarDetay").innerHTML = $(this).data("aciklama");
+            });
+            $("#dtcarihesap").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#Guncelle").val($(this).data("id"));
+                $("#DuzenleModalCariAdi").html(CariAdi);
+                CariId = $(this).data("cariid");
+                if ($(this).data("tip") == "Alacak") {
+                    tip = "Alacak";
+                    $("#DuzenleAlacakBorcTip").val("0");
+                    $("#DuzenleTutar").removeClass("bg-danger-50");
+                    $("#DuzenleTutar").addClass("bg-success-50");
+                    if ($(this).data("tahsilatodemebit") == true) {
+                        $("#Duzenletahsilatchecked").prop("checked", true);
+                        $("#Duzenletahsilatyap").removeAttr("style", "display:none");
+                        $("#Duzenleodemeyap").attr("style", "display:none");
+                        //Duzenletahsilatyap
+                        //Duzenleodemeyap
+                        $("#DuzenleOdemeTarihiGoster").attr("style", "display:none");
+                        $("#DuzenleOdemeYapanGoster").removeAttr("style", "display:none");
+                    }
+                    else {
+                        $("#Duzenletahsilatchecked").prop("checked", false);
+                        $("#Duzenletahsilatyap").removeAttr("style", "display:none");
+                        $("#Duzenleodemeyap").attr("style", "display:none");
+                        $("#DuzenleOdemeTarihiGoster").removeAttr("style", "display:none");
+                        $("#DuzenleOdemeYapanGoster").attr("style", "display:none");
+                    }
+                }
+                else if ($(this).data("tip") == "Borç") {
+                    tip = "Borç";
+                    $("#DuzenleAlacakBorcTip").val("1");
+                    $("#DuzenleTutar").removeClass("bg-success-50");
+                    $("#DuzenleTutar").addClass("bg-danger-50");
+                    if ($(this).data("tahsilatodemebit") == true) {
+                        $("#Duzenleodemechecked").prop("checked", true);
+                        $("#Duzenleodemeyap").removeAttr("style", "display:none");
+                        $("#Duzenletahsilatyap").attr("style", "display:none");
+                        $("#DuzenleOdemeTarihiGoster").attr("style", "display:none");
+                        $("#DuzenleOdemeYapanGoster").removeAttr("style", "display:none");
+                    }
+                    else {
+                        $("#Duzenleodemechecked").prop("checked", false);
+                        $("#Duzenleodemeyap").removeAttr("style", "display:none");
+                        $("#Duzenletahsilatyap").attr("style", "display:none");
+                        $("#DuzenleOdemeTarihiGoster").removeAttr("style", "display:none");
+                        $("#DuzenleOdemeYapanGoster").attr("style", "display:none");
+                        $("#OdemeYapan").val("");
+                    }
+                }
+                if ($(this).data("odemesekli") == "---") {
+                    $("#DuzenleOdemeSekli").val("0");
+                }
+                else if ($(this).data("odemesekli") == "Nakit") {
+                    $("#DuzenleOdemeSekli").val("1");
+                }
+                else if ($(this).data("odemesekli") == "Kredi Kartı") {
+                    $("#DuzenleOdemeSekli").val("1");
+                }
+                else if ($(this).data("odemesekli") == "Banka Havalesi") {
+                    $("#DuzenleOdemeSekli").val("2");
+                }
+                $("#DuzenleIslemTarihi").val($(this).data("islemtarihi"));
+                $("#DuzenleOdemeTarihi").val($(this).data("odemetarihi"));
+                $("#DuzenleTutar").val($(this).data("tutar"));
+                $("#DuzenleTutar").data("tutar", $(this).data("tutar"));
+                $("#DuzenleAciklama").val($(this).data("aciklama"));
+                //$("#Duzenletahsilatyap").attr("style", "display:none");
+                //$("#Duzenleodemechecked").attr("style", "display:none");
+
+                odemeislem = "yapılmadı";
+                tahsilatislem = "yapılmadı";
+
+                $("#OdemeYapan").val($(this).data("odemeyapan"));
+
+            });
+            $("#dtcarihesap").on('click', '.Sil', function () {
+                var id = $(this).data("id");
+                var tarih = $(this).data("tarih");
+                var tip = $(this).data("tip");
+                var tutar = $(this).data("tutar");
+                Swal.fire(
+                    {
+                        title: "Kayıt Silinecek",
+                        html: "<p><h2 style='font-size:16px; color:red'><strong>Tarih : </strong>" + tarih + "</br><strong>Alacak/Borç : </strong>" + tip + "</br><strong>Tutar : </strong>" + tutar + "</h2></p><h2>Cari Hareket kaydı silinsin mi?</h2>",
+                        type: "error",
+                        showCancelButton: true,
+                        confirmButtonText: "Evet, Silinsin!",
+                        cancelButtonText: "İptal"
+                    }).then(function (result) {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                contentType: false,
+                                processData: false,
+                                url: "/Otomasyon/Muhasebe/CariHareketSil/" + id,
+                                success: function (data) {
+                                    alacaktoplam = 0; borctoplam = 0;
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        dt.api().ajax.reload();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            });
+            $("#dtcarihesap").on('click', '.TahsilatYap', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#TahsilatYapKaydet").val($(this).data("id"));
+                $("#TahsilatYapKaydet").data("tutar", $(this).data("tutar"));
+                CariId = $(this).data("cariid");
+                var cari = "";
+                if ($(this).data("firmaadi") == "") {
+                    cari = $(this).data("adsoyad");
+                }
+                else {
+                    cari = $(this).data("firmaadi") + " - " + $(this).data("yetkili");
+                }
+                $("#TahsilatYapModalCariAdi").html(cari);
+                if ($(this).data("tip") == "Alacak") {
+                    $("#TahsilatYapAlacakBorcTip").val("0");
+                    $("#TahsilatYapTutar").removeClass("bg-danger-50");
+                    $("#TahsilatYapTutar").addClass("bg-success-50");
+                }
+                else if ($(this).data("tip") == "Borç") {
+                    $("#TahsilatYapAlacakBorcTip").val("1");
+                    $("#TahsilatYapTutar").removeClass("bg-success-50");
+                    $("#TahsilatYapTutar").addClass("bg-danger-50");
+                }
+                if ($(this).data("odemesekli") == "---") {
+                    $("#TahsilatYapOdemeSekli").val("0");
+                }
+                else if ($(this).data("odemesekli") == "Nakit") {
+                    $("#TahsilatYapOdemeSekli").val("1");
+                }
+                else if ($(this).data("odemesekli") == "Kredi Kartı") {
+                    $("#TahsilatYapOdemeSekli").val("1");
+                }
+                else if ($(this).data("odemesekli") == "Banka Havalesi") {
+                    $("#TahsilatYapOdemeSekli").val("2");
+                }
+                $("#TahsilatYapIslemTarihi").val($(this).data("islemtarihi"));
+                //$("#TahsilatYapOdemeTarihi").val($(this).data("odemetarihi"));
+                $("#TahsilatYapTutar").val($(this).data("tutar"));
+                $("#TahsilatYapAciklama").val($(this).data("aciklama"));
+                $("#TahsilatYapOdemeYapan").val("");
+            });
+            $("#dtcarihesap").on('click', '.OdemeYap', function () {
+                $("#OdemeYapKaydet").val($(this).data("id"));
+                $("#OdemeYapKaydet").data("tutar", $(this).data("tutar"));
+                CariId = $(this).data("cariid");
+                var cari = "";
+                if ($(this).data("firmaadi") == "") {
+                    cari = $(this).data("adsoyad");
+                }
+                else {
+                    cari = $(this).data("firmaadi") + " - " + $(this).data("yetkili");
+                }
+                $("#OdemeYapModalCariAdi").html(cari);
+                if ($(this).data("tip") == "Alacak") {
+                    $("#OdemeYapAlacakBorcTip").val("0");
+                    $("#OdemeYapTutar").removeClass("bg-danger-50");
+                    $("#OdemeYapTutar").addClass("bg-success-50");
+                }
+                else if ($(this).data("tip") == "Borç") {
+                    $("#OdemeYapAlacakBorcTip").val("1");
+                    $("#OdemeYapTutar").removeClass("bg-success-50");
+                    $("#OdemeYapTutar").addClass("bg-danger-50");
+                }
+                if ($(this).data("odemesekli") == "---") {
+                    $("#OdemeYapOdemeSekli").val("0");
+                }
+                else if ($(this).data("odemesekli") == "Nakit") {
+                    $("#OdemeYapOdemeSekli").val("1");
+                }
+                else if ($(this).data("odemesekli") == "Kredi Kartı") {
+                    $("#OdemeYapOdemeSekli").val("1");
+                }
+                else if ($(this).data("odemesekli") == "Banka Havalesi") {
+                    $("#OdemeYapOdemeSekli").val("2");
+                }
+                $("#OdemeYapIslemTarihi").val($(this).data("islemtarihi"));
+                //$("#TahsilatYapOdemeTarihi").val($(this).data("odemetarihi"));
+                $("#OdemeYapTutar").val($(this).data("tutar"));
+                $("#OdemeYapAciklama").val($(this).data("aciklama"));
+                $("#OdemeYapOdemeYapan").val("");
+            });
+            $("#Guncelle").click(function () {
+                var odemesekli;
+
+                if ($("#DuzenleOdemeSekli").val() == "0") {
+                    odemesekli = "---";
+                }
+                else if ($("#DuzenleOdemeSekli").val() == "1") {
+                    odemesekli = "Nakit";
+                }
+                else if ($("#DuzenleOdemeSekli").val() == "2") {
+                    odemesekli = "Kredi Kartı";
+                }
+                else if ($("#DuzenleOdemeSekli").val() == "3") {
+                    odemesekli = "Banka Havalesi";
+                }
+                if ($("#DuzenleAlacakBorcTip").val() == "0") {
+                    tip = "Alacak";
+                }
+                else if ($("#DuzenleAlacakBorcTip").val() == "1") {
+                    tip = "Borç";
+                }
+                if ($("#DuzenleTutar").val() == "0,00 TL") {
+                    $("#DuzenleTutar").focus();
+                    $("#DuzenleTutarHata").append("<div class='hata' style='color:red'>Bir Tutar giriniz!</div>");
+                }
+                else if ($("#Duzenleodemechecked").is(':checked') == true || $("#Duzenletahsilatchecked").is(':checked') == true) { //Ödeme Şekli Seçiniz
+                    if ($("#DuzenleOdemeSekli").val() == "0") {
+                        $("#DuzenleOdemeSekliHata").append("<div class='duzenleodemehata' style='color:red'>Ödeme şeklini seçiniz!</div>");
+                    }
+                    else {
+                        var eskitutar = $("#DuzenleTutar").data("tutar").replace(" ", "");
+                        eskitutar = eskitutar.replace("TL", "");
+                        eskitutar = eskitutar.replace(".", "");
+                        eskitutar = eskitutar.replace(",", ".");
+
+                        var yenitutar = $("#DuzenleTutar").val().replace(" ", "");
+                        yenitutar = yenitutar.replace("TL", "");
+                        yenitutar = yenitutar.replace(".", "");
+                        yenitutar = yenitutar.replace(",", ".");
+                        if (parseFloat(yenitutar) > parseFloat(eskitutar)) {
+                            if (tip == "Alacak") {
+                                Swal.fire(
+                                    {
+                                        type: "warning",
+                                        title: "Alacak tutarından fazla bir tutar tahsil edemezsiniz!"
+                                    });
+                            }
+                            else if (tip == "Borç") {
+                                Swal.fire(
+                                    {
+                                        type: "warning",
+                                        title: "Borç tutarından fazla bir tutar ödeme yapamazsınız!"
+                                    });
+                            }
+                        }
+                        else if (parseFloat(yenitutar) < parseFloat(eskitutar)) {
+                            var aciklama;
+                            if (tip == "Alacak") {
+                                aciklama = "Alacak tutarından düşük bir tutar girdiniz.<br />Kalan tutar yeni bir Alacak olarak Kaydedilecek!"
+                            }
+                            else if (tip == "Borç") {
+                                aciklama = "Borç tutarından düşük bir tutar girdiniz.<br />Kalan tutar yeni bir Borç olarak Kaydedilecek!"
+                            }
+
+                            Swal.fire(
+                                {
+                                    type: "warning",
+                                    title: aciklama,
+                                    showCancelButton: true,
+                                    confirmButtonText: "Tamam, Kaydet",
+                                    cancelButtonText: "İptal"
+                                }).then(function (result) {
+                                    if (result.value) {
+                                        $('#HareketDuzenleModal').modal('hide');
+                                        id = $("#Guncelle").val();
+                                        var Tutar = $("#DuzenleTutar").val().replace(" TL", "");
+                                        var CariHareketData = new FormData();
+                                        CariHareketData.append("CariId", CariId);
+                                        CariHareketData.append("IslemTarihi", $("#DuzenleIslemTarihi").val());
+                                        CariHareketData.append("OdemeTarihi", $("#DuzenleOdemeTarihi").val());
+                                        CariHareketData.append("Tutar", Tutar);
+                                        CariHareketData.append("Tip", tip);
+                                        CariHareketData.append("Aciklama", $("#DuzenleAciklama").val());
+                                        CariHareketData.append("OdemeYapan", $("#DuzenleOdemeYapan").val());
+                                        CariHareketData.append("OdemeSekli", odemesekli);
+                                        CariHareketData.append("OdemeIslem", odemeislem);
+                                        CariHareketData.append("TahsilatIslem", tahsilatislem);
+                                        $.ajax({
+                                            type: "POST",
+                                            datatype: 'json',
+                                            data: CariHareketData,
+                                            contentType: false,
+                                            processData: false,
+                                            url: "/Otomasyon/Muhasebe/CariHareketGuncelle/" + id,
+                                            success: function (data) {
+                                                alacaktoplam = 0; borctoplam = 0;
+                                                if (data.Sonuc == false) {
+                                                    alertify.set('notifier', 'delay', 5);
+                                                    alertify.set('notifier', 'position', 'top-center');
+                                                    alertify.error(data.Mesaj);
+                                                }
+                                                else if (data.Sonuc == true) {
+                                                    alertify.set('notifier', 'delay', 3);
+                                                    alertify.set('notifier', 'position', 'top-center');
+                                                    alertify.success(data.Mesaj);
+                                                    dt.api().ajax.reload();
+                                                }
+                                            },
+                                            error: function (err) {
+                                                alert("HATA");
+                                            }
+                                        });
+                                    }
+                                });
+                        }
+                        else {
+                            $('#HareketDuzenleModal').modal('hide');
+                            id = $("#Guncelle").val();
+                            var Tutar = $("#DuzenleTutar").val().replace(" TL", "");
+                            var CariHareketData = new FormData();
+                            CariHareketData.append("CariId", CariId);
+                            CariHareketData.append("IslemTarihi", $("#DuzenleIslemTarihi").val());
+                            CariHareketData.append("OdemeTarihi", $("#DuzenleOdemeTarihi").val());
+                            CariHareketData.append("Tutar", Tutar);
+                            CariHareketData.append("Tip", tip);
+                            CariHareketData.append("Aciklama", $("#DuzenleAciklama").val());
+                            CariHareketData.append("OdemeYapan", $("#DuzenleOdemeYapan").val());
+                            CariHareketData.append("OdemeSekli", odemesekli);
+                            CariHareketData.append("OdemeIslem", odemeislem);
+                            CariHareketData.append("TahsilatIslem", tahsilatislem);
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                data: CariHareketData,
+                                contentType: false,
+                                processData: false,
+                                url: "/Otomasyon/Muhasebe/CariHareketGuncelle/" + id,
+                                success: function (data) {
+                                    alacaktoplam = 0; borctoplam = 0;
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        dt.api().ajax.reload();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    }
+                }
+                else {
+                    $('#HareketDuzenleModal').modal('hide');
+                    id = $("#Guncelle").val();
+                    var Tutar = $("#DuzenleTutar").val().replace(" TL", "");
+                    var CariHareketData = new FormData();
+                    CariHareketData.append("CariId", CariId);
+                    CariHareketData.append("IslemTarihi", $("#DuzenleIslemTarihi").val());
+                    CariHareketData.append("OdemeTarihi", $("#DuzenleOdemeTarihi").val());
+                    CariHareketData.append("Tutar", Tutar);
+                    CariHareketData.append("Tip", tip);
+                    CariHareketData.append("Aciklama", $("#DuzenleAciklama").val());
+                    CariHareketData.append("OdemeYapan", $("#DuzenleOdemeYapan").val());
+                    CariHareketData.append("OdemeSekli", odemesekli);
+                    CariHareketData.append("OdemeIslem", odemeislem);
+                    CariHareketData.append("TahsilatIslem", tahsilatislem);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: CariHareketData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Muhasebe/CariHareketGuncelle/" + id,
+                        success: function (data) {
+                            alacaktoplam = 0; borctoplam = 0;
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            $("#TahsilatYapKaydet").click(function () {
+                var odemesekli, tip;
+                id = $(this).val();
+                if ($("#TahsilatYapOdemeSekli").val() == "0") {
+                    odemesekli = "---";
+                }
+                else if ($("#TahsilatYapOdemeSekli").val() == "1") {
+                    odemesekli = "Nakit";
+                }
+                else if ($("#TahsilatYapOdemeSekli").val() == "2") {
+                    odemesekli = "Kredi Kartı";
+                }
+                else if ($("#TahsilatYapOdemeSekli").val() == "3") {
+                    odemesekli = "Banka Havalesi";
+                }
+
+                if ($("#TahsilatYapAlacakBorcTip").val() == "0") {
+                    tip = "Alacak";
+                }
+                else if ($("#TahsilatYapAlacakBorcTip").val() == "1") {
+                    tip = "Borç";
+                }
+
+                var alacaktutar = $("#TahsilatYapKaydet").data("tutar").replace(" ", "");
+                alacaktutar = alacaktutar.replace("TL", "");
+                alacaktutar = alacaktutar.replace(".", "");
+                alacaktutar = alacaktutar.replace(",", ".");
+
+                var tahsiledilentutar = $("#TahsilatYapTutar").val().replace(" ", "");
+                tahsiledilentutar = tahsiledilentutar.replace("TL", "");
+                tahsiledilentutar = tahsiledilentutar.replace(".", "");
+                tahsiledilentutar = tahsiledilentutar.replace(",", ".");
+
+                // Zorunlu Alan Kontrolü
+                if ($("#TahsilatYapTutar").val() == "0,00 TL") {
+                    $("#TahsilatYapTutar").focus();
+                    $("#TahsilatYapTutarHata").append("<div class='hata' style='color:red'>Bir Tutar giriniz!</div>");
+                }
+                else if ($("#TahsilatYapOdemeSekli").val() == "0") {
+                    $("#TahsilatYapOdemeSekliHata").append("<div class='tahsilatyapodemehata' style='color:red'>Ödeme şeklini seçiniz!</div>");
+                }
+                else {
+                    if (parseFloat(tahsiledilentutar) > parseFloat(alacaktutar)) {
+                        Swal.fire(
+                            {
+                                type: "warning",
+                                title: "Alacak tutarından fazla bir tutar tahsil edemezsiniz!"
+                            });
+                    }
+                    else if (parseFloat(tahsiledilentutar) < parseFloat(alacaktutar)) {
+                        Swal.fire(
+                            {
+                                type: "warning",
+                                title: "Alacak tutarından düşük bir tutar girdiniz.<br />Kalan tutar yeni bir Alacak olarak Kaydedilecek!",
+                                showCancelButton: true,
+                                confirmButtonText: "Tamam, Kaydet",
+                                cancelButtonText: "İptal"
+                            }).then(function (result) {
+                                if (result.value) {
+                                    $('#TahsilatYapModal').modal('hide');
+                                    var Tutar = $("#TahsilatYapTutar").val().replace(" TL", "");
+                                    var CariHareketData = new FormData();
+                                    CariHareketData.append("CariId", CariId);
+                                    CariHareketData.append("IslemTarihi", $("#TahsilatYapIslemTarihi").val());
+                                    CariHareketData.append("OdemeTarihi", $("#TahsilatYapOdemeTarihi").val());
+                                    CariHareketData.append("Tutar", Tutar);
+                                    CariHareketData.append("Tip", "Alacak");
+                                    CariHareketData.append("OdemeSekli", odemesekli);
+                                    CariHareketData.append("Aciklama", $("#TahsilatYapAciklama").val());
+                                    CariHareketData.append("OdemeYapan", $("#TahsilatYapOdemeYapan").val());
+                                    $.ajax({
+                                        type: "POST",
+                                        datatype: 'json',
+                                        data: CariHareketData,
+                                        contentType: false,
+                                        processData: false,
+                                        url: "/Otomasyon/Muhasebe/TahsilatYap/" + id,
+                                        success: function (data) {
+                                            alacaktoplam = 0; borctoplam = 0;
+                                            if (data.Sonuc == false) {
+                                                alertify.set('notifier', 'delay', 5);
+                                                alertify.set('notifier', 'position', 'top-center');
+                                                alertify.error(data.Mesaj);
+                                            }
+                                            else if (data.Sonuc == true) {
+                                                alertify.set('notifier', 'delay', 3);
+                                                alertify.set('notifier', 'position', 'top-center');
+                                                alertify.success(data.Mesaj);
+                                                dt.api().ajax.reload();
+                                            }
+                                        },
+                                        error: function (err) {
+                                            alert("HATA");
+                                        }
+                                    });
+                                }
+                            });
+                    }
+                    else {
+                        $('#TahsilatYapModal').modal('hide');
+                        var Tutar = $("#TahsilatYapTutar").val().replace(" TL", "");
+                        var CariHareketData = new FormData();
+                        CariHareketData.append("CariId", CariId);
+                        CariHareketData.append("IslemTarihi", $("#TahsilatYapIslemTarihi").val());
+                        CariHareketData.append("OdemeTarihi", $("#TahsilatYapOdemeTarihi").val());
+                        CariHareketData.append("Tutar", Tutar);
+                        CariHareketData.append("Tip", "Alacak");
+                        CariHareketData.append("OdemeSekli", odemesekli);
+                        CariHareketData.append("Aciklama", $("#TahsilatYapAciklama").val());
+                        CariHareketData.append("OdemeYapan", $("#TahsilatYapOdemeYapan").val());
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            data: CariHareketData,
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Muhasebe/TahsilatYap/" + id,
+                            success: function (data) {
+                                alacaktoplam = 0; borctoplam = 0;
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                }
+            });
+            $("#OdemeYapKaydet").click(function () {
+                var odemesekli, tip;
+                id = $(this).val();
+                if ($("#OdemeYapOdemeSekli").val() == "0") {
+                    odemesekli = "---";
+                }
+                else if ($("#OdemeYapOdemeSekli").val() == "1") {
+                    odemesekli = "Nakit";
+                }
+                else if ($("#OdemeYapOdemeSekli").val() == "2") {
+                    odemesekli = "Kredi Kartı";
+                }
+                else if ($("#OdemeYapOdemeSekli").val() == "3") {
+                    odemesekli = "Banka Havalesi";
+                }
+
+                if ($("#OdemeYapAlacakBorcTip").val() == "0") {
+                    tip = "Alacak";
+                }
+                else if ($("#OdemeYapAlacakBorcTip").val() == "1") {
+                    tip = "Borç";
+                }
+
+                var borctutar = $("#OdemeYapKaydet").data("tutar").replace(" ", "");
+                borctutar = borctutar.replace("TL", "");
+                borctutar = borctutar.replace(".", "");
+                borctutar = borctutar.replace(",", ".");
+
+                var odenentutar = $("#OdemeYapTutar").val().replace(" ", "");
+                odenentutar = odenentutar.replace("TL", "");
+                odenentutar = odenentutar.replace(".", "");
+                odenentutar = odenentutar.replace(",", ".");
+
+                // Zorunlu Alan Kontrolü
+                if ($("#OdemeYapTutar").val() == "0,00 TL") {
+                    $("#OdemeYapTutar").focus();
+                    $("#OdemeYapTutarHata").append("<div class='hata' style='color:red'>Bir Tutar giriniz!</div>");
+                }
+                else if ($("#OdemeYapOdemeSekli").val() == "0") {
+                    $("#OdemeYapOdemeSekliHata").append("<div class='odemeyapodemehata' style='color:red'>Ödeme şeklini seçiniz!</div>");
+                }
+                else {
+                    if (parseFloat(odenentutar) > parseFloat(borctutar)) {
+                        Swal.fire(
+                            {
+                                type: "warning",
+                                title: "Borç tutarından fazla bir tutar ödemesi alamazsınız!"
+                            });
+                    }
+                    else if (parseFloat(odenentutar) < parseFloat(borctutar)) {
+                        Swal.fire(
+                            {
+                                type: "warning",
+                                title: "Borç tutarından düşük bir tutar girdiniz.<br />Kalan tutar yeni bir Borç olarak Kaydedilecek!",
+                                showCancelButton: true,
+                                confirmButtonText: "Tamam, Kaydet",
+                                cancelButtonText: "İptal"
+                            }).then(function (result) {
+                                if (result.value) {
+                                    $('#OdemeYapModal').modal('hide');
+                                    var Tutar = $("#OdemeYapTutar").val().replace(" TL", "");
+                                    var CariHareketData = new FormData();
+                                    CariHareketData.append("CariId", CariId);
+                                    CariHareketData.append("IslemTarihi", $("#OdemeYapIslemTarihi").val());
+                                    CariHareketData.append("OdemeTarihi", $("#OdemeYapOdemeTarihi").val());
+                                    CariHareketData.append("Tutar", Tutar);
+                                    CariHareketData.append("Tip", "Borç");
+                                    CariHareketData.append("OdemeSekli", odemesekli);
+                                    CariHareketData.append("Aciklama", $("#OdemeYapAciklama").val());
+                                    CariHareketData.append("OdemeYapan", $("#OdemeYapOdemeYapan").val());
+                                    $.ajax({
+                                        type: "POST",
+                                        datatype: 'json',
+                                        data: CariHareketData,
+                                        contentType: false,
+                                        processData: false,
+                                        url: "/Otomasyon/Muhasebe/OdemeYap/" + id,
+                                        success: function (data) {
+                                            alacaktoplam = 0; borctoplam = 0;
+                                            if (data.Sonuc == false) {
+                                                alertify.set('notifier', 'delay', 5);
+                                                alertify.set('notifier', 'position', 'top-center');
+                                                alertify.error(data.Mesaj);
+                                            }
+                                            else if (data.Sonuc == true) {
+                                                alertify.set('notifier', 'delay', 3);
+                                                alertify.set('notifier', 'position', 'top-center');
+                                                alertify.success(data.Mesaj);
+                                                dt.api().ajax.reload();
+                                            }
+                                        },
+                                        error: function (err) {
+                                            alert("HATA");
+                                        }
+                                    });
+                                }
+                            });
+                    }
+                    else {
+                        $('#OdemeYapModal').modal('hide');
+                        var Tutar = $("#OdemeYapTutar").val().replace(" TL", "");
+                        var CariHareketData = new FormData();
+                        CariHareketData.append("CariId", CariId);
+                        CariHareketData.append("IslemTarihi", $("#OdemeYapIslemTarihi").val());
+                        CariHareketData.append("OdemeTarihi", $("#OdemeYapOdemeTarihi").val());
+                        CariHareketData.append("Tutar", Tutar);
+                        CariHareketData.append("Tip", "Borç");
+                        CariHareketData.append("OdemeSekli", odemesekli);
+                        CariHareketData.append("Aciklama", $("#OdemeYapAciklama").val());
+                        CariHareketData.append("OdemeYapan", $("#OdemeYapOdemeYapan").val());
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            data: CariHareketData,
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Muhasebe/OdemeYap/" + id,
+                            success: function (data) {
+                                alacaktoplam = 0; borctoplam = 0;
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                }
+            });
+
+            $("#dtcarihesap").on('click', '.SmsGonder', function () {
+                $("#SMSGonderModalCariAdi").html("");
+                $("#SMSGonderTutar").val("");
+                $("#SMSMetni").html("");
+                $("#SmsMetinleri").val("0");
+                FirmaAdi = $(this).data("firmaadi")
+                if ($(this).data("yetkili") != "") {
+                    OdemeYapan = $(this).data("yetkili")
+                }
+                else if ($(this).data("adsoyad") != "") {
+                    OdemeYapan = $(this).data("adsoyad")
+                }
+                else if ($(this).data("odemeyapan") != "") {
+                    OdemeYapan = $(this).data("odemeyapan")
+                }
+                CariAdi = $(this).data("firmaadi") + ' ' + $(this).data("yetkili") + ' ' + $(this).data("adsoyad");
+                CariId = $(this).data("cariid");
+                var caritel = $(this).data("ceptel");
+                smsgondertutar = $(this).data("tutar");
+
+                $("#SMSGonder").val($(this).data("odemeid"));
+                $("#SMSGonder").data("tutar", $(this).data("tutar"));
+                $("#SMSGonder").data("cariid", $(this).data("cariid"));
+                $("#SMSGonder").data("odemetarihi", $(this).data("odemetarihi"));
+                $("#SMSGonderModalCariAdi").html(CariAdi + " - " + caritel);
+                $("#SMSGonderTutar").val($(this).data("tutar"));
+                $("#SmsBalonuGoster").attr("style", "display:none");
+            });
+            $("#SmsMetinleri").change(function () {
+                metin = $(this).find("option:selected").data("smsmetni");
+                odemetarihi = $("#SMSGonder").data("odemetarihi");
+                smsgondertutar = $("#SMSGonder").data("tutar").replace("TL", "").trim();
+                metin = metin.replace("{AdSoyad}", OdemeYapan);
+                metin = metin.replace("{OdemeTarihi}", odemetarihi);
+                metin = metin.replace("{Tutar}", smsgondertutar);
+                metin = metin.replace("{FirmaAdi}", FirmaAdi);
+                smsmetinid = $(this).find("option:selected").val();
+                //$("#SmsBalonuGoster").attr("style", "display:none");
+                $("#SmsBalonuGoster").removeAttr("style");
+                $("#SMSMetni").html(metin);
+            });
+            $("#SMSGonder").click(function () {
+                Swal.fire(
+                    {
+                        title: "Bilgi SMS'i Gönder",
+                        //text: "< " + giskategori + " > adlı Günlük İş Katergorisi silinsin mi?",
+                        html: "<p style='color:red;font-size:12pt;'><h3> Cariye Seçilen Bilgi SMS'i gönderilsin mi?</h3></p> ",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Gönder!"
+                    }).then(function (result) {
+                        if (result.value) {
+                            var SMSGonderData = new FormData();
+                            SMSGonderData.append("CariId", CariId);
+                            SMSGonderData.append("OdemeTarihi", odemetarihi)
+                            SMSGonderData.append("SmsMetinId", smsmetinid);
+                            SMSGonderData.append("Tutar", smsgondertutar);
+                            SMSGonderData.append("SmsMetin", metin);
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                data: SMSGonderData,
+                                contentType: false,
+                                processData: false,
+                                beforeSend: function () {
+                                    Swal.fire(
+                                        {
+                                            title: "Müşteriye Bilgi SMS'i Gönderiliyor!",
+                                            html: "<strong>Lütfen Bekleyin.</strong>",
+                                            onBeforeOpen: function onBeforeOpen() {
+                                                Swal.showLoading();
+                                            }
+                                        });
+                                },
+                                url: "/Otomasyon/Muhasebe/CariSMSGonder/",
+                                success: function (data) {
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                        swal.close();
+                                        $('#BilgiSMSGonder').modal('hide');
+                                        $("#SMSGonderModalMusteriAdi").html("");
+                                        $("#SMSGonderTutar").val("");
+                                        $("#SMSMetni").html("");
+                                        $("#SmsMetinleri").val("0");
+                                        $("#SmsBalonuGoster").attr("style", "display:none");
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        swal.close();
+                                        $('#BilgiSMSGonder').modal('hide');
+                                        $("#SMSGonderModalMusteriAdi").html("");
+                                        $("#SMSGonderTutar").val("");
+                                        $("#SMSMetni").html("");
+                                        $("#SmsMetinleri").val("0");
+                                        $("#SmsBalonuGoster").attr("style", "display:none");
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            });
+
+            $("#AlacakToplam").html(accounting.formatMoney(alacaktoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alacaklar Toplamı</small>");
+            $("#BorcToplam").html(accounting.formatMoney(borctoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Borçlar Toplamı</small>");
+            $("#Bakiye").html(accounting.formatMoney(bakiye, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Bakiye</small>");
+
+            $("#IlkTarih").keyup(function () { alacaktoplam = 0; borctoplam = 0; bakiye = 0; dt.fnDraw(); });
+            $("#IlkTarih").change(function () { alacaktoplam = 0; borctoplam = 0; bakiye = 0; dt.fnDraw(); });
+            $("#SonTarih").keyup(function () { alacaktoplam = 0; borctoplam = 0; bakiye = 0; dt.fnDraw(); });
+            $("#SonTarih").change(function () { alacaktoplam = 0; borctoplam = 0; bakiye = 0; dt.fnDraw(); });
+            $("#GoruntuleTip").change(function () { alacaktoplam = 0; borctoplam = 0; bakiye = 0; dt.fnDraw(); });
+            $("#Sube").change(function () { alacaktoplam = 0; borctoplam = 0; bakiye = 0; dt.fnDraw(); });
+            $("input[type='search']").keydown(function () {
+                alacaktoplam = 0; borctoplam = 0; bakiye = 0;
+            });
+            $.fn.dataTableExt.afnFiltering.push(
+                function (Settings, Data, DataIndex) {
+                    var ilktarih = parseDateValue($("#IlkTarih").val());
+                    var sontarih = parseDateValue($("#SonTarih").val());
+                    var firmaadi = $("#Firma").val();
+                    //var subeadi = $("#Sube").val();
+                    var goruntuletip = $("#GoruntuleTip").val(); // 0,1,2,3,4
+                    var cariid = $("#Cari").val();
+                    var tarih, firma, sube, tip, cari, odemetahsilatbit;
+                    if (firmaadi == undefined) {
+                        firmaadi = 0;
+                    }
+                    if (tarihsecim == "Islem")
+                        tarih = parseDateValue(Data[4]);
+                    else if (tarihsecim == "Odeme")
+                        tarih = parseDateValue(Data[5]);
+
+                    firma = Data[0];
+                    //sube = Data[1];
+                    cari = Data[2]; // Tablodaki CariId
+                    odemetahsilatbit = Data[7];
+
+                    if (Data[6] == "Alacak" && Data[7] == "false") {
+                        tip = 1;
+                        alacak = Data[9];
+                        alacak = alacak.replace("TL", "");
+                        alacak = alacak.replace(".", "");
+                        alacak = alacak.replace(",", ".");
+                    }
+                    else if (Data[6] == "Alacak" && Data[7] == "true") {
+                        tip = 3;
+                        alacak = Data[9];
+                        alacak = alacak.replace("TL", "");
+                        alacak = alacak.replace(".", "");
+                        alacak = alacak.replace(",", ".");
+                    }
+                    else if (Data[6] == "Borç" && Data[7] == "false") {
+                        tip = 2;
+                        borc = Data[9];
+                        borc = borc.replace("TL", "");
+                        borc = borc.replace(".", "");
+                        borc = borc.replace(",", ".");
+                    }
+                    else if (Data[6] == "Borç" && Data[7] == "true") {
+                        tip = 4;
+                        borc = Data[9];
+                        borc = borc.replace("TL", "");
+                        borc = borc.replace(".", "");
+                        borc = borc.replace(",", ".");
+                    }
+
+                    if (ilktarih == null && sontarih == null) return true;
+                    if (ilktarih == null && tarih <= sontarih) return true;
+                    if (sontarih == null && tarih >= ilktarih) return true;
+                    if (tarih <= sontarih && tarih >= ilktarih) {
+                        if (firmaadi == 0 && goruntuletip == 0 && cariid == 0) {
+                            if (odemetahsilatbit == 'false') {
+                                if (tip == 1) {
+                                    alacaktoplam = parseFloat(alacaktoplam) + parseFloat(alacak);
+                                }
+                                else {
+                                    borctoplam = parseFloat(borctoplam) + parseFloat(borc);
+                                }
+                            }
+                            bakiye = parseFloat(alacaktoplam) - parseFloat(borctoplam);
+                            if (parseFloat(bakiye) > 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-success-800");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-left");
+                            }
+                            else if (parseFloat(bakiye) < 0) {
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-danger-500");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-right");
+                            }
+                            else if (parseFloat(bakiye) == 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").addClass("bg-fusion-50");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale");
+                            }
+                            $("#AlacakToplam").html(accounting.formatMoney(alacaktoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alacaklar Toplamı</small>");
+                            $("#BorcToplam").html(accounting.formatMoney(borctoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Borçlar Toplamı</small>");
+                            $("#Bakiye").html(accounting.formatMoney(bakiye, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Bakiye</small>");
+                            return true;
+                        }
+                        else if (firmaadi == 0 && goruntuletip == 0 && cariid == cari) {
+                            if (odemetahsilatbit == 'false') {
+                                if (tip == 1) {
+                                    alacaktoplam = parseFloat(alacaktoplam) + parseFloat(alacak);
+                                }
+                                else {
+                                    borctoplam = parseFloat(borctoplam) + parseFloat(borc);
+                                }
+                            }
+                            bakiye = parseFloat(alacaktoplam) - parseFloat(borctoplam);
+                            if (parseFloat(bakiye) > 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-success-800");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-left");
+                            }
+                            else if (parseFloat(bakiye) < 0) {
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-danger-500");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-right");
+                            }
+                            else if (parseFloat(bakiye) == 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").addClass("bg-fusion-50");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale");
+                            }
+                            $("#AlacakToplam").html(accounting.formatMoney(alacaktoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alacaklar Toplamı</small>");
+                            $("#BorcToplam").html(accounting.formatMoney(borctoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Borçlar Toplamı</small>");
+                            $("#Bakiye").html(accounting.formatMoney(bakiye, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Bakiye</small>");
+                            return true;
+                        }
+                        else if (firmaadi == 0 && goruntuletip == tip && cariid == 0) {
+                            if (odemetahsilatbit == 'false') {
+                                if (tip == 1) {
+                                    alacaktoplam = parseFloat(alacaktoplam) + parseFloat(alacak);
+                                }
+                                else {
+                                    borctoplam = parseFloat(borctoplam) + parseFloat(borc);
+                                }
+                            }
+                            bakiye = parseFloat(alacaktoplam) - parseFloat(borctoplam);
+                            if (parseFloat(bakiye) > 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-success-800");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-left");
+                            }
+                            else if (parseFloat(bakiye) < 0) {
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-danger-500");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-right");
+                            }
+                            else if (parseFloat(bakiye) == 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").addClass("bg-fusion-50");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale");
+                            }
+                            $("#AlacakToplam").html(accounting.formatMoney(alacaktoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alacaklar Toplamı</small>");
+                            $("#BorcToplam").html(accounting.formatMoney(borctoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Borçlar Toplamı</small>");
+                            $("#Bakiye").html(accounting.formatMoney(bakiye, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Bakiye</small>");
+                            return true;
+                        }
+                        else if (firmaadi == 0 && goruntuletip == tip && cariid == cari) {
+                            if (odemetahsilatbit == 'false') {
+                                if (tip == 1) {
+                                    alacaktoplam = parseFloat(alacaktoplam) + parseFloat(alacak);
+                                }
+                                else {
+                                    borctoplam = parseFloat(borctoplam) + parseFloat(borc);
+                                }
+                            }
+                            bakiye = parseFloat(alacaktoplam) - parseFloat(borctoplam);
+                            if (parseFloat(bakiye) > 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-success-800");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-left");
+                            }
+                            else if (parseFloat(bakiye) < 0) {
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-danger-500");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-right");
+                            }
+                            else if (parseFloat(bakiye) == 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").addClass("bg-fusion-50");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale");
+                            }
+                            $("#AlacakToplam").html(accounting.formatMoney(alacaktoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alacaklar Toplamı</small>");
+                            $("#BorcToplam").html(accounting.formatMoney(borctoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Borçlar Toplamı</small>");
+                            $("#Bakiye").html(accounting.formatMoney(bakiye, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Bakiye</small>");
+                            return true;
+                        }
+                        else if (firmaadi == firma && goruntuletip == 0 && cariid == 0) {
+                            if (odemetahsilatbit == 'false') {
+                                if (tip == 1) {
+                                    alacaktoplam = parseFloat(alacaktoplam) + parseFloat(alacak);
+                                }
+                                else {
+                                    borctoplam = parseFloat(borctoplam) + parseFloat(borc);
+                                }
+                            }
+                            bakiye = parseFloat(alacaktoplam) - parseFloat(borctoplam);
+                            if (parseFloat(bakiye) > 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-success-800");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-left");
+                            }
+                            else if (parseFloat(bakiye) < 0) {
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-danger-500");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-right");
+                            }
+                            else if (parseFloat(bakiye) == 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").addClass("bg-fusion-50");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale");
+                            }
+                            $("#AlacakToplam").html(accounting.formatMoney(alacaktoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alacaklar Toplamı</small>");
+                            $("#BorcToplam").html(accounting.formatMoney(borctoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Borçlar Toplamı</small>");
+                            $("#Bakiye").html(accounting.formatMoney(bakiye, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Bakiye</small>");
+                            return true;
+                        }
+                        else if (firmaadi == firma && goruntuletip == tip && cariid == 0) {
+                            if (odemetahsilatbit == 'false') {
+                                if (tip == 1) {
+                                    alacaktoplam = parseFloat(alacaktoplam) + parseFloat(alacak);
+                                }
+                                else {
+                                    borctoplam = parseFloat(borctoplam) + parseFloat(borc);
+                                }
+                            }
+                            bakiye = parseFloat(alacaktoplam) - parseFloat(borctoplam);
+                            if (parseFloat(bakiye) > 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-success-800");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-left");
+                            }
+                            else if (parseFloat(bakiye) < 0) {
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-danger-500");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-right");
+                            }
+                            else if (parseFloat(bakiye) == 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").addClass("bg-fusion-50");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale");
+                            }
+                            $("#AlacakToplam").html(accounting.formatMoney(alacaktoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alacaklar Toplamı</small>");
+                            $("#BorcToplam").html(accounting.formatMoney(borctoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Borçlar Toplamı</small>");
+                            $("#Bakiye").html(accounting.formatMoney(bakiye, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Bakiye</small>");
+                            return true;
+                        }
+                        else if (firmaadi == firma && goruntuletip == tip && cariid == cari) {
+                            if (odemetahsilatbit == 'false') {
+                                if (tip == 1) {
+                                    alacaktoplam = parseFloat(alacaktoplam) + parseFloat(alacak);
+                                }
+                                else {
+                                    borctoplam = parseFloat(borctoplam) + parseFloat(borc);
+                                }
+                            }
+                            bakiye = parseFloat(alacaktoplam) - parseFloat(borctoplam);
+                            if (parseFloat(bakiye) > 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-success-800");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-left");
+                            }
+                            else if (parseFloat(bakiye) < 0) {
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").removeClass("bg-fusion-50");
+                                $("#BakiyeRenk").addClass("bg-danger-500");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale-right");
+                            }
+                            else if (parseFloat(bakiye) == 0) {
+                                $("#BakiyeRenk").removeClass("bg-danger-500");
+                                $("#BakiyeRenk").removeClass("bg-success-800");
+                                $("#BakiyeRenk").addClass("bg-fusion-50");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-right");
+                                //$("#BakiyeIkon").removeClass("fal fa-balance-scale-left");
+                                //$("#BakiyeIkon").addClass("fal fa-balance-scale");
+                            }
+                            $("#AlacakToplam").html(accounting.formatMoney(alacaktoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alacaklar Toplamı</small>");
+                            $("#BorcToplam").html(accounting.formatMoney(borctoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Borçlar Toplamı</small>");
+                            $("#Bakiye").html(accounting.formatMoney(bakiye, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Bakiye</small>");
+                            return true;
+                        }
+                        else
+                            return false;
+                    }
+                    return false;
+                });
+            dt = $('#dtcarihesap').dataTable(
+                {
+                    responsive: true,
+                    "destroy": true,
+                    "createdRow": function (row, data, dataIndex) { // Ödemesi yapılmış veya Tahsilat yapılmış Kayıtlar yeşil olacak
+                        if (data["TahsilatOdemeBit"] == true && data["Tip"] == "Alacak") {
+                            $('td', row).addClass('bg-primary-100 text-black');
+                        }
+                        else if (data["TahsilatOdemeBit"] == true && data["Tip"] == "Borç") {
+                            $('td', row).addClass('bg-warning-100 text-black');
+                        }
+                    },
+                    //"searching": false, // arama kaldır
+                    //"lengthChange": false, // sayfa başına göster kaldır
+                    //"order": [[7, "asc"], [4, "asc"]],
+                    "order": [[0, "asc"], [12, "asc"], [3, "asc"]],
+                    "columnDefs": [{ "targets": 12, "type": "date-eu" }],
+                    "columns": [
+                        { "data": "FirmaAdi", "autowidth": true, "visible": false, "className": "align-middle" },
+                        { "data": "SubeAdi", "autowidth": true, "visible": false, "className": "align-middle" },
+                        { "data": "CariId", "autowidth": true, "visible": false, "className": "align-middle" },
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                islem = "";
+                                if (DetayYetki == "True") {
+                                    if (row.CariFirma != "" && row.CariAdSoyad == "") {
+                                        islem = islem + "<a href='#' class='Detay' data-cariid='" + row.CariId + "' data-subeadi='" + row.SubeAdi + "' data-firmaadi='" + row.CariFirma + "' data-yetkili='" + row.CariYetkili + "' data-vergidairesi='" + row.CariVergiDairesi + "'" +
+                                            " data-vergino='" + row.CariVergiNo + "' data-adsoyad='" + row.CariAdSoyad + "' data-tckimlikno='" + row.CariTcKimlikNo + "' data-fax='" + row.CariFax + "' data-aciklama='" + row.CariAciklama + "'" +
+                                            " data-sabittel='" + row.CariSabitTel + "' data-ceptel='" + row.CariCepTel + "' data-email='" + row.CariEmail + "' data-adres='" + row.CariAdres + "' data-toggle='modal' data-target='#CariDetayModal' title='Cari Detay'>" +
+                                            row.CariFirma + " - " + row.CariYetkili
+                                        "</a>"
+                                    }
+                                    else if (row.CariFirma == "" && row.CariAdSoyad != "") {
+                                        islem = islem + "<a href='#' class='Detay' data-cariid='" + row.CariId + "' data-subeadi='" + row.SubeAdi + "' data-firmaadi='" + row.CariFirma + "' data-yetkili='" + row.CariYetkili + "' data-vergidairesi='" + row.CariVergiDairesi + "'" +
+                                            " data-vergino='" + row.CariVergiNo + "' data-adsoyad='" + row.CariAdSoyad + "' data-tckimlikno='" + row.CariTcKimlikNo + "' data-fax='" + row.CariFax + "' data-aciklama='" + row.CariAciklama + "'" +
+                                            " data-sabittel='" + row.CariSabitTel + "' data-ceptel='" + row.CariCepTel + "' data-email='" + row.CariEmail + "' data-adres='" + row.CariAdres + "' data-toggle='modal' data-target='#CariDetayModal' title='Cari Detay'>" +
+                                            row.CariAdSoyad
+                                        "</a>"
+                                    }
+                                }
+                                else {
+                                    if (row.CariFirma != "" && row.CariAdSoyad == "") {
+                                        islem = islem + row.CariFirma + " - " + row.CariYetkili
+                                    }
+                                    else if (row.CariFirma == "" && row.CariAdSoyad != "") {
+                                        islem = islem + row.CariAdSoyad
+                                    }
+                                }
+                                return islem;
+                            }
+                        }, // Cari
+                        { "data": "IslemTarihi", "autowidth": true, "className": "align-middle" },
+                        { "data": "OdemeTarihi", "autowidth": true, "className": "align-middle" },
+                        { "data": "Tip", "autowidth": true, "className": "align-middle" },
+                        { "data": "TahsilatOdemeBit", "autowidth": true, "visible": false, "className": "align-middle" },
+                        { "data": "OdemeSekli", "autowidth": true, "className": "align-middle" },
+                        { // Tutar
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                return ParaFormat(row.Tutar)
+                            }
+                        }, // Tutar
+                        { "data": "Aciklama", "autowidth": true, "className": "align-middle" },
+                        {
+                            "data": null,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                islem = "";
+                                if (DuzenleYetki == "True") {
+                                    islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon mr-1 Duzenle' data-id='" + row.Id + "' data-cariid='" + row.CariId + "' data-firmaadi='" + row.CariFirma + "' data-yetkili='" + row.CariYetkili + "' data-adsoyad='" + row.CariAdSoyad + "' data-tutar='" + ParaFormat(row.Tutar) + "' data-tip='" + row.Tip + "' data-tahsilatodemebit='" + row.TahsilatOdemeBit + "'" +
+                                        "data-islemtarihi='" + row.IslemTarihi + "' data-odemetarihi='" + row.OdemeTarihi + "' data-odemesekli='" + row.OdemeSekli + "' data-aciklama='" + row.Aciklama + "' data-odemeyapan='" + row.OdemeYapan + "' data-toggle='modal' data-target='#HareketDuzenleModal' title='Düzenle'>" +
+                                        "<i class='fal fa-edit'></i>" +
+                                        "</a>"
+                                }
+                                if (SMSYetki == "True") {
+                                    islem = islem + "<a href='#' class='btn btn-xs btn-secondary btn-icon mr-1 SmsGonder' data-id='" + row.Id + "' data-cariid='" + row.CariId + "' data-firmaadi='" + row.CariFirma + "' data-yetkili='" + row.CariYetkili + "' data-adsoyad='" + row.CariAdSoyad + "' data-odemeyapan='" + row.OdemeYapan + "' data-tutar='" + ParaFormat(row.Tutar) + "' data-ceptel='" + row.CariCepTel + "'" +
+                                        "data-odemetarihi='" + row.OdemeTarihi + "' data-firmaadi='"+row.FirmaAdi+"'"+
+                                        "data-toggle='modal' data-target='#BilgiSMSGonder' title='Sms Gönder'>" +
+                                        "<i class='fal fa-mobile-alt'></i>" +
+                                        "</a>"
+                                }
+                                if (EkleYetki == "True") {
+                                    if (row.TahsilatOdemeBit == false && row.Tip == "Borç") { // Ödeme Yap
+                                        islem = islem + "<a href='#'class='btn btn-xs btn-warning btn-icon mr-1 OdemeYap' data-id='" + row.Id + "' data-cariid='" + row.CariId + "' data-firmaadi='" + row.CariFirma + "' data-yetkili='" + row.CariYetkili + "' data-adsoyad='" + row.CariAdSoyad + "' data-tutar='" + ParaFormat(row.Tutar) + "' data-tip='" + row.Tip + "' data-tahsilatodemebit='" + row.TahsilatOdemeBit + "'" +
+                                            "data-islemtarihi='" + row.IslemTarihi + "' data-odemetarihi='" + row.OdemeTarihi + "' data-odemesekli='" + row.OdemeSekli + "' data-aciklama='" + row.Aciklama + "' data-toggle='modal' data-target='#OdemeYapModal' title='Ödeme Yap'>" +
+                                            "<i class='fal fa-minus-square'></i>" +
+                                            "</a>"
+                                    }
+                                    if (row.TahsilatOdemeBit == false && row.Tip == "Alacak") { // Tahsilat Yap
+                                        islem = islem + "<a href='#'class='btn btn-xs btn-success btn-icon mr-1 TahsilatYap' data-id='" + row.Id + "' data-cariid='" + row.CariId + "' data-firmaadi='" + row.CariFirma + "' data-yetkili='" + row.CariYetkili + "' data-adsoyad='" + row.CariAdSoyad + "' data-tutar='" + ParaFormat(row.Tutar) + "' data-tip='" + row.Tip + "' data-tahsilatodemebit='" + row.TahsilatOdemeBit + "'" +
+                                            "data-islemtarihi='" + row.IslemTarihi + "' data-odemetarihi='" + row.OdemeTarihi + "' data-odemesekli='" + row.OdemeSekli + "' data-aciklama='" + row.Aciklama + "' data-toggle='modal' data-target='#TahsilatYapModal' title='Tahsilat Yap'>" +
+                                            "<i class='fal fa-plus-square'></i>" +
+                                            "</a>"
+                                    }
+                                }
+                                if (SilYetki == "True") {
+                                    islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon mr-1 Sil' title='Cari Hareket Kaydını Sil' data-id='" + row.Id + "' data-tutar='" + ParaFormat(row.Tutar) + "' data-tip='" + row.Tip + "' data-tarih='" + row.Tarih + "'>" +
+                                        "<i class='fal fa-trash-alt'></i>" +
+                                        "</a>"
+                                }
+                                return islem
+                            }
+                        }, // İşlem
+                        { "data": "IslemTarihi", "autowidth": true, "className": "align-middle", "visible": false },
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": url,
+                        "contentType": 'application/json; charset=utf-8',
+                        'type': 'POST',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        'sProcessing': 'Yükleniyor... Lütfen Bekleyin',
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+        });
+    </script>
+}
+

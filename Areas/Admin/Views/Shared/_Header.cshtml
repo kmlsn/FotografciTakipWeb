@@ -1,0 +1,103 @@
+﻿@using FotografciTakipWeb.Models
+@{Lisanslar lisans = (Lisanslar)Session["Lisans"];}
+<header class="page-header" role="banner">
+    <!-- we need this logo when user switches to nav-function-top -->
+    <div class="page-logo">
+        <a href="#" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
+            <img src="/Areas/Otomasyon/Content/img/Logo_Tek_28x28.png" alt="SmartAdmin WebApp" aria-roledescription="logo">
+            <span class="page-logo-text mr-1">TeTRa Bilişim <br> Fotoğrafçı Takip Uygulaması</span>
+            <span class="position-absolute text-white opacity-50 small pos-top pos-right mr-2 mt-n2"></span>
+            <i class="fal fa-angle-down d-inline-block ml-1 fs-lg color-primary-300"></i>
+        </a>
+    </div>
+    <!-- DOC: nav menu layout change shortcut -->
+    <div class="hidden-md-down dropdown-icon-menu position-relative">
+        <a href="#" class="header-btn btn js-waves-off" data-action="toggle" data-class="nav-function-hidden" title="Menüyü Gizle">
+            <i class="ni ni-menu"></i>
+        </a>
+        <ul>
+            <li>
+                <a href="#" class="btn js-waves-off" data-action="toggle" data-class="nav-function-minify" title="Menüyü Küçült">
+                    <i class="ni ni-minify-nav"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="btn js-waves-off" data-action="toggle" data-class="nav-function-fixed" title="Menüyü Sabitle">
+                    <i class="ni ni-lock-nav"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- DOC: mobile button appears during mobile width -->
+    <div class="hidden-lg-up">
+        <a href="#" class="header-btn btn press-scale-down" data-action="toggle" data-class="mobile-nav-on">
+            <i class="ni ni-menu"></i>
+        </a>
+    </div>
+    <div class="search hidden-md-down">
+        @*<form class="app-forms hidden-xs-down" role="search" action="page_search.html" autocomplete="off">
+                <input type="text" id="search-field" placeholder="Uygulama içi arama" class="form-control" tabindex="1">
+                <a href="#" onclick="return false;" class="btn-danger btn-search-close js-waves-off d-none" data-action="toggle" data-class="mobile-search-on">
+                    <i class="fal fa-times"></i>
+                </a>
+            </form>*@
+        <div class="row ml-3 mt-3">
+            @Html.Partial("_SiteMap2")
+        </div>
+    </div>
+    <div class="info-card-firma">
+        <img src="@Session["FirmaLogo"]" class="profile-image rounded-plus" alt="@Session["Firma"]">
+
+        @*<img src="~/Areas/Otomasyon/Dosyalar/FirmaLogolar/Varsayılan_Firma_Logo.png" class="profile-image rounded-plus"/>*@
+        <div class="info-card-text hidden-sm-down">
+            @*<a href="#" class="d-flex align-items-center text-black-50 text-wrap">*@
+            <span class="text-truncate text-truncate-sm d-inline-block text-wrap">
+                @Session["Firma"]
+            </span>
+            @*</a>*@
+            @*<span class="d-inline-block text-truncate text-truncate-sm">Toronto, Canada</span>*@
+        </div>
+    </div>
+
+    @*@{Html.RenderAction("_SubeListesi2", "Default");}*@
+    <div class="ml-auto d-flex">
+        <!-- activate app search icon (mobile) -->
+        @*<a href="~/Admin/Destek/DestekTalepleri" class="header-icon" title="Destek Talebi">
+                <i class="fal fa-info"></i>
+            </a>*@
+        @{Html.RenderAction("_Destek", "Dashboard");}
+        @*@{Html.RenderAction("_SubeListesi3", "Dashboard");}*@
+        @if (lisans.Musteriler_MusteriMesajlari)
+        {
+            Html.RenderAction("_OkunmamisMesajlar", "Dashboard");
+        }
+        <!-- app user menu -->
+        <div>
+            <a href="#" data-toggle="dropdown" title="@Session["Email"]" class="header-icon d-flex align-items-center justify-content-center ml-2">
+                <img src="@Session["ResimYol"]" class="profile-image rounded-circle" alt="@Session["AdSoyad"]">
+            </a>
+            <div class="dropdown-menu dropdown-menu-animated dropdown-lg">
+                <div class="dropdown-header bg-trans-gradient d-flex flex-row py-4 rounded-top">
+                    <div class="d-flex flex-row align-items-center mt-1 mb-1 color-white">
+                        <span class="mr-2">
+                            <img src="@Session["ResimYol"]" class="rounded-circle profile-image" alt="@Session["AdSoyad"]">
+                        </span>
+                        <div class="info-card-text">
+                            <div class="fs-lg text-truncate text-truncate-lg">@Session["AdSoyad"]</div>
+                            <span class="text-truncate text-truncate-md opacity-80">@Session["Email"]</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-divider m-0"></div>
+                <a class="dropdown-item fw-500 pt-3 pb-3" href="~/Admin/KullaniciIslemleri/Profil">
+                    <span data-i18n="drpdwn.page-logout">Profil</span>
+                    @*<span class="float-right fw-n">&commat;codexlantern</span>*@
+                </a>
+                <a class="dropdown-item fw-500 pt-3 pb-3" href="~/Admin/Giris/CikisYap">
+                    <span data-i18n="drpdwn.page-logout">Çıkış Yap</span>
+                    @*<span class="float-right fw-n">&commat;codexlantern</span>*@
+                </a>
+            </div>
+        </div>
+    </div>
+</header>

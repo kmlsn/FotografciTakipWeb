@@ -1,0 +1,1143 @@
+﻿
+@{
+    ViewBag.Title = "Şube İşlemleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+
+@using FotografciTakipWeb.Models
+@model List<Il>
+@{
+    List<Ilce> ilceler = ViewBag.ilceler;
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    List<Personel> personelList = ViewBag.PersonelListesi;
+    List<Kullanici> kullaniciList = ViewBag.KullaniciListesi;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string DetayYetki = KullaniciYetki.KayitDetayi.ToString();
+    bool SLimit = ViewBag.SLimit;
+}
+@*@section Head{
+        <style>
+            #ayirmacizgisi{
+                width:100%;
+                border-style:solid;
+                color:cornflowerblue;
+                border-width:2px;
+            }
+        </style>
+    }*@
+@section Head
+{
+    <style type="text/css">
+        .swal2-container {
+            display: -webkit-box;
+            display: flex;
+            position: fixed;
+            z-index: 300000; /*Uyarı penceresini herşeyin önüne getimek için*/
+        }
+    </style>
+}
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Şube Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            @*@using (Ajax.BeginForm("SubeEkle", "FirmaSubeIslemleri",null, new AjaxOptions { HttpMethod = "POST" }, new { @class = "needs-validation", @novalidate = "" }))
+                {*@
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-4 mb-3" id="SubeAdidHata">
+                                <label class="form-label" for="SubeAdi">Şube Adı</label>
+                                <input type="text" class="form-control form-control-sm" id="SubeAdi" name="SubeAdi" maxlength="50" required>
+                            </div>
+                            <div class="col-4 mb-3" id="illerSubeHata">
+                                <label class="form-label">İl</label>
+                                <select class="custom-select form-control custom-select-sm " id="illerSube" name="illerSube" required>
+                                    <option selected="" value="0">İl Seçiniz</option>
+                                    @foreach (var iller in Model)
+                                    {
+                                        <option value="@iller.Id">@iller.Il1</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-4 mb-3" id="ilcelerSubeHata">
+                                <label class="form-label">İlçe</label>
+                                <select class="custom-select form-control custom-select-sm" id="ilcelerSube" name="ilcelerSube" required>
+                                    <option selected="" value="0">İlçe Seçiniz</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row mb-3">
+                            @*/* Yetkili seçmek için personel Dropdown*/*@
+
+                            <div class="form-group col-sm-8">
+                                <label class="form-label" for="YetkiliPersonelId">Yetkili Personel</label>
+                                <select class="custom-select form-control custom-select-sm" id="YetkiliPersonelId" name="YetkiliPersonelId" title="Kayıtlı peronellerden seçebilirsiniz.">
+                                    <option selected="" value="0">Yetkili Personel Seçiniz - Yeni Personel</option>
+                                    @foreach (var personel in personelList)
+                                    {
+                                        <option value="@personel.Id" data-yetkilipersoneladsoyad="@personel.AdiSoyadi"
+                                                data-yetkilipersoneltckimlikno="@personel.TCKimlikNo" data-yetkiliemail="@personel.Email" data-yetkiliceptel="@personel.CepTel">
+                                            @personel.AdiSoyadi - (@personel.Sube.SubeAdi - @personel.PersonelGorevleri.Gorev)
+                                        </option>
+                                    }
+                                </select>
+                            </div>
+                           
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-sm-4" id="AdSoyadHata">
+                                <label class="form-label" for="Yetkili">Ad Soyad</label>
+                                <input type="text" id="Yetkili" class="form-control form-control-sm" name="Yetkili" maxlength="50" required>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <label class="form-label" for="TCKimlikNo">T.C. Kimlik Numarası</label>
+                                <input  type="text" class="form-control form-control-sm" id="TCKimlikNo" name="TCKimlikNo" maxlength="11" data-inputmask="'mask': '99999999999'">
+                            </div>
+                            <div class="col-4 mb-3" id="EmailHata">
+                                <label class="form-label">Email Adresi</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-mouse-pointer width-1 text-align-center"></i></span>
+                                    </div>
+                                    <input type="text" data-inputmask="'alias': 'email'" class="form-control form-control-sm" im-insert="true" name="Email" maxlength="50" id="Email" required>
+                                </div>
+                            </div>
+                            @*<div class="col-4 mb-3" id="illerSubeHata">
+            <label class="form-label">İl</label>
+            <select class="custom-select form-control custom-select-sm " id="illerSube" name="illerSube" required>
+                <option selected="" value="0">İl Seçiniz</option>
+                @foreach (var iller in Model)
+                {
+                    <option value="@iller.Id">@iller.Il1</option>
+                }
+            </select>
+        </div>
+        <div class="col-4 mb-3" id="ilcelerSubeHata">
+            <label class="form-label">İlçe</label>
+            <select class="custom-select form-control custom-select-sm" id="ilcelerSube" name="ilcelerSube" required>
+                <option selected="" value="0">İlçe Seçiniz</option>
+            </select>
+        </div>*@
+                        </div>
+                        <div class="form-row">
+                            <div class="col-4 mb-3" id="CepTelHata">
+                                <label class="form-label">Cep Telefonu</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="CepTel" id="CepTel" required>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <label class="form-label">Sabit Telefon</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="SabitTel" id="SabitTel">
+                            </div>
+                            <div class="col-4 mb-3">
+                                <label class="form-label">Fax</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="Fax" id="Fax">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label" for="Adres">Adres</label>
+                                <textarea class="form-control form-control-sm" id="Adres" rows="2" maxlength="250" name="Adres" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label" for="SubeHakkinda">Şube Hakkında</label>
+                                <textarea class="form-control form-control-sm" id="SubeHakkinda" rows="2" name="SubeHakkinda" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label" for="WebSitesi">Web Sitesi</label>
+                                <input type="text" id="WebSitesi" class="form-control form-control-sm" maxlength="250" name="WebSitesi">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label" for="Facebook">Facebook</label>
+                                <input type="text" id="Facebook" class="form-control form-control-sm" maxlength="250" name="Facebook">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label" for="Twitter">X (Twetter)</label>
+                                <input type="text" id="Twitter" class="form-control form-control-sm" maxlength="250" name="Twitter">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label" for="Instagram">Instagram</label>
+                                <input type="text" id="Instagram" class="form-control form-control-sm" maxlength="250" name="Instagram">
+                            </div>
+                        </div>
+                        <hr id="ayirmacizgisi" />
+                        <div class="form-row">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label pb-2" for="PerosnelSubeleri"><b>Şubede Çalışacak Personeller</b></label>
+                                <div class="frame-wrap">
+                                    @foreach (var personel in personelList)
+                                    {
+                                        if (personel.PersonelGorevleri.Gorev == "Firma Sahibi")
+                                        {
+                                            <div class="custom-control custom-checkbox custom-control-inline pr-3 pb-3">
+                                                <input type="checkbox" class="custom-control-input" id="@personel.Id" data-personelid="@personel.Id" data-islem="personelsec" checked="checked" disabled>
+                                                <label class="custom-control-label" for="@personel.Id">@personel.AdiSoyadi - @personel.PersonelGorevleri.Gorev</label>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="custom-control custom-checkbox custom-control-inline pr-3 pb-3">
+                                                <input type="checkbox" class="custom-control-input" id="@personel.Id" data-personelid="@personel.Id" data-islem="personelsec">
+                                                <label class="custom-control-label" for="@personel.Id">@personel.AdiSoyadi - @personel.PersonelGorevleri.Gorev</label>
+                                            </div>
+                                        }
+
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        @*<hr id="ayirmacizgisi" />
+        <div class="form-row">
+            <div class="form-group col-sm-12">
+                <label class="form-label pb-2" for="KullaniciSubeleri"><b>Şubede Yetkili Kullanıcılar</b></label>
+                <div class="frame-wrap" id="KullaniciSubeleri">
+                    @foreach (var kullanici in kullaniciList)
+                    {
+                        <div class="custom-control custom-checkbox custom-control-inline pr-3 pb-3">
+                            <input type="checkbox" class="custom-control-input" id="@kullanici.Id" data-kullaniciid="@kullanici.Id" data-islem="kullanicisec">
+                            <label class="custom-control-label" for="@kullanici.Id">@kullanici.AdSoyad - @kullanici.Email</label>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>*@
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="submit" class="btn btn-primary" id="Kaydet">Kaydet</button>
+            </div>
+            @*}*@
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitGuncelleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-4 mb-3" id="SubeAdiDuzenledHata">
+                                <label class="form-label" for="SubeAdiDuzenle">Şube Adı</label>
+                                <input type="text" class="form-control form-control-sm" id="SubeAdiDuzenle" name="SubeAdiDuzenle" maxlength="50" required>
+                            </div>
+                            <div class="col-4 mb-3" id="YetkiliDuzenleHata">
+                                <label class="form-label" for="YetkiliDuzenle">Yetkili</label>
+                                <input type="text" disabled class="form-control form-control-sm" id="YetkiliDuzenle" name="YetkiliDuzenle" maxlength="50" required>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <label class="form-label" for="TCKimlikNoDuzenle">T.C. Kimlik Numarası</label>
+                                <input type="text" class="form-control form-control-sm" id="TCKimlikNoDuzenle" name="TCKimlikNoDuzenle" maxlength="11" disabled data-inputmask="'mask': '99999999999'">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-4 mb-3" id="CepTelDuzenleHata">
+                                <label class="form-label">Cep Telefonu</label>
+                                <input type="text" disabled data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="CepTelDuzenle" id="CepTelDuzenle" required>
+                            </div>
+                            <div class="col-4 mb-3">
+                                <label class="form-label">Sabit Telefon</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="SabitTelDuzenle" id="SabitTelDuzenle">
+                            </div>
+                            <div class="col-4 mb-3">
+                                <label class="form-label">Fax</label>
+                                <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="FaxDuzenle" id="FaxDuzenle">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-4 mb-3" id="EmailDuzenleHata">
+                                <label class="form-label">Email Adresi</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"><i class="fal fa-mouse-pointer width-1 text-align-center"></i></span>
+                                    </div>
+                                    <input type="text" data-inputmask="'alias': 'email'" class="form-control form-control-sm" im-insert="true" name="EmailDuzenle" disabled="disabled" maxlength="50" id="EmailDuzenle" required>
+                                </div>
+                            </div>
+                            <div class="col-4 mb-3" id="illerSubeDuzenleHata">
+                                <label class="form-label">İl</label>
+                                <select class="custom-select form-control custom-select-sm " id="illerSubeDuzenle" name="illerSubeDuzenle" required>
+                                    <option selected="">İl Seçiniz</option>
+                                    @foreach (var iller in Model)
+                                    {
+                                        <option value="@iller.Id">@iller.Il1</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="col-4 mb-3" id="ilcelerSubeDuzenleHata">
+                                <label class="form-label">İlçe</label>
+                                <select class="custom-select form-control custom-select-sm" id="ilcelerSubeDuzenle" name="ilcelerSubeDuzenle" required>
+                                    <option selected="">İlçe Seçiniz</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label" for="AdresDuzenle">Adres</label>
+                                <textarea class="form-control form-control-sm" id="AdresDuzenle" rows="2" maxlength="250" name="AdresDuzenle" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label" for="SubeHakkindaDuzenle">Şube Hakkında</label>
+                                <textarea class="form-control form-control-sm" id="SubeHakkindaDuzenle" rows="2" name="SubeHakkindaDuzenle" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label" for="WebSitesiDuzenle">Web Sitesi</label>
+                                <input type="text" id="WebSitesiDuzenle" class="form-control form-control-sm" maxlength="250" name="WebSitesiDuzenle">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label" for="FacebookDuzenle">Facebook</label>
+                                <input type="text" id="FacebookDuzenle" class="form-control form-control-sm" maxlength="250" name="FacebookDuzenle">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-6 mb-3">
+                                <label class="form-label" for="TwitterDuzenle">X (Twetter)</label>
+                                <input type="text" id="TwitterDuzenle" class="form-control form-control-sm" maxlength="250" name="TwitterDuzenle">
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label class="form-label" for="InstagramDuzenle">Instagram</label>
+                                <input type="text" id="InstagramDuzenle" class="form-control form-control-sm" maxlength="250" name="InstagramDuzenle">
+                            </div>
+                        </div>
+                        <hr id="ayirmacizgisi" />
+                        <div class="form-row">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label pb-2" for="PerosnelSubeleriDuzenle">Şubede Çalışacak Personeller</label>
+                                <div class="frame-wrap" id="PerosnelSubeleriDuzenle">
+                                    @foreach (var personel in personelList)
+                                    {
+                                        if (personel.PersonelGorevleri.Gorev == "Firma Sahibi" || personel.PersonelGorevleri.Gorev == "Şube Yetkilisi")
+                                        {
+                                            <div class="custom-control custom-checkbox custom-control-inline pr-3 pb-3">
+                                                <input type="checkbox" class="custom-control-input" id="duzenle-@personel.Id" data-personelidduzenle="@personel.Id" data-islem="personelsecDuzenle" checked="checked" disabled>
+                                                <label class="custom-control-label" for="duzenle-@personel.Id">@personel.AdiSoyadi - @personel.PersonelGorevleri.Gorev</label>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="custom-control custom-checkbox custom-control-inline pr-3 pb-3">
+                                                <input type="checkbox" class="custom-control-input" id="duzenle-@personel.Id" data-personelidduzenle="@personel.Id" data-islem="personelsecDuzenle">
+                                                <label class="custom-control-label" for="duzenle-@personel.Id">@personel.AdiSoyadi - @personel.PersonelGorevleri.Gorev</label>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        @*<hr id="ayirmacizgisi" />
+                            <div class="form-row">
+                                <div class="form-group col-sm-12">
+                                    <label class="form-label pb-2" for="KullaniciSubeleriDuzenle"><b>Şubede Yetkili Kullanıcılar</b></label>
+                                    <div class="frame-wrap"  id="KullaniciSubeleriDuzenle">
+                                        @foreach (var kullanici in kullaniciList)
+                                        {
+                                            <div class="custom-control custom-checkbox custom-control-inline pr-3 pb-3">
+                                                <input type="checkbox" class="custom-control-input" id="duzenle-@kullanici.Id" data-kullaniciidduzenle="@kullanici.Id" data-islem="kullanicisecDuzenle">
+                                                <label class="custom-control-label" for="duzenle-@kullanici.Id">@kullanici.AdSoyad - @kullanici.Email</label>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>*@
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer kilitlibilgiler" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="submit" class="btn btn-primary" id="Guncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<!-- Detay Modal Penceresi -->
+<div class="modal fade" id="DetayModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header"><h4 class="modal-title" id="DetayBaslik">Şube Detay Bilgileri</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div><div class="modal-body">
+                <table class="table">
+                    <tr style="display:none"><td><b>Şube Id :</b></td> <td id="SubeIdDetay"></td></tr>
+                    <tr>
+                        <td class="w-15"><b>Şube Adı :</b></td>
+                        <td id="SubeAdiDetay"></td>
+                        <td class="w-15"><b>Yetkili :</b></td>
+                        <td id="YetkiliDetay"></td>
+                    </tr>
+                    <tr>
+                        <td class="w-15"><b>TC Kimlik No :</b></td>
+                        <td id="TCKimlikNoDetay"></td>
+                        <td class="w-15"><b>Email :</b></td>
+                        <td id="EmailDetay"></td>
+                    </tr>
+                    <tr>
+                        <td class="w-15"><b>Cep Telefonu :</b></td>
+                        <td id="CepDetay"></td>
+                        <td class="w-15"><b>Sabit Telefon :</b></td>
+                        <td id="SabitDetay"></td>
+                    </tr>
+                    <tr>
+                        <td class="w-15"><b>İl Id :</b></td>
+                        <td id="IlIdDetay"></td>
+                        <td class="w-15"><b>İlçe Id :</b></td>
+                        <td id="IlceIdDetay"></td>
+                    </tr>
+                    <tr>
+                        <td class="w-15"><b>İl :</b></td>
+                        <td id="IlDetay"></td>
+                        <td class="w-15"><b>İlçe :</b></td>
+                        <td id="IlceDetay"></td>
+                    </tr>
+                    <tr>
+                        <td class="w-15"><b>Adres :</b></td>
+                        <td id="AdresDetay" colspan="3"></td>
+                    </tr>
+                    <tr>
+                        <td class="w-15"><b>Web Adresi :</b></td>
+                        <td id="WebAdresDetay"></td>
+                        <td class="w-15"><b>Facebook :</b></td>
+                        <td id="FacebookDetay"></td>
+                    </tr>
+                    <tr>
+                        <td class="w-15"><b>Instagram :</b></td>
+                        <td id="InstagramDetay"></td>
+                        <td class="w-15"><b>X (Twitter) :</b></td>
+                        <td id="TwitterDetay"></td>
+                    </tr>
+                    <tr>
+                        <td class="w-15"><b>Şube Hakkında :</b></td>
+                        <td id="SubeHakkindaDetay"></td>
+                        <td class="w-15"><b>Notlar :</b></td>
+                        <td id="NotlarDetay"></td>
+                    </tr>
+                    <tr>
+                        <td class="w-25"><b>Çalışan Personeller</b></td>
+                        <td id="SubelerDetay2" colspan="3">
+                            <div class="frame-wrap" id="PersonelSubeleriDetay">
+                                @foreach (var personel in personelList)
+                                {
+                                    <div class="custom-control custom-checkbox custom-control-inline pr-3 pb-3">
+                                        <input type="checkbox" class="custom-control-input" name="subelerdetay" id="Detay-@personel.Id" data-personeliddetay="@personel.Id" data-tip="personellerdetay" disabled>
+                                        <label class="custom-control-label" for="Detay-@personel.Id">@personel.AdiSoyadi</label>
+                                    </div>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="w-15"><b>Durum :</b></td>
+                        <td id="AktifDetay" colspan="3"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Detay Modal Penceresi -->
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            @if (ViewBag.KullaniciYetki.KayitEkle && SLimit)
+            {
+                <div class="panel-hdr">
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle"> Yeni Şube Ekle </button>
+                </div>
+            }
+
+            <input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+            @*<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">*@
+            <input type="text" id="KullaniciYetkiKayitDetayi" class="form-control" name="Id" maxlength="50" style="display:none" value="@DetayYetki">
+            <input type="text" id="AktifSubeId" class="form-control" name="AktifSubeId" maxlength="50" style="display:none" value="@Session["AktifSubeId"]">
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <table id="tb-subeler" class="table table-bordered table-sm table-hover table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th class="w-5">ID</th>
+                                <th>Firma</th>
+                                <th>Sube Adı</th>
+                                <th>Yetkili</th>
+                                <th>Email</th>
+                                <th>Cep Tel</th>
+                                <th>Durum</th>
+                                <th class="w-10">İşlem</th>
+                                <th style="display:none;" class="w-5">Aktif</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sube-satir"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                $('#YetkiliPersonelId').select2({
+                    dropdownParent: $('#YeniKayitEkleModal')
+                });
+            });
+            var dt;
+            var yetkilipersonelid;
+            var rolid = $('#RolId').data("rolid");
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var DetayYetki = $("#KullaniciYetkiKayitDetayi").val();
+            var PersonelListesi = new Array();
+            var PersonelListesiDuzenle = new Array();
+            $(":input").inputmask();
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#Email').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(".emailhata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#EmailDuzenle').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(".emailhata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#illerSube').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.ilhata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#ilcelerSube').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.ilcehata").remove();
+                }
+            }); // Validation hata kaldırma
+            $("#illerSube").change(function () { //Firma Düzenleme Tab'ındaki Seçilen İl'in İlçeleri listeleniyor.
+                ilId = $(this).find("option:selected").val();
+                var id = ilId;
+                $("#ilcelerSube").empty();
+                $("#ilcelerSube").append("<option value='0'> İlçe Seçiniz </option>");
+                if (id > 0) {
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        url: "/Otomasyon/FirmaSubeIslemleri/IlceGetir/" + id,
+                        success: function (durum) {
+                            $.each(durum, function () {
+                                $("#ilcelerSube").append("<option value=" + this.Id + "> " + this.IlceAd + " </option>");
+                            });
+                        }
+                    });
+                }
+            });
+            $("#illerSubeDuzenle").change(function () { //Firma Düzenleme Tab'ındaki Seçilen İl'in İlçeleri listeleniyor.
+                ilId = $(this).find("option:selected").val();
+                var id = ilId;
+                $("#ilcelerSubeDuzenle").empty();
+                $("#ilcelerSubeDuzenle").append("<option value='0'> İlçe Seçiniz </option>");
+                if (id > 0) {
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        url: "/Otomasyon/FirmaSubeIslemleri/IlceGetir/" + id,
+                        success: function (durum) {
+                            $.each(durum, function () {
+                                $("#ilcelerSubeDuzenle").append("<option value=" + this.Id + "> " + this.IlceAd + " </option>");
+                            });
+                        }
+                    });
+                }
+            });
+
+            // ------ Personel Listesinden Personel seçimi
+            $("#YetkiliPersonelId").change(function () {
+                yetkilipersonelid = $(this).find("option:selected").val();
+                var yetkiliadsoyad = $(this).find("option:selected").data("yetkilipersoneladsoyad");
+                var yetkilitckimlik = $(this).find("option:selected").data("yetkilipersoneltckimlikno");
+                var yetkiliemail = $(this).find("option:selected").data("yetkiliemail");
+                var yetkiliceptel = $(this).find("option:selected").data("yetkiliceptel");
+                if (yetkilipersonelid != 0) {
+                    $("#Yetkili").val(yetkiliadsoyad);
+                    $("#TCKimlikNo").val(yetkilitckimlik);
+                    $("#Email").val(yetkiliemail);
+                    $("#CepTel").val(yetkiliceptel);
+
+                    $("#Yetkili").addClass("disabled");
+                    $("#TCKimlikNo").addClass("disabled");
+                    $("#Email").addClass("disabled");
+                    $("#CepTel").addClass("disabled");
+
+                    $("#Yetkili").attr("disabled", "disabled");
+                    $("#TCKimlikNo").attr("disabled", "disabled");
+                    $("#Email").attr("disabled", "disabled");
+                    $("#CepTel").attr("disabled", "disabled");
+                }
+                else {
+                    $("#Yetkili").val("");
+                    $("#TCKimlikNo").val("");
+                    $("#Email").val("");
+                    $("#CepTel").val("");
+                    $("#Yetkili").removeClass("disabled");
+                    $("#TCKimlikNo").removeClass("disabled");
+                    $("#Email").removeClass("disabled");
+                    $("#CepTel").removeClass("disabled");
+
+                    $("#Yetkili").removeAttr("disabled");
+                    $("#TCKimlikNo").removeAttr("disabled");
+                    $("#Email").removeAttr("disabled");
+                    $("#CepTel").removeAttr("disabled");
+                
+                }
+                //$('#YetkiliPersonelId').select2('close');
+            });
+            // ------ Personel Listesinden Personel seçim
+
+            $("#tb-subeler").on('click', '.Detay', function () {
+                var ceptel = $(this).data("ceptel").replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                var sabittel = $(this).data("sabittel").replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                var fax = $(this).data("fax").replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                document.getElementById("SubeIdDetay").innerHTML = $(this).data("subeid");
+                //document.getElementById("FirmaAdiDetay").innerHTML = $(this).data("firmaadi");
+                document.getElementById("SubeAdiDetay").innerHTML = $(this).data("subeadi");
+                document.getElementById("YetkiliDetay").innerHTML = $(this).data("yetkili");
+                document.getElementById("TCKimlikNoDetay").innerHTML = $(this).data("tckimlikno");
+                document.getElementById("EmailDetay").innerHTML = $(this).data("email");
+                document.getElementById("CepDetay").innerHTML = ceptel;
+                document.getElementById("SabitDetay").innerHTML = sabittel;
+                //document.getElementById("FaxDetay").innerHTML = fax;
+                document.getElementById("IlIdDetay").innerHTML = $(this).data("ilid");
+                document.getElementById("IlceIdDetay").innerHTML = $(this).data("ilceid");
+                document.getElementById("IlDetay").innerHTML = $(this).data("il");
+                document.getElementById("IlceDetay").innerHTML = $(this).data("ilce");
+                document.getElementById("AdresDetay").innerHTML = $(this).data("adres");
+                document.getElementById("WebAdresDetay").innerHTML = $(this).data("websitesi");
+                document.getElementById("FacebookDetay").innerHTML = $(this).data("facebook");
+                document.getElementById("InstagramDetay").innerHTML = $(this).data("instagram");
+                document.getElementById("TwitterDetay").innerHTML = $(this).data("twitter");
+                document.getElementById("SubeHakkindaDetay").innerHTML = $(this).data("subehakkinda");
+                document.getElementById("NotlarDetay").innerHTML = $(this).data("notlar");
+                if ($(this).data("aktif") == true) {
+                    document.getElementById("AktifDetay").innerHTML = "<span class='dtr-data'><h4><span class='badge badge-success'>Aktif</span><h4/></span>";
+                }
+                else {
+                    document.getElementById("AktifDetay").innerHTML = "<span class='dtr-data'><h4><span class='badge badge-danger'>Pasif</span><h4/></span>";
+                }
+                $("#PersonelSubeleriDetay").next($("input[type=checkbox]").each(function (i) { // Düzenle modal daki tüm checbox ların chek leri kaldırılıyor.
+                    if ($(this).is(':checked')) {
+                        $(this).prop("checked", false);
+                    }
+                }));
+                var personeller = [];
+                var datapersoneller = $(this).data("personeller"); // tek şube yetkisi var ise split ile ayrılamıyor, bu nedenle virgül olup olmadığına bakarak yetki tek şubemi birden fazla şube mi anlaşılıyor.
+                var tek = datapersoneller.toString().search(",");
+                if (tek == "-1") {
+                    $("#Detay-" + datapersoneller).prop("checked", true);
+                }
+                else {
+                    personeller = [];
+                    personeller = $(this).data("personeller").split(',');
+                    for (var i = 0; i < personeller.length; i++) {
+                        $("#Detay-" + personeller[i]).prop("checked", true);
+                    }
+                }
+                //if ($(this).data("sil") == true) {
+                //    document.getElementById("SilDetay").innerHTML = "<span class='dtr-data'><h4><span class='badge badge-danger'>Silinmiş</span><h4/></span>";
+                //}
+                //else {
+                //    document.getElementById("SilDetay").innerHTML = "<span class='dtr-data'><h4><span class='badge badge-success'>Silinmemiş</span><h4/></span>";
+                //}
+            });
+            $("#tb-subeler").on('click', '.subeduzenle', function () {
+                var ilid = $(this).data("ilid");
+                var ilceid = $(this).data("ilceid");
+                var kilitbit = $(this).data("kilitbit");
+                var subeadi = $(this).data("subeadi");
+                var yetkili = $(this).data("yetkili");
+                var email = $(this).data("email");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    url: "/Otomasyon/FirmaSubeIslemleri/IlceGetir/" + ilid,
+                    success: function (durum) {
+                        $.each(durum, function () {
+                            $("#ilcelerSubeDuzenle").append("<option value=" + this.Id + "> " + this.IlceAd + " </option>");
+                        });
+                        $("#ilcelerSubeDuzenle").val(ilceid);
+                    }
+                });
+                if (kilitbit == true) {
+                    document.getElementById("SubeAdiDuzenle").setAttribute("disabled", "");
+                    document.getElementById("YetkiliDuzenle").setAttribute("disabled", "");
+                    document.getElementById("EmailDuzenle").setAttribute("disabled", "");
+                }
+                //else {
+                //    document.getElementById("SubeAdiDuzenle").removeAttribute("disabled", "");
+                //    document.getElementById("YetkiliDuzenle").removeAttribute("disabled", "");
+                //    document.getElementById("EmailDuzenle").removeAttribute("disabled", "");
+                //}
+                $("#Guncelle").val($(this).data("subeid"));
+                $(".kilitlibilgiler").data("kilitbit", kilitbit);
+                $(".kilitlibilgiler").data("subeadi", subeadi);
+                $(".kilitlibilgiler").data("yetkili", yetkili);
+                $(".kilitlibilgiler").data("email", email);
+                $("#SubeAdiDuzenle").val($(this).data("subeadi"));
+                $("#YetkiliDuzenle").val($(this).data("yetkili"));
+                $("#TCKimlikNoDuzenle").val($(this).data("tckimlikno"));
+                $("#CepTelDuzenle").val($(this).data("ceptel"));
+                $("#SabitTelDuzenle").val($(this).data("sabittel"));
+                $("#FaxDuzenle").val($(this).data("fax"));
+                $("#EmailDuzenle").val($(this).data("email"));
+                $("#illerSubeDuzenle").val($(this).data("ilid"));
+                $("#AdresDuzenle").val($(this).data("adres"));
+                $("#SubeHakkindaDuzenle").val($(this).data("subehakkinda"));
+                $("#WebSitesiDuzenle").val($(this).data("websitesi"));
+                $("#FacebookDuzenle").val($(this).data("facebook"));
+                $("#InstagramDuzenle").val($(this).data("instagram"));
+                $("#TwitterDuzenle").val($(this).data("twitter"));
+                $("#PerosnelSubeleriDuzenle").next($("input[type=checkbox]").each(function (i) { // Düzenle modal daki tüm checbox ların chek leri kaldırılıyor.
+                    if ($(this).is(':checked')) {
+                        $(this).prop("checked", false);
+                    }
+                }));
+                var personeller = [];
+                var datapersoneller = $(this).data("personeller"); // tek şube yetkisi var ise split ile ayrılamıyor, bu nedenle virgül olup olmadığına bakarak yetki tek şubemi birden fazla şube mi anlaşılıyor.
+                var tek = datapersoneller.toString().search(",");
+                if (tek == "-1") {
+                    $("#duzenle-" + datapersoneller).prop("checked", true);
+                }
+                else {
+                    personeller = [];
+                    personeller = $(this).data("personeller").split(',');
+                    for (var i = 0; i < personeller.length; i++) {
+                        $("#duzenle-" + personeller[i]).prop("checked", true);
+                    }
+                }
+            });
+            $("#tb-subeler").on('click', '.subesil', function () {
+                var id = $(this).data("subeid");
+                var AktifSube = $("#AktifSubeId").val();
+                if (id == AktifSube) {
+                    //Swal.fire("Dikkat?", "Silmeye Çalıştığınız Şube Aktif. Lütfen Şube değiştirerek tekrar deneyiniz.", "info", { confirmButtonText: "Tamam!",});
+                    Swal.fire(
+                        {
+                            html: "<p><h2 style='font-size:16px; color:red'><strong>DİKKAT</strong></h2></p><h4> Silmeye Çalıştığınız Şube Aktif </br> Lütfen Şube değiştirerek tekrar deneyiniz. </h4>",
+                            type: "info",
+                            showCancelButton: false,
+                            confirmButtonText: "Tamam"
+                        });
+                }
+                else {
+                    var subeadi = $(this).data("subeadi");
+                    Swal.fire(
+                        {
+                            title: "Kayıt Silinecek",
+                            html: "<p><h2 style='font-size:16px; color:red'><strong>Şube Adı : </strong>" + subeadi + "</h2></p><h4> Şubeye ait Günlük İş, Sözleşme, Gelir-Gider kaydı varsa silemezsiniz. Personel ve Kullanıcı Silinmez. </h4><h2> Şube silinsin mi?</h2>",
+                            type: "error",
+                            showCancelButton: true,
+                            confirmButtonText: "Evet, Silinsin!",
+                            cancelButtonText: "İptal"
+                        }).then(function (result) {
+                            if (result.value) {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/FirmaSubeIslemleri/SubeSil/" + id,
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            //dt.api().ajax.reload();
+                                            window.location.replace("/Otomasyon/FirmaSubeIslemleri/SubeIslemleri")
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                        });
+                }
+            });
+
+            $("#tb-subeler").on('click', '.subesil', function () {
+     
+            });
+            $("#tb-subeler").on('click', '.durumdegistir', function () {
+                var id = $(this).data("subeid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/FirmaSubeIslemleri/SubeDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#Kaydet").click(function () {
+                // Zorunlu alan kontrolü
+                if ($("#SubeAdi").val() == "") {
+                    $("#SubeAdi").focus();
+                    $("#SubeAdidHata").append("<div class='hata' style='color:red'>Şube Adını Giriniz!</div>");
+                }
+                else if ($("#Yetkili").val() == "") {
+                    $("#Yetkili").focus();
+                    $("#YetkiliHata").append("<div class='hata' style='color:red'>Şube Yetkilisini Giriniz!</div>");
+                }
+                else if ($("#CepTel").val() == "") {
+                    $("#CepTel").focus();
+                    $("#CepTelHata").append("<div class='hata' style='color:red'>Bir Cep Telefonu Giriniz!</div>");
+                }
+                else if ($("#Email").val() == "") {
+                    $("#Email").focus();
+                    $("#EmailHata").append("<div class='emailhata' style='color:red'>Email Adresini Giriniz!</div>");
+                }
+                else if ($("#illerSube").val() == "0") {
+                    $("#illerSube").focus();
+                    $("#illerSubeHata").append("<div class='ilhata' style='color:red'>Şubenizin Bulunduğu İli Seçiniz!</div>");
+                }
+                else if ($("#ilcelerSube").val() == "0") {
+                    $("#ilcelerSube").focus();
+                    $("#ilcelerSubeHata").append("<div class='ilcehata' style='color:red'>Şubenizin Bulunduğu İlçeyi Seçiniz!</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    PersonelListesi = [];
+                    KullaniciListesi = [];
+
+                    $("input[type=checkbox]").each(function (i) { // seçili checkboxlar diziye alınıyor.
+                        if ($(this).data("islem") == "personelsec" && $(this).is(':checked')) {
+                            PersonelListesi.push($(this).data("personelid"))
+                        }
+                        else if ($(this).data("islem") == "kullanicisec" && $(this).is(':checked')) {
+                            KullaniciListesi.push($(this).data("kullaniciid"))
+                        }
+                    })
+                    //var YetkiliPersonelId = $("#YetkiliPersonelId").val();
+                    var SubeData = new FormData();
+                    SubeData.append("SubeAdi", $("#SubeAdi").val());
+                    SubeData.append("YetkiliPersonelId", $("#YetkiliPersonelId").val());
+                    SubeData.append("Yetkili", $("#Yetkili").val());
+                    SubeData.append("TCKimlikNo", $("#TCKimlikNo").val());
+                    SubeData.append("SabitTel", $("#SabitTel").val());
+                    SubeData.append("CepTel", $("#CepTel").val());
+                    SubeData.append("Email", $("#Email").val());
+                    SubeData.append("Fax", $("#Fax").val());
+                    SubeData.append("illerSube", $("#illerSube").val());
+                    SubeData.append("ilcelerSube", $("#ilcelerSube").val());
+                    SubeData.append("Adres", $("#Adres").val());
+                    SubeData.append("SubeHakkinda", $("#SubeHakkinda").val());
+                    SubeData.append("WebSitesi", $("#WebSitesi").val());
+                    SubeData.append("Facebook", $("#Facebook").val());
+                    SubeData.append("Twitter", $("#Twitter").val());
+                    SubeData.append("Instagram", $("#Instagram").val());
+                    SubeData.append("PersonelListesi", PersonelListesi);
+                    SubeData.append("KullaniciListesi", KullaniciListesi);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: SubeData,
+                        contentType: false,
+                        processData: false,
+                        beforeSend: function () {
+                            Swal.fire(
+                                {
+                                    title: "Şube Oluşturuluyor ve Yetkilendirmeler Yapılıyor...!",
+                                    html: "<strong>Lütfen Bekleyin.</strong>",
+                                    onBeforeOpen: function onBeforeOpen() {
+                                        Swal.showLoading();
+                                    }
+                                });
+                        },
+                        url: "/Otomasyon/FirmaSubeIslemleri/SubeEkle/",
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 8);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                                swal.close();
+                            }
+                            else if (data.Sonuc == true) {
+                                if (data.Mail == false) {
+                                    alertify.set('notifier', 'delay', 8);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                    //dt.api().ajax.reload();
+                                    window.location.replace("/Otomasyon/FirmaSubeIslemleri/SubeIslemleri")
+                                    swal.close();
+                                }
+                                else {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    //dt.api().ajax.reload();
+                                    window.location.replace("/Otomasyon/FirmaSubeIslemleri/SubeIslemleri")
+                                    swal.close();
+                                }
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                    //});
+                }
+            });
+            $("#Guncelle").click(function () {
+                // Zorunlu alan kontrolü
+                if ($("#SubeAdiDuzenle").val() == "") {
+                    $("#SubeAdiDuzenle").focus();
+                    $("#SubeAdiDuzenledHata").append("<div class='hata' style='color:red'>Şube Adını Giriniz!</div>");
+                }
+                else if ($("#YetkiliDuzenle").val() == "") {
+                    $("#YetkiliDuzenle").focus();
+                    $("#YetkiliDuzenleHata").append("<div class='hata' style='color:red'>Şube Yetkilisini Giriniz!</div>");
+                }
+                else if ($("#CepTelDuzenle").val() == "") {
+                    $("#CepTelDuzenle").focus();
+                    $("#CepTelDuzenleHata").append("<div class='hata' style='color:red'>Bir Cep Telefonu Giriniz!</div>");
+                }
+                else if ($("#EmailDuzenle").val() == "") {
+                    $("#EmailDuzenle").focus();
+                    $("#EmailDuzenleHata").append("<div class='emailhata' style='color:red'>Email Adresini Giriniz!</div>");
+                }
+                else if ($("#illerSubeDuzenle").val() == "0") {
+                    $("#illerSubeDuzenle").focus();
+                    $("#illerSubeDuzenleHata").append("<div class='ilhata' style='color:red'>Email Adresini Giriniz!</div>");
+                }
+                else if ($("#ilcelerSubeDuzenle").val() == "0") {
+                    $("#ilcelerSubeDuzenle").focus();
+                    $("#ilcelerSubeDuzenleHata").append("<div class='ilcehata' style='color:red'>Email Adresini Giriniz!</div>");
+                }
+                else {
+                    $('#KayitGuncelleModal').modal('hide');
+                    var id = $(this).val();
+                    var kilitbit = $(".kilitlibilgiler").data("kilitbit");
+                    var subeadi = $(".kilitlibilgiler").data("subeadi");
+                    var yetkili = $(".kilitlibilgiler").data("yetkili");
+                    var email = $(".kilitlibilgiler").data("email");
+                    PersonelListesiDuzenle = [];
+
+                    $("input[type=checkbox]").each(function (i) { // seçili checkboxlar diziye alınıyor.
+                        if ($(this).data("islem") == "personelsecDuzenle" && $(this).is(':checked')) {
+                            PersonelListesiDuzenle.push($(this).data("personelidduzenle"))
+                        }
+                    })
+                    var SubeData = new FormData();
+                    if (kilitbit == true) {
+                        SubeData.append("SubeAdi", subeadi);
+                        SubeData.append("Yetkili", yetkili);
+                        SubeData.append("Email", email);
+                    }
+                    else {
+                        SubeData.append("SubeAdi", $("#SubeAdiDuzenle").val());
+                        SubeData.append("Yetkili", $("#YetkiliDuzenle").val());
+                        SubeData.append("Email", $("#EmailDuzenle").val());
+                    }
+                    SubeData.append("TCKimlikNo", $("#TCKimlikNoDuzenle").val());
+                    SubeData.append("SabitTel", $("#SabitTelDuzenle").val());
+                    SubeData.append("CepTel", $("#CepTelDuzenle").val());
+                    SubeData.append("Fax", $("#FaxDuzenle").val());
+                    SubeData.append("illerSube", $("#illerSubeDuzenle").val());
+                    SubeData.append("ilcelerSube", $("#ilcelerSubeDuzenle").val());
+                    SubeData.append("Adres", $("#AdresDuzenle").val());
+                    SubeData.append("SubeHakkinda", $("#SubeHakkindaDuzenle").val());
+                    SubeData.append("WebSitesi", $("#WebSitesiDuzenle").val());
+                    SubeData.append("Facebook", $("#FacebookDuzenle").val());
+                    SubeData.append("Twitter", $("#TwitterDuzenle").val());
+                    SubeData.append("Instagram", $("#InstagramDuzenle").val());
+                    SubeData.append("PersonelListesi", PersonelListesiDuzenle);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: SubeData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/FirmaSubeIslemleri/SubeGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            dt = $('#tb-subeler').dataTable(
+                {
+                    "createdRow": function (row, data, dataIndex) {
+                        if (data["Aktif"] == false) {
+                            //$(row).addClass('bg-warning-100 text-white');
+                            $('td', row).addClass('bg-danger-100');
+                        }
+                    },
+                    responsive: true,
+                    "destroy": true,
+                    "searching": false, // arama kaldır
+                    "lengthChange": false, // sayfa başına göster kaldır
+                    "order": [[0, "asc"]],
+                    "columns": [
+                        { "data": "Id", "autowidth": true, "visible": false },
+                        { "data": "FirmaAdi", "autowidth": true, "visible": false },
+                        { "data": "SubeAdi", "autowidth": true },
+                        { "data": "Yetkili", "autowidth": true },
+                        { "data": "Email", "autowidth": true },
+                        { "data": "CepTel", "autowidth": true },
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "render": function (data, type, row) {
+                                islem = "";
+                                if (row.KilitBit == false) {
+                                    if (DuzenleYetki == "True") {
+                                        if (row.Aktif == true) {
+                                            //islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                            islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-subeid='" + row.Id + "'>Aktif</button>"
+                                        }
+                                        else {
+                                            //islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                            islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-subeid='" + row.Id + "'>Pasif</button>"
+                                        }
+                                    }
+                                    else {
+                                        if (row.Aktif == true) {
+                                            islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                            //islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Aktif</button>"
+                                        }
+                                        else {
+                                            islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                            //islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Pasif</button>"
+                                        }
+                                    }
+                                }
+                                else {
+                                    if (row.Aktif == true) {
+                                        islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                        //islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Aktif</button>"
+                                    }
+                                    else {
+                                        islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                        //islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Pasif</button>"
+                                    }
+                                }
+                                return islem
+                            }
+                        }, // Durum
+                        {
+                            "data": null,
+                            "render": function (data, type, row) {
+                                islem = "";
+                                if (DetayYetki == "True") {
+                                    islem = islem + "<a href='#' class='btn btn-xs btn-success btn-icon mr-1 Detay' title='Şube Detayları' data-subeid='" + row.Id + "' data-firmaadi='" + row.FirmaAdi + "' data-subeadi='" + row.SubeAdi + "'" +
+                                        "data-yetkili='" + row.Yetkili + "' data-tckimlikno='" + row.TCKimlikNo + "'" +
+                                        "data-email='" + row.Email + "' data-ceptel='" + row.CepTel + "' data-sabittel='" + row.SabitTel + "' data-fax='" + row.Fax + "'  data-il='" + row.Il + "'" +
+                                        "data-ilce='" + row.Ilce + "' data-ilid='" + row.IlId + "' data-ilceid='" + row.IlceId + "' data-adres='" + row.Adres + "' data-websitesi='" + row.WebSitesi + "'" +
+                                        "data-facebook='" + row.Facebook + "' data-instagram='" + row.Instagram + "' data-twitter='" + row.Twitter + "' data-subehakkinda='" + row.SubeHakkinda + "' data-notlar='" + row.Notlar + "'" +
+                                        "data-personeller='" + row.GorevliPersoneller + "' data-aktif='" + row.Aktif + "' data-sil='" + row.Sil + "' data-toggle='modal' data-target='#DetayModal'>" +
+                                        "<i class='fal fa-eye'></i>" +
+                                        "</a>"
+                                }
+                                if (row.KilitBit == false) {
+                                    if (DuzenleYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon mr-1 subeduzenle' title='Şube Bilgilerini Düzenle' data-subeid='" + row.Id + "' data-firmaadi='" + row.FirmaAdi + "' data-subeadi='" + row.SubeAdi + "'" +
+                                            "data-yetkili='" + row.Yetkili + "' data-tckimlikno='" + row.TCKimlikNo + "'" +
+                                            "data-email='" + row.Email + "' data-ceptel='" + row.CepTel + "' data-sabittel='" + row.SabitTel + "' data-fax='" + row.Fax + "'  data-il='" + row.Il + "'" +
+                                            "data-ilce='" + row.Ilce + "' data-ilid='" + row.IlId + "' data-ilceid='" + row.IlceId + "' data-adres='" + row.Adres + "' data-websitesi='" + row.WebSitesi + "' data-kilitbit='" + row.KilitBit + "'" +
+                                            "data-facebook='" + row.Facebook + "' data-instagram='" + row.Instagram + "' data-twitter='" + row.Twitter + "' data-subehakkinda='" + row.SubeHakkinda + "' data-notlar='" + row.Notlar + "'" +
+                                            "data-personeller='" + row.GorevliPersoneller + "' data-aktif='" + row.Aktif + "' data-sil='" + row.Sil + "' data-toggle='modal' data-target='#KayitGuncelleModal'>" +
+                                            "<i class='fal fa-edit'></i>" +
+                                            "</a>"
+                                    }
+                                }
+
+                                if (row.KilitBit == false) {
+                                    islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon mr-1 subesil' title='Şubeyi Sil' data-subeid='" + row.Id + "' data-subeadi='" + row.SubeAdi + "'>" +
+                                                        "<i class='fal fa-trash-alt'></i>" +
+                                                    "</a>"
+                                }
+                                return islem
+                            }
+                        },
+                        { "data": "Aktif", "autowidth": true, "visible": false },
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Otomasyon/FirmaSubeIslemleri/SubelerListesi/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        'sProcessing': 'Yükleniyor... Lütfen Bekleyin',
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+        });
+    </script>
+}

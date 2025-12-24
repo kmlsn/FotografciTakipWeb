@@ -1,0 +1,39 @@
+﻿
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            @*<div class="panel-hdr">
+                    <h2> </h2>
+                    <input type="hidden" data-yetki="@ViewBag.MusteriYetkileri.FotografSecim" id="fotografsecim" />
+                </div>*@
+
+            <div class="panel-container show">
+                <div class="panel-content">
+
+                    @*<img class="card-img-top" src="@ViewBag.FirmaLogo">*@
+
+                    <div class="d-flex flex-column align-items-center justify-content-center p-4">
+                        <img src="@ViewBag.FirmaLogo" class="rounded-plus shadow-2 p-2 img-thumbnail" width="150" alt="">
+                        <h1 class="mb-0 fw-700 color-primary-600 text-center mt-3">
+                            @ViewBag.Firma
+                        </h1>
+
+                        <h3 class="mb-0 fw-500 text-center mt-3">
+                            Sayın @ViewBag.AdSoyad, Sağlıklı, mutlu ve kazançlı günler ederiz.
+                        </h3>
+                        @*<h4 class="mb-0 fw-500 text-center mt-3">
+                                Sizlere en iyi hizmeti sunmak için çalışıyoruz.
+                            </h4>*@
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+

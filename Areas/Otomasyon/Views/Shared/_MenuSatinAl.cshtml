@@ -1,0 +1,49 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool satinalyetki = ky.FirstOrDefault(x => x.SayfaId == 14 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 14 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool paketsecyetki = ky.FirstOrDefault(x => x.SayfaId == 107 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 107 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool siparislerimyetki = ky.FirstOrDefault(x => x.SayfaId == 108 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 108 && x.Sil == false && x.Aktif == true).SayfaYetki;
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Satın Al" ? "active open" : "";
+    string altmenupaketsec = ViewBag.AltMenu == "Paket Seç" ? "active" : "";
+    string altmenusiparisler = ViewBag.AltMenu == "Siparişler" ? "active" : "";
+}
+@if (satinalyetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Satın Al" data-filter-tags="satın al">
+            <i class="fal fa-credit-card"></i>
+            <span class="nav-link-text" data-i18n="nav.satin_al">Satın Al</span>
+        </a>
+        <ul>
+            @if (lisans.SatinAl_PaketSec)
+            {
+                if (paketsecyetki)
+                {
+                    <li class=@altmenupaketsec>
+                        <a href="~/Otomasyon/SatinAl/PaketSec" title="Paket Seç" data-filter-tags="satın al paket seç">
+                            <span class="nav-link-text" data-i18n="nav.satin_al_paket_sec">Paket Seç</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.SatinAl_Siparisler)
+            {
+                if (siparislerimyetki)
+                {
+                    <li class=@altmenusiparisler>
+                        <a href="~/Otomasyon/SatinAl/Siparisler" title="Siparişler" data-filter-tags="satın al siparişler">
+                            <span class="nav-link-text" data-i18n="nav.satin_al_siparisler">Siparişler</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}
+
+
+

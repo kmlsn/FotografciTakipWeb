@@ -1,0 +1,253 @@
+﻿
+@{
+    ViewBag.Title = "Email Hesap Ayarları";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@using FotografciTakipWeb.App_Settings
+@{ 
+    MD5Sifreleme sifreleme = new MD5Sifreleme();
+}
+@model AyarlarMailHesap
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h3> Email Gönderim Ayarları</h3>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <form action="/Otomasyon/Ayarlar/EmailHesapAyarlari" method="post" enctype="multipart/form-data" autocomplete="off">
+                        @if (Model != null)
+                        {
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="EmailHata">
+                                    <label class="form-label">Gönderen Email Adresi</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fal fa-mouse-pointer width-1 text-align-center"></i></span>
+                                        </div>
+                                        <input type="text" data-inputmask="'alias': 'email'" class="form-control" im-insert="true" name="GonderenMail" id="Email" maxlength="100" value="@Model.GonderenMail" required>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6" id="GonderenSifreHata">
+                                    <label class="form-label" for="GonderenSifre">Gönderen Mail Şifresi</label>
+                                    <input type="password" id="GonderenSifre" class="form-control" name="GonderenSifre" maxlength="20" value="@sifreleme.SifreCoz(Model.GonderenSifre)" required autocomplete="off">
+                                    <input type="text" id="Id" class="form-control" name="Id" maxlength="50" style="display:none" value="@Model.Id">
+                                    <input type="text" id="FirmaId" class="form-control" name="FirmaId" maxlength="50" style="display:none" value="@Model.FirmaId">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="GonderenAdSoyad">Gönderen Ad-Soyad</label>
+                                    <input type="text" id="GonderenAdSoyad" class="form-control" name="GonderenAdSoyad" maxlength="50" value="@Model.GonderenAdSoyad" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="SmtpAdresHata">
+                                    <label class="form-label" for="SmtpAdres">Smtp Adresi</label>
+                                    <input type="text" id="SmtpAdres" class="form-control" name="SmtpAdres" maxlength="50" value="@Model.SmtpAdres" required>
+                                </div>
+                                <div class="form-group col-sm-6" id="SmtpPortHata">
+                                    <label class="form-label" for="SmtpPort">Smtp Portu</label>
+                                    <input type="text" id="SmtpPort" class="form-control" name="SmtpPort" maxlength="3" value="@Model.SmtpPort" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6 m-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.Ssl == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" name="SslKullan" id="SslKullan" checked="">
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" name="SslKullan" id="SslKullan">
+                                    }
+                                    <label class="custom-control-label" for="SslKullan">SSL Kullan</label>
+                                </div>
+                                @*<div class="form-check">
+                        @if (Model.Ssl == true)
+                        {
+                            <input class="form-check-input" type="checkbox" value="" name="SslKullan" id="SslKullan" checked="">
+                        }
+                        else
+                        {
+                            <input class="form-check-input" type="checkbox" value="" name="SslKullan" id="SslKullan">
+                        }
+                        <label class="form-check-label" for="SslKullan">SSL Kullan</label>
+                    </div>*@
+                            </div>
+                            <div class="row mb-3">
+                                <div class="form-group col-sm-8">
+                                    <label class="form-label" for="Aciklama">Açıklama</label>
+                                    <textarea class="form-control" id="Aciklama" rows="2" name="Aciklama" style="overflow:auto;resize:none">@Model.Aciklama</textarea>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-primary" role="alert">
+                                İstenilen bilgileri Email hizmet sağlayıcınızdan öğrenebilirsiniz. Bu bilgileri boş bırakırsanız varsayılan olarak <a href="#"><u>info&#64;fotografcitakip.com</u></a> e-mail adresi kullanılacak.
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="EmailHata">
+                                    <label class="form-label">Gönderen Email Adresi</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fal fa-mouse-pointer width-1 text-align-center"></i></span>
+                                        </div>
+                                        <input type="text" data-inputmask="'alias': 'email'" class="form-control" im-insert="true" name="GonderenMail" id="Email" maxlength="100" required>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6" id="GonderenSifreHata">
+                                    <label class="form-label" for="GonderenSifre">Gönderen Mail Şifresi</label>
+                                    <input type="password" id="GonderenSifre" class="form-control" name="GonderenSifre" maxlength="20" required>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="GonderenAdSoyad">Gönderen Ad-Soyad</label>
+                                    <input type="text" id="GonderenAdSoyad" class="form-control" name="GonderenAdSoyad" maxlength="50" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="SmtpAdresHata">
+                                    <label class="form-label" for="SmtpAdres">Smtp Adresi</label>
+                                    <input type="text" id="SmtpAdres" class="form-control" name="SmtpAdres" maxlength="50" required>
+                                </div>
+                                <div class="form-group col-sm-6" id="SmtpPortHata">
+                                    <label class="form-label" for="SmtpPort">Smtp Portu</label>
+                                    <input type="text" id="SmtpPort" class="form-control" name="SmtpPort" maxlength="3" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6 m-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="SslKullan" name="SslKullan" checked>
+                                    <label class="custom-control-label" for="SslKullan">SSL Kullan</label>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="form-group col-sm-8">
+                                    <label class="form-label" for="Aciklama">Açıklama</label>
+                                    <textarea class="form-control" id="Aciklama" rows="2" name="Aciklama" style="overflow:auto;resize:none"></textarea>
+                                </div>
+                            </div>
+                        }
+         
+
+                        @if (ViewBag.KullaniciYetki)
+                        {
+                            <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                                @*<a class="btn btn-primary ml-auto waves-effect waves-themed" id="AyarTest"><i class="ni ni-energy mr-2"></i>Ayarlaraı Test Et</a>*@
+                                <button type="button" class="btn btn-primary ml-auto waves-effect waves-themed" id="AyarTest"><i class="ni ni-energy mr-2"></i>Ayarlaraı Test Et</button>
+                                <button type="submit" class="btn btn-primary ml-auto waves-effect waves-themed"><i class="fal fa-save mr-2"></i> Kaydet</button>
+                            </div>
+                        }
+                    </form>
+                    @*<div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                        <button class="btn btn-primary ml-auto waves-effect waves-themed" id="AyarTest"><i class="ni ni-energy mr-2"></i>Ayarlaraı Test Et</button>
+                    </div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            $(":input").inputmask();
+            var ssl = "";
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+
+            $('#Email').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $("#mailhata").remove();
+                }
+            }); // zorunlu alan kontrolü
+           
+
+            $("#AyarTest").click(function () {
+                if ($("#Email").val() == "") // Kişi seçilmişse zorunlu alan kontrolü
+                {
+                    $("#Email").focus();
+                    $("#EmailHata").append("<div id='mailhata' style='color:red'>Lütfen E-mail Adresini Giriniz.</div>");
+                }
+
+                else if ($("#GonderenSifre").val() == "") // Kişi seçilmişse zorunlu alan kontrolü
+                {
+                    $("#GonderenSifre").focus();
+                    $("#GonderenSifreHata").append("<div class='hata' style='color:red'>Lütfen Mail Şifrenizi Giriniz.</div>");
+                }
+                else if ($("#SmtpAdres").val() == "") // Kişi seçilmişse zorunlu alan kontrolü
+                {
+                    $("#SmtpAdres").focus();
+                    $("#SmtpAdresHata").append("<div class='hata' style='color:red'>Lütfen SMTP Adresini Giriniz.</div>");
+                }
+                else if ($("#SmtpPort").val() == "") // Kişi seçilmişse zorunlu alan kontrolü
+                {
+                    $("#SmtpPort").focus();
+                    $("#SmtpPortHata").append("<div class='hata' style='color:red'>Lütfen SMTP Portunu Giriniz.</div>");
+                }
+                else {
+                    if ($("#SslKullan").is(':checked')) {
+                        ssl = "Var";
+                    }
+                    else {
+                        ssl = "Yok";
+                    }
+                    
+                    var Ayar = new FormData();
+                    Ayar.append("Email", $("#Email").val());
+                    Ayar.append("AdSoyad", $("#GonderenAdSoyad").val());
+                    Ayar.append("GonderenSifre", $("#GonderenSifre").val());
+                    Ayar.append("SmtpAdres", $("#SmtpAdres").val());
+                    Ayar.append("SmtpPort", $("#SmtpPort").val());
+                    Ayar.append("Ssl", ssl);
+                   
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: Ayar,
+                        beforeSend: function () {
+                            Swal.fire(
+                                {
+                                    title: "Ayarlar Kontrol Ediliyor!",
+                                    html: "<strong>Lütfen Bekleyin.</strong>",
+                                    onBeforeOpen: function onBeforeOpen() {
+                                        Swal.showLoading();
+                                    }
+                                });
+                        },
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Ayarlar/MailAyarKontrol/",
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                                swal.close();
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                swal.close();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
+

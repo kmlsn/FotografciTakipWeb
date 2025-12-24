@@ -1,0 +1,111 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool raporlaryetki = ky.FirstOrDefault(x => x.SayfaId == 6 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 6 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rezervasyonraporlariyetki = ky.FirstOrDefault(x => x.SayfaId == 53 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 53 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool islemadetleriraporlariyetki = ky.FirstOrDefault(x => x.SayfaId == 54 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 54 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool gelirgiderraporlariyetki = ky.FirstOrDefault(x => x.SayfaId == 55 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 55 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rezervasyonturleriraporlariyetki = ky.FirstOrDefault(x => x.SayfaId == 56 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 56 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool gelecekodemelerraporlariyetki = ky.FirstOrDefault(x => x.SayfaId == 57 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 57 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool haftalikraporyetki = ky.FirstOrDefault(x => x.SayfaId == 58 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 58 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rezervasyonekhizmetleriraporlariyetki = ky.FirstOrDefault(x => x.SayfaId == 59 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 59 && x.Sil == false && x.Aktif == true).SayfaYetki;
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Raporlar" ? "active open" : "";
+    string altmenurezervasyonraporlari = ViewBag.AltMenu == "Rezervasyon Raporları" ? "active" : "";
+    string altmenurezervasyonislemadetleriraporlari = ViewBag.AltMenu == "Rezervasyon İşlem Adetleri" ? "active" : "";
+    string altmenugelirgiderraporlari = ViewBag.AltMenu == "Gelir-Gider Raporları" ? "active" : "";
+    string altmenurezervasyonturleriraporu = ViewBag.AltMenu == "Rezervasyon Türleri Raporu" ? "active" : "";
+    string altmenugelecekodemelerraporu = ViewBag.AltMenu == "Gelecek Ödemeler Raporu" ? "active" : "";
+    string altmenuhaftalikrapor = ViewBag.AltMenu == "Haftalık Rapor" ? "active" : "";
+    string altmenurezervasyonekhizmetraporu = ViewBag.AltMenu == "Rezervasyon Ek Hizmetler Raporu" ? "active" : "";
+}
+@if (raporlaryetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Raporlar" data-filter-tags="raporlar">
+            <i class="fal fa-chart-pie"></i>
+            <span class="nav-link-text" data-i18n="nav.raporlar">Raporlar</span>
+        </a>
+        <ul>
+            @if (lisans.Raporlar_RezervasyonRaporlari)
+            {
+                if (rezervasyonraporlariyetki)
+                {
+                    <li class=@altmenurezervasyonraporlari>
+                        <a href="~/Admin/Raporlar/RezervasyonRaporlari" title="Rezervasyon Raporları" data-filter-tags="raporlar rezervasyon raporları">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_rezervasyon_raporlari">Rezervasyon Raporları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_RezervasyonIslemAdetleriRaporu)
+            {
+                if (islemadetleriraporlariyetki)
+                {
+                    <li class=@altmenurezervasyonislemadetleriraporlari>
+                        <a href="~/Admin/Raporlar/RezervasyonIslemAdetleri" title="Rezervasyon İşlem Adetleri" data-filter-tags="raporlar rezervasyon işlem adetleri">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_rezervasyon_islem_adetleri">Rezervasyon İşlem Adetleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_GelirGiderRaporlari)
+            {
+                if (gelirgiderraporlariyetki)
+                {
+                    <li class=@altmenugelirgiderraporlari>
+                        <a href="~/Admin/Raporlar/GelirGiderRaporlari" title="Gelir-Gider Raporları" data-filter-tags="raporlar gelir gider raporları">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_aylik_gelir_gider_raporlari">Gelir-Gider Raporları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_RezervasyonTurleriRaporu)
+            {
+                if (rezervasyonturleriraporlariyetki)
+                {
+                    <li class=@altmenurezervasyonturleriraporu>
+                        <a href="~/Admin/Raporlar/RezervasyonTurleriRaporu" title="Rezervasyon Türleri Raporu" data-filter-tags="raporlar rezervasyon türleri raporu">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_rezervasyon_turleri_raporu">Rezervasyon Türleri Raporu</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_RezervasyonEkHizmetleriRaporu)
+            {
+                if (rezervasyonekhizmetleriraporlariyetki)
+                {
+                    <li class=@altmenurezervasyonekhizmetraporu>
+                        <a href="~/Admin/Raporlar/EkHizmetlerRaporu" title="Rezervasyok Ek Hizmetler Raporu" data-filter-tags="raporlar rezervasyon ek hizmetler raporu">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_rezervasyon_ek_hizmetler_raporu">Rezervasyok Ek Hizmetler Raporu</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_GelecekOdemelerRaporu)
+            {
+                if (gelecekodemelerraporlariyetki)
+                {
+                    <li class=@altmenugelecekodemelerraporu>
+                        <a href="~/Admin/Raporlar/GelecekOdemelerRaporu" title="Gelecek Ödemeler Raporu" data-filter-tags="raporlar gelecek ödemeler raporu">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_gelecek_odemeler_raporu">Gelecek Ödemeler Raporu</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_HaftalikRapor)
+            {
+                if (haftalikraporyetki)
+                {
+                    <li class=@altmenuhaftalikrapor>
+                        <a href="~/Admin/Raporlar/HaftalikRapor" title="Haftalık Rapor" data-filter-tags="raporlar haftalık rapor">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_haftalik_rapor">Haftalık Rapor</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}

@@ -1,0 +1,105 @@
+﻿
+@{
+    ViewBag.Title = "Sms Gönder";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-6 col-sm-12 col-xs-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h3> SMS Gönder</h3>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    @*<form action="/Otomasyon/Ayarlar/EmailHesapAyarlari" method="post" enctype="multipart/form-data">*@
+
+                    <div class="row mb-3">
+                        <div class="form-group col-sm-12" id="TelefonNoHata">
+                            <label class="form-label" for="TelefonNo">Cep Telefonu</label>
+                            <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="TelefonNo" id="TelefonNo">
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="form-group col-sm-12">
+                            <label class="form-label" for="MesajMetni">Mesaj İçeriği</label>
+                            <textarea class="form-control" id="MesajMetni" rows="6" name="MesajMetni" style="overflow:auto;resize:none"></textarea>
+                        </div>
+                    </div>
+                    <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                        <button type="button" class="btn btn-primary ml-auto waves-effect waves-themed" id="SmsGonder">Gönder</button>
+                    </div>
+                    @*</form>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            $(":input").inputmask();
+            $('input').on('focusout keydown paste', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+
+            $("#SmsGonder").click(function () {
+                var telno = $("#TelefonNo").val();
+                telno = telno.replaceAll("_", "");
+                telno = telno.replaceAll(")", "");
+                telno = telno.replaceAll("(", "");
+                telno = telno.replaceAll("-", "");
+                telno = telno.replaceAll(" ", "");
+                if ($("#TelefonNo").val() == "") {
+                    $("#TelefonNo").focus();
+                    $("#TelefonNoHata").append("<div class='hata' style='color:red'>Telefon Numarasını Giriniz!</div>");
+                }
+                else if (telno < 11) {
+                    $("#TelefonNo").focus();
+                    $("#TelefonNoHata").append("<div class='hata' style='color:red'>Eksik Numara Girdiniz!</div>");
+                }
+                else {
+                    var SmsData = new FormData();
+                    SmsData.append("TelefonNo", $("#TelefonNo").val());
+                    SmsData.append("MesajMetni", $("#MesajMetni").val());
+
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: SmsData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Dashboard/HizliSmsGonder/",
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                alert(data.Mesaj);
+                                $("#TelefonNo").val("");
+                                $("#MesajMetni").val("");
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+        });
+
+    </script>
+}
+
+
+

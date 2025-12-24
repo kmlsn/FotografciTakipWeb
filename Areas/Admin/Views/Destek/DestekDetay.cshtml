@@ -1,0 +1,247 @@
+﻿
+@{
+    ViewBag.Title = "Destek Talebi Detayı";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model List<DestekTalepleriDetay>
+@{
+    DestekTalepleri Talep = ViewBag.Talep;
+    string talepdurum = "";
+    if (Talep.Durum == "1")
+    {
+        talepdurum = "Cevap Bekliyor";
+    }
+    else if (Talep.Durum == "2")
+    {
+        talepdurum = "Okundu";
+    }
+    else if (Talep.Durum == "3")
+    {
+        talepdurum = "Cevaplandı";
+    }
+    else if (Talep.Durum == "4")
+    {
+        talepdurum = "Değerlendiriliyor";
+    }
+    else if (Talep.Durum == "5")
+    {
+        talepdurum = "Kapandı";
+    }
+    else if (Talep.Durum == "6")
+    {
+        talepdurum = "Talep İletildi";
+    }
+    else if (Talep.Durum == "7")
+    {
+        talepdurum = "İptal";
+    }
+
+}
+@section Head
+{
+    @*<link href="https://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet">*@
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="~/Areas/Admin/Content/css/DestekTalepStyle.css" rel="stylesheet" />
+}
+<input type="text" id="TalepId" class="form-control" name="TalepId" maxlength="50" style="display:none" value="@Talep.Id">
+@*   Destek Talebi Cevap Modal   *@
+<div class="modal fade" id="CevapYazModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Destek Talebi - @Talep.TalepBaslik
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-12 mb-3" id="TalepMesajHata">
+                                    <label class="form-label" for="TalepMesaj">Mesaj</label>
+                                    <textarea class="form-control form-control-sm" id="TalepMesaj" rows="5" name="TalepMesaj" style="overflow:auto;resize:none"></textarea>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6 mb-0">
+                                    <label class="form-label" for="TalepEkranGorunutusu">Ekran Görüntüsü Yükle (Sadece resim dosyaları seçebilirsiniz.)</label>
+                                    <input type="file" id="TalepEkranGorunutusu" class="form-control-file" accept=".jpg, .jpeg, .png, .bmp, .tiff, .tif,|images/*">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="CevapGonder">Cevap Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+@*   Destek Talebi Cevap Modal  *@
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-6" class="panel">
+            <div class="panel-hdr">
+                <h2>
+                    @Talep.TalepTuru - @Talep.TalepBaslik
+                </h2>
+                <div class="form-group row mt-4 mr-4" id="DurumHata">
+                    <div class="col-md-8">
+                        <select id="Durum" class="form-control">
+                            <option value="0" selected disabled>Durum Seçiniz</option>
+                            <option value="1">1 - Cevap Bekliyor</option>
+                            <option value="2">2 - Okundu</option>
+                            <option value="3">3 - Cevaplandı</option>
+                            <option value="4">4 - Değerlendiriliyor</option>
+                            <option value="5">5 - Kapandı</option>
+                            <option value="6">6 - Talep İletildi</option>
+                            <option value="7">7 - İptal</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-xs btn-primary" id="DurumGuncelle">Durum Güncelle</button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-container show">
+                <div class="tile tile-alt" id="messages-main">
+                    @foreach (var detaylar in Model.OrderBy(x => x.Id))
+                    {
+                        @*Talet Eden Firma*@
+                        if (detaylar.MusteriCevap)
+                        {
+                            <div class="message-feed media">
+                                <div class="pull-left mr-3">
+                                    @*Firma Logo*@
+                                    <img src="@Talep.Firma.Resim.ResimAdres" alt="" class="img-avatar">
+                                </div>
+                                <div class="media-body">
+                                    <div class="mf-content">
+                                        @* Talep Detayı *@
+                                        @Html.Raw(detaylar.Mesaj)
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(detaylar.ResimYol))
+                                    {
+                                        <small class="mf-date"><a href="@detaylar.ResimYol" target="_blank">Ek Göster</a></small>
+                                    }
+                                    @* Talep Tarih Saat *@
+                                    <small class="mf-date"><i class="fa fa-user"></i> @detaylar.Kullanici.AdSoyad - <i class="fa fa-clock-o"></i> @detaylar.OlusturmaTarih</small>
+                                </div>
+                            </div>
+                        }
+                        if (detaylar.FirmaCevap)
+                        {
+                            @*Cevap Veren Sistem Yöneticisi*@
+                            <div class="message-feed right">
+                                <div class="pull-right">
+                                    <img src="/Areas/Otomasyon/Dosyalar/FirmaLogolar/Fotografci_Takip_Logo_Renkli_Tek.png" alt="" class="img-avatar">
+                                </div>
+                                <div class="media-body">
+                                    <div class="mf-content">
+                                        @* Talep Cevap *@
+                                        @Html.Raw(detaylar.Mesaj)
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(detaylar.ResimYol))
+                                    {
+                                        <small class="mf-date"><a href="@detaylar.ResimYol" target="_blank">Ek Göster</a></small>
+                                    }
+                                    <small class="mf-date"><i class="fa fa-user"></i> @detaylar.Kullanici.AdSoyad - <i class="fa fa-clock-o"></i> @detaylar.OlusturmaTarih</small>
+                                </div>
+                            </div>
+                        }
+                    }
+                    @if (Talep.Durum != "5" && Talep.Durum != "7")
+                    {
+                        <div class="msb-reply">
+                            <textarea placeholder="Cevapla..." id="TalepCevap"></textarea>
+                            <button id="Cevapla"><i class="fal fa-paper-plane"></i></button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        var durum = 0;
+        $(document).ready(function () {
+            $("#Durum").change(function () {
+                durum = $(this).find("option:selected").val();
+                if ($(this).val != "0") {
+                    $("#dhata").remove();
+                }
+            });
+            $('#Durum').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $("#dhata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $("#Cevapla").click(function () {
+                if ($("#TalepCevap").val() != "") {
+                    if (durum == 0) {
+                        $("#Durum").focus();
+                        $("#DurumHata").append("<div id='dhata' style='color:red'>Bir Durum Seçiniz!</div>");
+                    }
+                    else {
+                        var talepid = $("#TalepId").val();
+                        var CevapData = new FormData();
+                        CevapData.append("TalepCevap", $("#TalepCevap").val());
+                        CevapData.append("Durum", $("#Durum").val());
+                        CevapData.append("TalepId", talepid);
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            data: CevapData,
+                            contentType: false,
+                            processData: false,
+                            url: "/Admin/Destek/TalepCevapla/",
+                            success: function (data) {
+                                window.location.replace("/Admin/Destek/DestekDetay/" + talepid); // aynı sekme
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                }
+            });
+
+
+            $("#DurumGuncelle").click(function () {
+                var talepid = $("#TalepId").val();
+                var CevapData = new FormData();
+                CevapData.append("Durum", $("#Durum").val());
+                CevapData.append("TalepId", talepid);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: CevapData,
+                    contentType: false,
+                    processData: false,
+                    url: "/Admin/Destek/DurumGuncelle/",
+                    success: function (data) {
+                        if (data.Sonuc == true) {
+                            window.location.replace("/Admin/Destek/DestekTalepleri/");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+
+        });
+
+    </script>
+}

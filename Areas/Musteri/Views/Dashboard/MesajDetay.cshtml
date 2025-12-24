@@ -1,0 +1,286 @@
+﻿
+@{
+    ViewBag.Title = "Mesaj Detayları";
+    Layout = "~/Areas/Musteri/Views/Shared/_Layout.cshtml";
+    ViewBag.AdSoyad = Session["AdSoyad"];
+    ViewBag.Email = Session["Email"];
+    ViewBag.Firma = Session["Firma"];
+    ViewBag.FirmaLogo = Session["FirmaLogo"];
+}
+@using FotografciTakipWeb.Models
+
+@model List<MusteriMesaj>
+@{
+    MusteriMesaj ilkmesaj = ViewBag.ilkmesaj;
+    string Konu = ilkmesaj.Konu;
+    if (ilkmesaj.Durum == "5")
+    {
+        Konu = Konu + " [Konu Kapandı]";
+    }
+}
+
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Mesaj Düzenle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="form-group col-sm-12" id="KonuDuzenleHata">
+                                <label class="form-label" for="KonuDuzenle">Konu</label>
+                                <input type="text" id="KonuDuzenle" class="form-control form-control-sm" name="KonuDuzenle" placeholder="Konu" value="">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="form-group col-sm-12" id="MesajDuzenleHata">
+                                <label class="form-label" for="MesajDuzenle">Mesajınız</label>
+                                <textarea class="form-control form-control-sm" id="MesajDuzenle" rows="15" name="Mesaj" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Guncelle">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Cevapla Modal Penceresi -->
+<div class="modal fade" id="CevaplaModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Cevapla
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <h1 class="subheader-title ml-3" id="Konu">
+                                <input type="text" id="MesajKonu" class="form-control form-control-sm" style="display:none" name="Konu" placeholder="Konu" value="@ilkmesaj.Konu">
+                                <i class='subheader-icon fal fa-comment-alt'></i> Konu: @ilkmesaj.Konu
+                            </h1>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="form-group col-sm-12" id="MesajHata">
+                                <label class="form-label" for="Mesaj">Mesajınız</label>
+                                <textarea class="form-control form-control-sm" id="Mesaj" rows="15" name="Mesaj" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Kaydet" value="@ilkmesaj.Id">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Cevapla Modal Penceresi -->
+
+<div class="subheader pt-2 mb-2">
+    <h1 class="subheader-title">
+        <i class='subheader-icon fal fa-comment-alt'></i> Konu: @Konu
+    </h1>
+</div>
+
+<div class="row" id="js-contacts">
+    @if (Model.Count > 0)
+    {
+        foreach (var mesaj in Model)
+        {
+            if (mesaj.MesajId != null) // Mesaj müşteri tarafından yazılan ilek mesaj değilse
+            {
+                if (mesaj.FirmaCevapBit) // Mesaj firma tarafından yazıldı ise
+                {
+                    <div class="col-xl-6">
+                        <div id="c_1" class="card border shadow-0 mb-g shadow-sm-hover">
+                            <div class="card-body border-faded border-top-0 border-left-0 border-right-0 rounded-top p-2 bg-fusion-50">
+                                <div class="d-flex flex-row align-items-center">
+                                    @*<span class="rounded-circle profile-image d-block " style="background-image:url('@mesaj.Firma.Resim.ResimAdres'); background-size: cover;"></span>*@
+                                    <img class="rounded-circle profile-image d-block "src="@mesaj.Firma.Resim.ResimAdres" />
+                                    <div class="info-card-text flex-1 ml-2">
+                                        @mesaj.Firma.FirmaAdi
+                                        <span class="text-truncate text-truncate-xl">@Convert.ToInt64(mesaj.Firma.CepTel).ToString("(0###) ###-####") - @mesaj.Firma.Email</span>  @*Ayar a bağlanacak*@
+                                    </div>
+                                    @if (mesaj.CevaplaBit)
+                                    {
+                                        <div class="form-group float-right mr-2">
+                                            <button type="button" class="btn btn-sm btn-primary mesajcevapla" data-toggle="modal" data-mesajid="@mesaj.Id" data-target="#CevaplaModal" id="Cevapla">Cevapla</button>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="card-body p-0 collapse show">
+                                <div class="p-3">
+                                    @Html.Raw(mesaj.Mesaj)
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="text-muted">
+                                    @mesaj.MesajTarihi
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else // Mesaj müşteri tarafından yazıldı ise
+                {
+                    <div class="col-xl-6">
+                        <div id="c_1" class="card border shadow-0 mb-g shadow-sm-hover">
+                            <div class="card-body border-faded border-top-0 border-left-0 border-right-0 rounded-top p-2 bg-warning-50">
+                                <div class="d-flex flex-row align-items-center">
+                                    <span class="rounded-circle profile-image d-block " style="background-image:url('/Areas/Otomasyon/Dosyalar/KullaniciProfilResimleri/Default_User.png'); background-size: cover;"></span>
+                                    <div class="info-card-text flex-1 ml-2">
+                                        @mesaj.Musteri.AdiSoyadi
+                                        <span class="text-truncate text-truncate-xl">@Convert.ToInt64(mesaj.Musteri.CepTel).ToString("(0###) ###-####") - @mesaj.Musteri.Email</span>
+                                    </div>
+                                    @*@if (mesaj.CevaplaBit)   Müşterinin kendi cevabına Cevap olmaz.
+                                    {
+                                        <div class="form-group float-right mr-2">
+                                            <button type="button" class="btn btn-sm btn-primary mesajcevapla" data-toggle="modal" data-mesajid="@mesaj.Id" data-target="#CevaplaModal" id="Cevapla">Cevapla</button>
+                                        </div>
+                                    }*@
+                                </div>
+                            </div>
+                            <div class="card-body p-0 collapse show">
+                                <div class="p-3">
+                                    @Html.Raw(mesaj.Mesaj)
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <div class="text-muted">
+                                    @mesaj.MesajTarihi
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        }
+    }
+
+    <div class="col-xl-4">
+        <div id="c_2" class="card border shadow-0 mb-g shadow-sm-hover">
+            <div class="card-body border-faded border-top-0 border-left-0 border-right-0 rounded-top p-2 bg-warning-50">
+                <div class="d-flex flex-row align-items-center">
+                    <span class="rounded-circle profile-image d-block " style="background-image:url('/Areas/Otomasyon/Dosyalar/KullaniciProfilResimleri/Default_User.png'); background-size: cover;"></span>
+                    <div class="info-card-text flex-1 ml-2">
+                        @ilkmesaj.Musteri.AdiSoyadi
+                        <span class="text-truncate text-truncate-xl">@Convert.ToInt64(ilkmesaj.Musteri.CepTel).ToString("(0###) ###-####") - @ilkmesaj.Musteri.Email</span>
+                    </div>
+                    @*@if (ilkmesaj.CevaplaBit)
+                    {
+                        <div class="form-group float-right mr-2">
+                            <button type="button" class="btn btn-sm btn-primary mesajcevapla" data-toggle="modal" data-mesajid="0" data-target="#CevaplaModal" id="Cevapla">Cevapla</button>
+                        </div>
+                    }*@
+                </div>
+            </div>
+            <div class="card-body p-0 collapse show">
+                <div class="p-3">
+                    @Html.Raw(ilkmesaj.Mesaj)
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="text-muted">
+                    @ilkmesaj.MesajTarihi
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Script
+{
+
+    <script>
+            function dateFormat(d) {
+                //console.log(d);
+                //console.log((d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear());
+                return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+            }
+            function timeFormat(t) {
+                var saat = t.getHours();
+                var dakika = t.getMinutes();
+                var zaman = saat + ":" + dakika
+                return zaman;
+            }
+            $(document).ready(function () {
+                $('input').on('focusout', function (e) {
+                    if ($(this).val != "") {
+                        $(this).next("div.hata").remove();
+                    }
+                }); // Validation hata kaldırma
+                $('#DurumHata').on('focusout', function (e) {
+                    if ($(this).val != "0") {
+                        $(this).next("div.durumhata").remove();
+                    }
+                }); // DurumHata hata kaldırma
+                $('#DurumHata').on('change', function (e) {
+                    if ($(this).val != "0") {
+                        $(this).next("div.durumhata").remove();
+                    }
+                }); // Validation hata kaldırma
+                $('.mesajcevapla').on('click', function (e) {
+                    $("#Kaydet").data("mesajid", $(this).data("mesajid"));
+                }); // Validation hata kaldırma
+                $("#Kaydet").click(function () {
+                    if ($("#Mesaj").val() == "") // Kişi seçilmişse zorunlu alan kontrolü
+                    {
+                        $("#Mesaj").focus();
+                        $("#MesajHata").append("<div class='hata' style='color:red'>Lütfen cevanınızı yazınız!</div>");
+                    }
+                    else if ($("#Durum").val() == "0") {
+                        $("#Durum").focus();
+                        $("#DurumHata").append("<div class='durumhata' style='color:red'>Konu Durumunu seçiniz!</div>");
+                    }
+                    else {
+                        $('#CevaplaModal').modal('hide');
+                        var ilkid = $(this).val();
+                        var mesajid = $(this).data("mesajid");
+                        var MesajData = new FormData();
+                        MesajData.append("IlkMesajId", ilkid);
+                        MesajData.append("MesajId", mesajid);
+                        MesajData.append("Konu", $("#MesajKonu").val());
+                        MesajData.append("Mesaj", $("#Mesaj").val());
+                        //MesajData.append("Durum", $("#Durum").val());
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            data: MesajData,
+                            contentType: false,
+                            processData: false,
+                            url: "/Musteri/Dashboard/MesajCevapla/",
+                            success: function (data) {
+                                window.location.replace("/Musteri/Dashboard/MesajDetay/" + ilkid); // aynı sekme
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            });
+
+    </script>
+}

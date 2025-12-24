@@ -1,0 +1,466 @@
+﻿@{
+    ViewBag.Title = "Mesajlar";
+    Layout = "~/Areas/Musteri/Views/Shared/_Layout.cshtml";
+    ViewBag.AdSoyad = Session["AdSoyad"];
+    ViewBag.Email = Session["Email"];
+    ViewBag.Firma = Session["Firma"];
+    ViewBag.FirmaLogo = Session["FirmaLogo"];
+}
+@using FotografciTakipWeb.Models
+@model List<MusteriMesaj>
+@{
+
+    string clss = "";
+    string durum = "";
+    string cevaptarihi = "";
+}
+
+@section Head
+{
+    <style>
+        .modal {
+            overflow: auto !important; /*Açılan ikinci modal ekranda kaymadığı için eklendi*/
+        }
+    </style>
+}
+
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Mesaj
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="form-group col-sm-12" id="KonuHata">
+                                <label class="form-label" for="Konu">Konu</label>
+                                <input type="text" id="Konu" class="form-control form-control-sm" name="Konu" placeholder="Konu" value="">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="form-group col-sm-12" id="MesajHata">
+                                <label class="form-label" for="Mesaj">Mesajınız</label>
+                                <textarea class="form-control form-control-sm" id="Mesaj" rows="15" name="Mesaj" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Kaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Mesaj Düzenle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="form-group col-sm-12" id="KonuDuzenleHata">
+                                <label class="form-label" for="KonuDuzenle">Konu</label>
+                                <input type="text" id="KonuDuzenle" class="form-control form-control-sm" name="KonuDuzenle" placeholder="Konu" value="">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="form-group col-sm-12" id="MesajDuzenleHata">
+                                <label class="form-label" for="MesajDuzenle">Mesajınız</label>
+                                <textarea class="form-control form-control-sm" id="MesajDuzenle" rows="15" name="Mesaj" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Guncelle">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h2> Mesajlarım</h2>
+                <input type="hidden" data-yetki="@ViewBag.MusteriYetkileri.MesajGonder" id="mesajgonder" />
+                @if (ViewBag.MusteriYetkileri.MesajGonder)
+                {
+                    <div class="form-group float-right">
+                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" id="YeniEkle"> Yeni Mesaj Gönder</button>
+                    </div>
+                }
+            </div>
+            <div class="border-bottom"></div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtmesajlar" class="table table-bordered table-hover table-striped table-sm w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Konu</th>
+                                <th class="w-15">Mesaj Tarihi</th>
+                                <th class="w-15">Cevap Tarihi</th>
+                                <th class="w-15">Durum</th>
+                                <th class="w-15">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                if (!item.OkunduBit)
+                                {
+                                    clss = "fw-700";
+                                }
+                            }
+                            @foreach (var item in Model.OrderByDescending(x => x.OkunduBit))
+                            {
+                                if (item.MesajId == null)
+                                {
+                                    if (item.Durum == "5")
+                                    { clss = clss + " bg-success-100"; }
+                                    else if (item.Durum == "7")
+                                    { clss = clss + " bg-danger-100"; }
+                                    switch (item.Durum)
+                                    {
+                                        case "1":
+                                            durum = "Cevap Bekleniyor";
+                                            break;
+                                        case "2":
+                                            durum = "Okundu";
+                                            break;
+                                        case "3":
+                                            durum = "Cevaplandı";
+                                            break;
+                                        case "4":
+                                            durum = "Değerlendiriliyor";
+                                            break;
+                                        case "5":
+                                            durum = "Konu Kapandı";
+                                            break;
+                                        case "6":
+                                            durum = "Konu Açık";
+                                            break;
+                                        case "7":
+                                            durum = "İptal";
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    <tr>
+                                        @*<td class="w-10 align-middle @clss">@item.Musteri.MusteriKodu</td>*@
+                                        <td class="align-middle @clss">@item.Konu</td>
+                                        <td class="w-15 align-middle @clss">@item.MesajTarihi.ToShortDateString() @item.MesajTarihi.ToShortTimeString() </td>
+                                        <td class="w-15 align-middle @clss">
+                                            @if (item.CevapTarihi != null)
+                                            {
+                                                cevaptarihi = Convert.ToDateTime(item.CevapTarihi).ToShortDateString();
+                                                cevaptarihi = cevaptarihi + " ";
+                                                cevaptarihi = cevaptarihi + Convert.ToDateTime(item.CevapTarihi).ToShortTimeString();
+                                            }
+                                            @cevaptarihi
+                                        </td>
+                                        <td class="w-15 align-middle @clss">@durum</td>
+                                        <td class="w-15 align-middle @clss">
+                                            <button type='button' class='btn btn-sm btn-primary detay' style='color:white' data-mesajid='@item.Id'>Görüntüle</button>
+
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+
+    <script>
+        function dateFormat(d) {
+            //console.log(d);
+            //console.log((d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear());
+            return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+        }
+        function timeFormat(t) {
+            var saat = t.getHours();
+            var dakika = t.getMinutes();
+            var zaman = saat + ":" + dakika
+            return zaman;
+        }
+        $(document).ready(function () {
+            $(":input").inputmask();
+            var dt;
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $("#Konu").val("");
+                $("#Mesaj").val("");
+            });
+            $("#Kaydet").click(function () {
+                if ($("#Konu").val() == "") // Kişi seçilmişse zorunlu alan kontrolü
+                {
+                    $("#Konu").focus();
+                    $("#KonuHata").append("<div class='hata' style='color:red'>Konumuz neydi?</div>");
+                }
+                else if ($("#Mesaj").val() == "") // Kişi seçilmişse zorunlu alan kontrolü
+                {
+                    $("#Mesaj").focus();
+                    $("#MesajHata").append("<div class='hata' style='color:red'>Lütfen bize talebinizi yazınız!</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var Konu = $("#Konu").val();
+                    var MesajData = new FormData();
+                    MesajData.append("Konu", $("#Konu").val());
+                    MesajData.append("Mesaj", $("#Mesaj").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: MesajData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Musteri/Dashboard/MesajKaydet/",
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+
+            $("#dtmesajlar").on('click', '.duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#Guncelle").val($(this).data("mesajid"));
+                $("#KonuDuzenle").val($(this).data("konu"));
+                var mesaj = $(this).data("mesaj").replace(/\<br \/\>/g, "\r\n");
+                $("#MesajDuzenle").val(mesaj);
+            });
+            $("#dtmesajlar").on('click', '.detay', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                var id = $(this).data("mesajid");
+                window.location.replace("/Musteri/MesajDetay/" + id);
+            });
+
+            $("#Guncelle").click(function () {
+                if ($("#Konu").val() == "") // Kişi seçilmişse zorunlu alan kontrolü
+                {
+                    $("#KonuDuzenle").focus();
+                    $("#KonuDuzenleHata").append("<div class='hata' style='color:red'>Konumuz neydi?</div>");
+                }
+                else if ($("#MesajDuzenle").val() == "") // Kişi seçilmişse zorunlu alan kontrolü
+                {
+                    $("#MesajDuzenle").focus();
+                    $("#MesajDuzenleHata").append("<div class='hata' style='color:red'>Lütfen bize talebinizi yazınız!</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var Konu = $("#KonuDuzenle").val();
+                    var MesajData = new FormData();
+                    MesajData.append("MesajId", $(this).val());
+                    MesajData.append("Konu", $("#KonuDuzenle").val());
+                    MesajData.append("Mesaj", $("#MesajDuzenle").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: MesajData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Musteri/Dashboard/MesajGuncelle/",
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+
+            dt = $('#dtmesajlar').dataTable(
+             {
+                 responsive: true,
+                 "destroy": true,
+                 "order": [[0, "desc"]],
+                 "searching": false, // arama kaldır
+                 "lengthChange": false, // sayfa başına göster kaldır
+                 "ordering": false,
+                 "createdRow": function (row, data, dataIndex) {
+                     if (data["OkunduBit"] == false) {
+                         $('td', row).addClass('fw-700');
+                     }
+                     if (data["Durum"] == "5") {
+                         $('td', row).addClass('bg-success-100');
+                     }
+                 },
+                 "columns": [
+                      { "data": "Konu", "autowidth": true, "className": "align-middle" },
+                      {
+                          "data": null,
+                          "className": "align-middle",
+                          "render": function (data, type, row) {
+                              if (row.MesajTarihi != null) {
+                                  var t = parseInt(row.MesajTarihi.match(/\d+/)[0]);
+                                  var tarih = new Date(t);
+                                  return dateFormat(tarih) + " - " + timeFormat(tarih)
+                              }
+                              return "";
+                          }
+                      },
+                      {
+                          "data": null,
+                          "className": "align-middle",
+                          "render": function (data, type, row) {
+                              if (row.CevapTarihi != null) {
+                                  var t = parseInt(row.CevapTarihi.match(/\d+/)[0]);
+                                  var tarih = new Date(t);
+                                  return dateFormat(tarih) + " - " + timeFormat(tarih)
+                              }
+                              return "";
+                          }
+                      },
+                      {
+                          "data": null,
+                          "className": "align-middle",
+                          "render": function (data, type, row) {
+                              if (row.Durum=="1") {
+                                  return "Cevap Bekleniyor"
+                              }
+                              else if (row.Durum == "2") {
+                                  return "Okundu"
+                              }
+                              else if (row.Durum == "3") {
+                                  return "Cevaplandı"
+                              }
+                              else if (row.Durum == "4") {
+                                  return "Değerlendiriliyor"
+                              }
+                              else if (row.Durum == "5") {
+                                  return "Konu Kapandı"
+                              }
+                              else if (row.Durum == "6") {
+                                  return "Konu Açık"
+                              }
+                              else if (row.Durum == "7") {
+                                  return "İptal"
+                              }
+                              else
+                              {
+                                  return ""
+                              }
+                          }
+                      },
+                      {
+                          "data": null,
+                          "className": "align-middle",
+                          "render": function (data, type, row) {
+                              islem = "";
+                              islem = islem + "<a type='button' class='btn btn-sm btn-primary detay' style='color:white' data-mesajid='" + row.Id + "'>Görüntüle</a>"
+                              return islem
+                          }
+                      }
+                 ],
+                 "processing": true,
+                 "ajax": {
+                     "url": "/Musteri/Dashboard/MesajListesi/",
+                     "contentType": 'application/json; charset=utf-8',
+                     'type': 'POST',
+                     'data': function (data) { return data = JSON.stringify(data); }
+                 },
+                 
+                 "oLanguage": {
+                     "sSearchPlaceholder": "Tabloda Ara",
+                     "sZeroRecords": "Kayıt yok.",
+                     "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                     "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                     "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                     "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                     "processing": "Yükleniyor... Lütfen Bekleyin",
+                     "oPaginate": {
+                         "sPrevious": "Önceki",
+                         "sNext": "Sonraki",
+                         "sFirst": "İlk",
+                         "sLast": "Son"
+                     }
+                 }
+             });
+
+            //dt = $('#dtmesajlar').dataTable(
+            //{
+            //    responsive: true,
+            //    "ordering": false,
+            //    "oLanguage": {
+            //        "sSearchPlaceholder": "Tabloda Ara",
+            //        "sZeroRecords": "Kayıt yok.",
+            //        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+            //        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+            //        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+            //        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+            //        "processing": "Yükleniyor... Lütfen Bekleyin",
+            //        "oPaginate": {
+            //            "sPrevious": "Önceki",
+            //            "sNext": "Sonraki",
+            //            "sFirst": "İlk",
+            //            "sLast": "Son"
+            //        }
+            //    }
+            //});
+
+        });
+
+    </script>
+}

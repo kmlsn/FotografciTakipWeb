@@ -1,0 +1,142 @@
+﻿@using FotografciTakipWeb.Models
+@{Lisanslar lisans = (Lisanslar)Session["Lisans"];}
+<header class="page-header" role="banner">
+    <!-- we need this logo when user switches to nav-function-top -->
+    <div class="page-logo">
+        <a href="#" class="page-logo-link press-scale-down d-flex align-items-center position-relative" data-toggle="modal" data-target="#modal-shortcut">
+            @*<img src="~/Areas/Otomasyon/Content/img/logo.png" alt="TeTRa Bilişim" aria-roledescription="logo"> @* TETRA BİBİŞİM LOGOSU
+            <span class="page-logo-text mr-1">TeTRa Bilişim</span>*@
+            <img src="/Areas/Otomasyon/Content/img/Logo_Tek_28x28.png" alt="SmartAdmin WebApp" aria-roledescription="logo">
+            <span class="page-logo-text mr-1">TeTRa Bilişim <br> Fotoğrafçı Takip Uygulaması</span>
+            <span class="position-absolute text-white opacity-50 small pos-top pos-right mr-2 mt-n2"></span>
+            <i class="fal fa-angle-down d-inline-block ml-1 fs-lg color-primary-300"></i>
+        </a>
+    </div>
+    <!-- DOC: nav menu layout change shortcut -->
+    <div class="hidden-md-down dropdown-icon-menu position-relative">
+        <a href="#" class="header-btn btn js-waves-off" data-action="toggle" data-class="nav-function-hidden" title="Menüyü Gizle">
+            <i class="ni ni-menu"></i>
+        </a>
+        <ul>
+            <li>
+                <a href="#" class="btn js-waves-off" data-action="toggle" data-class="nav-function-minify" title="Menüyü Küçült">
+                    <i class="ni ni-minify-nav"></i>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="btn js-waves-off" data-action="toggle" data-class="nav-function-fixed" title="Menüyü Sabitle">
+                    <i class="ni ni-lock-nav"></i>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- DOC: mobile button appears during mobile width -->
+    <div class="hidden-lg-up">
+        <a href="#" class="header-btn btn press-scale-down" data-action="toggle" data-class="mobile-nav-on">
+            <i class="ni ni-menu"></i>
+        </a>
+    </div>
+    <div class="search hidden-md-down">
+        @*<form class="app-forms hidden-xs-down" role="search" action="page_search.html" autocomplete="off">
+                <input type="text" id="search-field" placeholder="Uygulama içi arama" class="form-control" tabindex="1">
+                <a href="#" onclick="return false;" class="btn-danger btn-search-close js-waves-off d-none" data-action="toggle" data-class="mobile-search-on">
+                    <i class="fal fa-times"></i>
+                </a>
+            </form>*@
+        <div class="row ml-3 mt-3">
+            @*@{Html.RenderAction("_LisansSuresi2", "Dashboard");}
+                @{Html.RenderAction("_SMSKontur2", "Dashboard");}*@
+            @Html.Partial("_SiteMap3")
+        </div>
+    </div>
+    <div class="info-card-firma">
+        <a href="~/Otomasyon/FirmaSubeIslemleri/FirmaBilgileri">
+            <img src="@Session["FirmaLogo"]" class="profile-image rounded-plus" alt="@Session["Firma"]">
+        </a>
+        @*<img src="~/Areas/Otomasyon/Dosyalar/FirmaLogolar/Varsayılan_Firma_Logo.png" class="profile-image rounded-plus"/>*@
+        <div class="info-card-text hidden-sm-down">
+            @*<a href="#" class="d-flex align-items-center text-black-50 text-wrap">*@
+            <a href="~/Otomasyon/FirmaSubeIslemleri/FirmaBilgileri">
+                <span class="text-truncate text-truncate-sm d-inline-block fw-700 text-wrap">
+                    @Session["Firma"]
+                </span>
+            </a>
+            @*</a>*@
+            @*<span class="d-inline-block text-truncate text-truncate-sm">Toronto, Canada</span>*@
+        </div>
+    </div>
+
+    @*@{Html.RenderAction("_SubeListesi2", "Default");}*@
+    <div class="ml-auto d-flex">
+        <!-- activate app search icon (mobile) -->
+        @*<a href="~/Otomasyon/Destek/DestekTalepleri" class="header-icon" title="Destek Talebi">
+                <i class="fal fa-info"></i>
+            </a>*@
+        @{Html.RenderAction("_Destek", "Dashboard");}
+        @{Html.RenderAction("_SubeListesi3", "Dashboard");}
+        @if (lisans.Musteriler_MusteriMesajlari)
+        {
+            Html.RenderAction("_OkunmamisMesajlar", "Dashboard");
+        }
+        <!-- app user menu -->
+        <div>
+            <a href="#" data-toggle="dropdown" title="@Session["Email"]" class="header-icon d-flex align-items-center justify-content-center ml-2">
+                <img src="@Session["ResimYol"]" class="profile-image rounded-circle" alt="@Session["AdSoyad"]">
+                <!-- you can also add username next to the avatar with the codes below:
+                <span class="ml-1 mr-1 text-truncate text-truncate-header hidden-xs-down">Me</span>
+                <i class="ni ni-chevron-down hidden-xs-down"></i> -->
+            </a>
+            <div class="dropdown-menu dropdown-menu-animated dropdown-lg">
+                <div class="dropdown-header bg-trans-gradient d-flex flex-row py-4 rounded-top">
+                    <div class="d-flex flex-row align-items-center mt-1 mb-1 color-white">
+                        <span class="mr-2">
+                            <img src="@Session["ResimYol"]" class="rounded-circle profile-image" alt="@Session["AdSoyad"]">
+                        </span>
+                        <div class="info-card-text">
+                            <div class="fs-lg text-truncate text-truncate-lg">@Session["AdSoyad"]</div>
+                            <span class="text-truncate text-truncate-md opacity-80">@Session["Email"]</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-divider m-0"></div>
+                @*<a href="#" class="dropdown-item" data-action="app-reset">
+                        <span data-i18n="drpdwn.reset_layout">Reset Layout</span>
+                    </a>
+                    <a href="#" class="dropdown-item" data-toggle="modal" data-target=".js-modal-settings">
+                        <span data-i18n="drpdwn.settings">Settings</span>
+                    </a>
+                    <div class="dropdown-divider m-0"></div>
+                    <a href="#" class="dropdown-item" data-action="app-fullscreen">
+                        <span data-i18n="drpdwn.fullscreen">Fullscreen</span>
+                        <i class="float-right text-muted fw-n">F11</i>
+                    </a>
+                    <a href="#" class="dropdown-item" data-action="app-print">
+                        <span data-i18n="drpdwn.print">Print</span>
+                        <i class="float-right text-muted fw-n">Ctrl + P</i>
+                    </a>
+                    <div class="dropdown-multilevel dropdown-multilevel-left">
+                        <div class="dropdown-item">
+                            Language
+                        </div>
+                        <div class="dropdown-menu">
+                            <a href="#?lang=fr" class="dropdown-item" data-action="lang" data-lang="fr">Français</a>
+                            <a href="#?lang=en" class="dropdown-item active" data-action="lang" data-lang="en">English (US)</a>
+                            <a href="#?lang=es" class="dropdown-item" data-action="lang" data-lang="es">Español</a>
+                            <a href="#?lang=ru" class="dropdown-item" data-action="lang" data-lang="ru">Русский язык</a>
+                            <a href="#?lang=jp" class="dropdown-item" data-action="lang" data-lang="jp">日本語</a>
+                            <a href="#?lang=ch" class="dropdown-item" data-action="lang" data-lang="ch">中文</a>
+                        </div>
+                    </div>
+                    <div class="dropdown-divider m-0"></div>*@
+                <a class="dropdown-item fw-500 pt-3 pb-3" href="~/Otomasyon/KullaniciIslemleri/Profil">
+                    <span data-i18n="drpdwn.page-logout">Profil</span>
+                    @*<span class="float-right fw-n">&commat;codexlantern</span>*@
+                </a>
+                <a class="dropdown-item fw-500 pt-3 pb-3" href="~/Otomasyon/Giris/CikisYap">
+                    <span data-i18n="drpdwn.page-logout">Çıkış Yap</span>
+                    @*<span class="float-right fw-n">&commat;codexlantern</span>*@
+                </a>
+            </div>
+        </div>
+    </div>
+</header>

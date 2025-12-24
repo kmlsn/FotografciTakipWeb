@@ -1,0 +1,20 @@
+﻿
+@{
+    string ustmenuclass = ViewBag.UstMenu == "SatisPaketleri" ? "active open" : "";
+    string altmenusiparis = ViewBag.AltMenu == "Paketler" ? "active" : "";
+}
+
+<li class=@ustmenuclass>
+    <a href="#" title="Satış Paketleri" data-filter-tags="satis paketleri">
+        <i class="ni ni-phone"></i>
+        <span class="nav-link-text" data-i18n="nav.satis_paketleri">Satış Paketleri</span>
+    </a>
+    <ul>
+        <li class=@altmenusiparis>
+            <a href="~/Admin/SatisPaketleri/SatisPaketleri" title="Paketler" data-filter-tags="paketler">
+                <span class="nav-link-text" data-i18n="nav.satis_paketleri_paketler">Paketler</span>
+            </a>
+        </li>
+    </ul>
+</li>
+

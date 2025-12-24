@@ -1,0 +1,1260 @@
+﻿
+@{
+    ViewBag.Title = "Gelecek Ödemeler";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model List<GelirGider>
+@{
+    List<Firma> FirmaListesi = ViewBag.FirmaListesi;
+    List<Sube> SubeListesi = ViewBag.SubeListesi;
+    List<SubeToKullanici> SubeKullanici = ViewBag.SubeKullanici;
+    List<GelirGiderTurleri> GGTur = ViewBag.GGTur;
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    List<SmsMetinleri> Smsmetinleri = ViewBag.SmsMetinleri;
+    List<Sozlesme> Sozlesmeler = ViewBag.Sozlesmeler;
+    List<Musteri> Musteriler = ViewBag.Musteriler;
+    string DetayYetki = KullaniciYetki.KayitDetayi.ToString();
+    string YazdirYetki = KullaniciYetki.Yazdir.ToString();
+    string SMSYetki = KullaniciYetki.SmsGonder.ToString();
+    string EkleYetki = KullaniciYetki.KayitEkle.ToString();
+}
+@section Head
+{
+    <style type="text/css">
+        a {
+            color: black;
+        }
+        .swal2-container {
+            display: -webkit-box;
+            display: flex;
+            position: fixed;
+            z-index: 300000; /*Uyarı penceresini herşeyin önüne getimek için*/
+        }
+    </style>
+    <link href="~/Areas/Otomasyon/Content/css/SMSMesajStyle.css" rel="stylesheet" />
+}
+<!-- Borç Bilgi SMS'i Modal Penceresi -->
+<div class="modal fade" id="BorcBilgiSMSGonder" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Borç Bilgisi SMS Gönder
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="alert border border-primary bg-transparent text-primary" role="alert" id="SMSGonderModalMusteriAdi">
+
+                    </div>
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-12 mb-3">
+                                    <select class="custom-select form-control custom-select-sm" id="SmsMetinleri" name="SmsMetinleri" title="SMS Metini seçiniz">
+                                        <option selected="" value="0">SMS Metinini seçiniz</option>
+                                        @foreach (var smsmetin in Smsmetinleri)
+                                        {
+                                            <option value="@smsmetin.Id" data-smsmetni="@smsmetin.SMSMetni">@smsmetin.MetinAdi</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="SMSGonderTutar">Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control bg-success-50" name="SMSGonderTutar" maxlength="50" id="SMSGonderTutar" disabled>
+                                </div>
+                            </div>
+                            <div class="row mt-4" style="display:none" id="SmsBalonuGoster">
+                                <div class="bubble bubble-bottom-left mb-4" id="SMSMetni" contenteditable></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="SMSGonder">SMS Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Borç Bilgi SMS'i Modal Penceresi -->
+<!-- Ödeme Al Modal Penceresi -->
+<div class="modal fade" id="OdemeAlModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Ödeme Al
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="OdemeTarihi">Ödeme Tarih</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="OdemeTarihi">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="OdemeSekli">Ödeme Şekli</label>
+                                    <select class="custom-select form-control custom-select-sm" id="OdemeSekli" name="OdemeSekli" title="Ödeme Şeklini Seçiniz.">
+                                        <option selected="" value="0">Nakit</option>
+                                        <option value="1">Kredi Kartı</option>
+                                        <option value="2">Banka Havalesi</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="OdenecekTutarHata">
+                                    <label class="form-label" for="OdenecekTutar">Ödenecek Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control" disabled name="OdenecekTutar" maxlength="50" id="OdenecekTutar">
+                                </div>
+                                <div class="form-group col-sm-6" id="OdenenTutarHata">
+                                    <label class="form-label" for="OdenenTutar">Ödenen Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control" name="OdenenTutar" maxlength="50" id="OdenenTutar">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6" id="KalanTutarHata">
+                                    <label class="form-label" for="KalanTutar">Kalan Tutar </label>
+                                    <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control" disabled name="KalanTutar" maxlength="50" id="KalanTutar">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="form-label" for="KalanOdemeTarihi">Kalan Tutar Ödeme Tarihi</label>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm" value="07/17/2020" id="KalanOdemeTarihi">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text fs-sm">
+                                                <i class="fal fa-calendar-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <label class="form-label" for="OdemeYapan">Ödeme Yapan</label>
+                                    <input type="text" id="OdemeYapan" class="form-control form-control-sm" name="OdemeYapan" maxlength="250">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-12 mt-3">
+                                    <label class="form-label" for="Aciklama">Açıklama</label>
+                                    <input type="text" id="Aciklama" class="form-control form-control-sm" name="Aciklama" maxlength="250">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="OdemeAl">Ödeme Al</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Ödeme Al Modal Penceresi -->
+<!-- Müşteri Detay Satırı -->
+<div class="modal fade" id="MusteriDetayModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header"><h4 class="modal-title" id="DetayBaslik">Müşteri Detay Bilgileri</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div><div class="modal-body">
+                <table class="table" width="100">
+                    <tr style="display:none"><td><b>Musteri Id :</b></td> <td id="MusteriId"></td></tr>
+                    <tr><td class="w-25"><b>Müşteri Kodu :</b></td> <td id="MusteriKodu"></td></tr>
+                    <tr><td class="w-25"><b>TC Kimlik No :</b></td> <td id="MusteriTc"></td></tr>
+                    <tr><td class="w-25"><b>Adı-Soyadı :</b></td> <td id="MusteriAdSoyad"></td></tr>
+                    <tr><td class="w-25"><b>Cep Telefonu :</b></td> <td id="MusteriCepTel"></td></tr>
+                    <tr><td class="w-25"><b>Sabit Telefon :</b></td> <td id="MusteriSabitTel"></td></tr>
+                    <tr><td class="w-25"><b>Email :</b></td> <td id="MusteriEmail"></td></tr>
+                    <tr><td class="w-25"><b>Adres :</b></td> <td id="MusteriAdres"></td></tr>
+                    <tr><td class="w-25"><b>Notlar :</b></td> <td id="MusteriNotlar"></td></tr>
+
+                    @*<tr>
+                            <td><b>İşlem :</b></td>
+                            <td>
+                                <div class="d-flex mt-2">
+                                    <a href="#" class="btn btn-sm btn-outline-danger mr-2" id="Sil2" title="Kaydı Sil" data-dismiss="modal"><i class="fal fa-times"></i> Sil</a>
+                                    <a href="#" class="btn btn-sm btn-outline-primary mr-2" id="Duzenle2" title="Kaydı Düzenle"><i class="fal fa-edit"></i> Düzenle</a>
+                                </div>
+                            </td>
+                        </tr>*@
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Müşteri Detay Satırı -->
+<!-- Sözleşme Detay Satırı -->
+<div class="modal fade" id="SozlesmeDetayModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header"><h4 class="modal-title" id="DetayBaslik">Sözleşme Detay Bilgileri</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div><div class="modal-body">
+                <div class="modal-body">
+                    <table class="table">
+                        <tr>
+                            <td class="w-25"><b>Firma :</b></td>
+                            <td id="FirmaAdi"></td>
+                            <td class="w-25"><b>Firma Yetkilisi :</b></td>
+                            <td id="YetkiliPersonel"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25"><b>Sözleşme No :</b></td>
+                            <td id="SozlesmeNo"></td>
+                            <td class="w-25"><b>Rezervasyon Türü :</b></td>
+                            <td id="RezervasyonTuru"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25"><b>Sözleşme Tarihi :</b></td>
+                            <td id="SozlesmeTarihi"></td>
+                            <td class="w-25"><b>Saat :</b></td>
+                            <td id="OrganizasyonSaati"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25"><b>Opsiyon Tarihi :</b></td>
+                            <td id="OpsiyonTarihi"></td>
+                            <td class="w-25"><b>Görevli Personel :</b></td>
+                            <td id="GorevliPersonel"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25"><b>Müşteri :</b></td>
+                            <td id="Musteri"></td>
+                            <td class="w-25"><b>Müşteri Telefon :</b></td>
+                            <td id="MusteriTelefon"></td>
+                        </tr>
+                        <tr id="OrganizasyonKimin"></tr>
+                        <tr>
+                            <td class="w-25"><b>Paketler :</b></td>
+                            <td id="Paketler"></td>
+                            <td class="w-25"><b>Ek Hizmetler :</b></td>
+                            <td id="EkHizmetler"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25"><b>Sözleşme Tutarı :</b></td>
+                            <td id="SozlesmeTutari"></td>
+                            <td class="w-25"><b>Durum :</b></td>
+                            <td id="Durum"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25"><b>Organizasyon Yeri :</b></td>
+                            <td id="OrganizasyonYeri"></td>
+                            <td class="w-25"><b>Notlar :</b></td>
+                            <td id="Notlar"></td>
+                        </tr>
+                        @*<tr>
+                                <td><b>İşlem :</b></td>
+                                <td>
+                                    <div class="d-flex mt-2">
+                                        <a href="#" class="btn btn-sm btn-outline-danger mr-2" id="Sil2" title="Kaydı Sil" data-dismiss="modal"><i class="fal fa-times"></i> Sil</a>
+                                        <a href="#" class="btn btn-sm btn-outline-primary mr-2" id="Duzenle2" title="Kaydı Düzenle"><i class="fal fa-edit"></i> Düzenle</a>
+                                    </div>
+                                </td>
+                            </tr>*@
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Sözleşme Detay Satırı -->
+<!-- Günlük İş Detay Satırı -->
+<div class="modal fade" id="GisDetayModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header"><h4 class="modal-title" id="DetayBaslik">Günlük İş Detay Bilgileri</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div><div class="modal-body">
+                <table class="table" width="100">
+                    <tr style="display:none"><td><b>Gunlük İş Id :</b></td> <td id="DetayGisId"></td></tr>
+                    <tr><td class="w-25"><b>Takip No :</b></td> <td id="DetayTakipNo"></td></tr>
+                    <tr><td class="w-25"><b>Tarih :</b></td> <td id="DetayTarih"></td></tr>
+                    <tr><td class="w-25"><b>Kategori :</b></td> <td id="DetayKategori"></td></tr>
+                    <tr><td class="w-25"><b>Müşteri :</b></td> <td id="DetayMusteri"></td></tr>
+                    <tr><td class="w-25"><b>Ücret :</b></td> <td id="DetayUcret"></td></tr>
+                    <tr><td class="w-25"><b>Ödeme Şekli:</b></td> <td id="DetayOdemeSekli"></td></tr>
+                    <tr><td class="w-25"><b>Notlar :</b></td> <td id="DetayNotlar"></td></tr>
+                    @*<tr><td class="w-25"><b>Adres :</b></td> <td id="MusteriAdres"></td></tr>*@
+                    @*<tr><td class="w-25"><b>Notlar :</b></td> <td id="MusteriNotlar"></td></tr>*@
+
+                    @*<tr>
+                            <td><b>İşlem :</b></td>
+                            <td>
+                                <div class="d-flex mt-2">
+                                    <a href="#" class="btn btn-sm btn-outline-danger mr-2" id="Sil2" title="Kaydı Sil" data-dismiss="modal"><i class="fal fa-times"></i> Sil</a>
+                                    <a href="#" class="btn btn-sm btn-outline-primary mr-2" id="Duzenle2" title="Kaydı Düzenle"><i class="fal fa-edit"></i> Düzenle</a>
+                                </div>
+                            </td>
+                        </tr>*@
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Günlük İş Detay Satırı -->
+<!-- Alınan/Gelecek Ödemeler Tolapamları Satırı -->
+<div class="row">
+    <div class="col-sm-6 col-xl-4">
+        <div class="p-3 bg-primary-300 rounded overflow-hidden position-relative text-white mb-g">
+            <div class="">
+                <h3 class="display-4 d-block l-h-n m-0 fw-500" id="AlinanOdemelerToplam">
+
+                    <small class="m-0 l-h-n">Alınan Ödemeler Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-plus-circle position-absolute pos-right pos-bottom opacity-15 mb-n1 mr-n1" style="font-size:6rem"></i>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-4">
+        <div class="p-3 bg-warning-400 rounded overflow-hidden position-relative text-white mb-g">
+            <div class="">
+                <h3 class="display-4 d-block l-h-n m-0 fw-500" id="GelecekOdemelerToplam">
+
+                    <small class="m-0 l-h-n">Gelecek Ödemeler Toplamı</small>
+                </h3>
+            </div>
+            <i class="fal fa-minus-circle position-absolute pos-right pos-bottom opacity-15  mb-n1 mr-n2" style="font-size: 6rem;"></i>
+        </div>
+    </div>
+</div>
+<!-- Alınan/Gelecek Ödemeler Tolapamları Satırı -->
+<input type="text" id="KullaniciYetkiKayitDetayi" class="form-control" name="Id" maxlength="50" style="display:none" value="@DetayYetki">
+<input type="text" id="KullaniciYetkiYazdir" class="form-control" name="Id" maxlength="50" style="display:none" value="@YazdirYetki">
+<input type="text" id="KullaniciYetkiSMS" class="form-control" name="Id" maxlength="50" style="display:none" value="@SMSYetki">
+<input type="text" id="KullaniciYetkiEkle" class="form-control" name="Id" maxlength="50" style="display:none" value="@EkleYetki">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <form id="FiltreForm">
+                <div class="row col col-12 mt-3" id="date_filter">
+                    <div class="form-group col-sm-2">
+                        <div class="input-group mt-2">
+                            <div class="custom-control custom-switch">
+                                <input type="checkbox" class="custom-control-input" checked="" id="tarihsecim" name="TarihSecim">
+                                <label class="custom-control-label" for="tarihsecim" id="tarihsecimetiket">İşlem Tarihi</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" value="07/17/2020" id="IlkTarih" name="IlkTarih">
+                            <div class="input-group-append">
+                                <span class="input-group-text fs-sm">
+                                    <i class="fal fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" value="07/17/2020" id="SonTarih" name="SonTarih">
+                            <div class="input-group-append">
+                                <span class="input-group-text fs-sm">
+                                    <i class="fal fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <select class="custom-select form-control custom-select-sm" id="Sube" name="Sube" title="Görüntülenecek Şube">
+                            <option value="0">Tüm Şubeler</option>
+                            @foreach (var sube in SubeKullanici)
+                            {
+                                if (Convert.ToInt64(Session["AktifSubeId"]) == sube.SubeId && sube.Sube.Aktif == true)
+                                {
+                                    <option selected="" value="@sube.Sube.Id">@sube.Sube.SubeAdi</option>
+                                }
+                                else if (sube.Sube.Aktif == true)
+                                {
+                                    <option value="@sube.Sube.Id">@sube.Sube.SubeAdi</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <select class="custom-select form-control custom-select-sm" id="GoruntuleTip" name="GoruntuleTip" title="Görüntülenecek Ödemeler">
+                            <option selected="" value="0">--TÜMÜ--</option>
+                            <option value="1">Alınan Ödemeler</option>
+                            <option value="2">Gelecek Ödemeler</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row col col-12 mb-3" id="date_filter">
+                    @*// Aktif Sözleşme Listesi  // Aktif Müşteri Listesi*@
+
+                    <div class="form-group col-sm-5">
+                        <label class="form-label" for="FiltreSozlesmeId">Sözleşmeler</label>
+                        <select class="custom-select form-control custom-select-sm" id="FiltreSozlesmeId" name="FiltreSozlesmeId" title="Aktif sözleşmelerden seçebilirsiniz.">
+                            <option selected="" value="0">Sözleşme Seçiniz - TÜMÜ - </option>
+                            @foreach (var sozlesme in Sozlesmeler)
+                            {
+                                <option value="@sozlesme.Id" data-sozlesmeno="@sozlesme.SozlesmeNo" data-sozlesmetarihi="@sozlesme.SozlesmeTarihi" data-rezezvastontarihi="@sozlesme.RezervasyonTarihi">
+                                    @sozlesme.SozlesmeNo - (@sozlesme.SozlesmeTarihi - @sozlesme.RezervasyonTarihi)
+                                </option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-5">
+                        <label class="form-label" for="FiltreMusteriId">Müşteriler</label>
+                        <select class="custom-select form-control custom-select-sm" id="FiltreMusteriId" name="FiltreMusteriId" title="Kayıtlı müşterilerden seçebilirsiniz.">
+                            <option selected="" value="0">Müşteri Seçiniz - TÜMÜ - </option>
+                            @foreach (var musteri in Musteriler)
+                            {
+                                <option value="@musteri.Id" data-musteriadi="@musteri.AdiSoyadi" data-musterisube="@musteri.Sube.SubeAdi" data-musterikodu="@musteri.MusteriKodu">
+                                    @musteri.AdiSoyadi - (@musteri.MusteriKodu - @musteri.Sube.SubeAdi)
+                                </option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </form>
+            <div class="border-bottom"></div>
+            <input type="text" id="FiltreAyar" style="display:none" data-filtreayar="@ViewBag.FiltreAyar">
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="tb-GelecekOdemeler" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th style="vertical-align:middle; display:none">Firma</th> @*//0*@
+                                <th style="vertical-align:middle; display:none">Şube</th> @*//1*@
+                                <th style="vertical-align:middle">İşlem Tarihi</th> @*//2*@
+                                <th style="vertical-align:middle">Ödeme Tarihi</th> @*//3*@
+                                <th style="vertical-align:middle">Sözleşme No <br />Günlük İş No</th> @*//4*@
+                                <th style="vertical-align:middle">Müşteri</th> @*//5*@
+                                <th style="vertical-align:middle">Ödeme Türü</th> @*//6*@
+                                <th style="vertical-align:middle">Tutar</th> @*//7*@
+                                <th style="display:none">ÖdemeAl</th> @*//8*@
+                                <th style="vertical-align:middle">Açıklama</th> @*//9*@
+                                <th style="vertical-align:middle" class="w-5">İşlem</th>@*//10*@
+                                <th style="display:none">Ödeme Tarihi Sıralama</th> @*//11*@
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Script
+{
+    <script src="~/Areas/Otomasyon/Content/js/tablotarihsirala.js"></script>
+    <script>
+        var dt;
+        var filtreayar = $('#FiltreAyar').data("filtreayar");
+        var controls = {
+            leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
+            rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
+        }
+        var runDatePicker = function () {
+            if (filtreayar == "0") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+            } // 1 Gün
+            else if (filtreayar == "1") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() + 7)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr'
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() - 7)));
+            } // 1 Hafta Öncesi - 1 Hafta Sonrası
+            else if (filtreayar == "2") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr'
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() - 1)));
+            } // 1 Ay Öncesi - 1 Ay Sonrası
+            else if (filtreayar == "3") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr'
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
+            } // 1 Yıl Öncesi - 1 Yıl Sonrası
+            else if (filtreayar == "4") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+            } // Ayın başından bu güne
+            else if (filtreayar == "5") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), 0, 1));
+            } // Yılın başından bu güne
+            $('#OdemeTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#KalanOdemeTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+        }
+        function ParaFormat(fiyat) {
+            var para_sembol = "TL"
+            var format = new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: 'TRY',
+                minumumFractionDigits: 2
+            })
+            //return format.format(fiyat)
+            return format.format(fiyat).replace('TRY', para_sembol)
+        }
+        $(document).ready(function () {
+            $(function () {
+                $('#FiltreSozlesmeId').select2({
+                    //dropdownParent: $('#YeniKayitEkleModal')
+                });
+            });
+            $(function () {
+                $('#FiltreMusteriId').select2({
+                    //dropdownParent: $('#YeniKayitEkleModal')
+                });
+            });
+            var formattedOutput = new Intl.NumberFormat('tr-TR', {
+                style: 'currency',
+                currency: 'TRY',
+                minimumFractionDigits: 2,
+            });
+            var DetayYetki = $("#KullaniciYetkiKayitDetayi").val();
+            var YazdirYetki = $("#KullaniciYetkiYazdir").val();
+            var SMSYetki = $("#KullaniciYetkiSMS").val();
+            var EkleYetki = $("#KullaniciYetkiEkle").val();
+            var islem, odemelertoplam, odemetutar, smsgondertutar = 0, smsmetinid = 0, odemetarihi = 0, musteriadi;
+            $(":input").inputmask();
+            $("#OdenecekTutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#OdenenTutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#KalanTutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#SMSGonderTutar").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            runDatePicker();
+            function dateFormat(d) {
+                return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+            }
+            function parseDateValue(rawDate) {
+                var dateArray = rawDate.split(".");
+                var parsedDate = dateArray[2] + dateArray[1] + dateArray[0];
+                return parsedDate;
+            }
+            $("#tarihsecim").on('click', function () {
+                if ($(this).is(':checked')) {
+                    $("#tarihsecimetiket").html("İşlem Tarihi");
+                }
+                else {
+                    $("#tarihsecimetiket").html("Ödeme Tarihi");
+                }
+                gelecekodemelertoplam = 0; alinanodemelertoplam = 0; dt.api().ajax.url('/Muhasebe/GelecekOdemelerFiltre?' + $('#FiltreForm').serialize()).load();
+                $("#GelecekOdemelerToplam").html(accounting.formatMoney(gelecekodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                $("#AlinanOdemelerToplam").html(accounting.formatMoney(alinanodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+            }); // Tarih filtrelemenin hangi tarihe göre yapılacağı seçimi
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            //Tablo Filtreleme işlemleri
+            gelecekodemelertoplam = 0;
+            alinanodemelertoplam = 0;
+            //Tablo Filtreleme işlemleri
+            $.fn.dataTableExt.afnFiltering.push(
+                function (Settings, Data, DataIndex) {
+                    var odeme, odemetutar;
+                    //Toplam hesaplamaları için
+                    if (Data[6] == "Gelecek Ödeme" && Data[8] == "false")
+                        odeme = 0;
+                    else if (Data[6] == "Alınan Ödeme")
+                        odeme = 1;
+
+                    odemetutar = Data[7];
+                    odemetutar = odemetutar.replace("TL", "");
+                    odemetutar = odemetutar.replace(".", "");
+                    odemetutar = odemetutar.replace(",", ".");
+                    if (odeme == 0)
+                        gelecekodemelertoplam = parseFloat(gelecekodemelertoplam) + parseFloat(odemetutar);
+                    else if (odeme == 1)
+                        alinanodemelertoplam = parseFloat(alinanodemelertoplam) + parseFloat(odemetutar);
+                    $("#GelecekOdemelerToplam").html(accounting.formatMoney(gelecekodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                    $("#AlinanOdemelerToplam").html(accounting.formatMoney(alinanodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+                    return true;
+                });
+
+            $("#GelecekOdemelerToplam").html(accounting.formatMoney(gelecekodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+            $("#AlinanOdemelerToplam").html(accounting.formatMoney(alinanodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+            var odenentutar = 0;
+            var odenecektutar = 0;
+            var kalantutar = 0;
+            $("#OdenenTutar").keypress(function () {
+                odenentutar = $("#OdenenTutar").val().replace(" TL", "");
+                odenentutar = odenentutar.replace(".", "");
+                odenentutar = odenentutar.replace(",", ".");
+                odenecektutar = $("#OdenecekTutar").val().replace(" TL", "");
+                odenecektutar = odenecektutar.replace(".", "");
+                odenecektutar = odenecektutar.replace(",", ".");
+                kalantutar = $("#KalanTutar").val().replace(" TL", "");
+                kalantutar = odenecektutar.replace(".", "");
+                kalantutar = odenecektutar.replace(",", ".");
+                kalantutar = parseFloat(odenecektutar) - parseFloat(odenentutar);
+                $("#KalanTutar").val(formattedOutput.format(parseFloat(kalantutar)));
+             
+            });
+
+            $("#tb-GelecekOdemeler").on('click', '.musteridetay', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                document.getElementById("MusteriId").innerHTML = $(this).data("musteriid");
+                document.getElementById("MusteriKodu").innerHTML = $(this).data("musterikodu");
+                document.getElementById("MusteriTc").innerHTML = $(this).data("musteritc");
+                document.getElementById("MusteriAdSoyad").innerHTML = $(this).data("musteriadisoyadi");
+                var ceptel = $(this).data("mustericeptel").replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                document.getElementById("MusteriCepTel").innerHTML = ceptel;
+                var sabittel = $(this).data("musterisabittel").replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                document.getElementById("MusteriSabitTel").innerHTML = sabittel;
+                document.getElementById("MusteriEmail").innerHTML = $(this).data("musteriemail");
+                document.getElementById("MusteriAdres").innerHTML = $(this).data("musteriadres");;
+                document.getElementById("MusteriNotlar").innerHTML = $(this).data("musterinotlar");
+            });
+            $("#tb-GelecekOdemeler").on('click', '.sozlesmedetay', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                //document.getElementById("SozlesmeId").innerHTML = $(this).data("sozlesmeid");
+                document.getElementById("SozlesmeNo").innerHTML = $(this).data("sozlesmeno");
+                document.getElementById("FirmaAdi").innerHTML = $(this).data("firmaadi");
+                document.getElementById("RezervasyonTuru").innerHTML = $(this).data("rezervasyontur");
+                document.getElementById("YetkiliPersonel").innerHTML = $(this).data("yetkilipersonel");
+                document.getElementById("SozlesmeTarihi").innerHTML = $(this).data("sozlesmetarih");
+                var baslangic = $(this).data("baslangicsaat");
+                var bitis = $(this).data("bitissaat");
+                document.getElementById("OrganizasyonSaati").innerHTML = baslangic + " - " + bitis;
+                if ($(this).data("opsiyontarihi") == "01.01.0001") {
+                    document.getElementById("OpsiyonTarihi").innerHTML = "";
+                }
+                else {
+                    document.getElementById("OpsiyonTarihi").innerHTML = $(this).data("opsiyontarihi");
+                }
+                //document.getElementById("OpsiyonTarihi").innerHTML = $(this).data("opsiyontarihi");
+                document.getElementById("GorevliPersonel").innerHTML = $(this).data("gorevlipersonel");
+                document.getElementById("Musteri").innerHTML = $(this).data("musteriadisoyadi");
+                var musteritel = $(this).data("musteritelefon").replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                document.getElementById("MusteriTelefon").innerHTML = musteritel;
+                if ($(this).data("yetkiliadsoyad") != null && ($(this).data("modeller") == null || $(this).data("urunler") == null)) {
+                    $("#OrganizasyonKimin").empty();
+                    $("#OrganizasyonKimin").append("<td class='w-25'><b>Organizasyon - Yetkili :</b></td>" +
+                        "<td id='OrganizasyonYetkili'>" + $(this).data("yetkiliadsoyad") + "</td>" +
+                        "<td class='w-25'><b>Organizasyon - Yetkili Tel/Email :</b> </td>" +
+                        "<td id='OrganizasyonYetkiliTel'>" + $(this).data("yetkilitel") + " / " + $(this).data("yetkiliemail") + "</td>");
+                }
+                if ($(this).data("cocukadsoyad") != null) {
+                    $("#OrganizasyonKimin").empty();
+                    $("#OrganizasyonKimin").append("<td class='w-25'><b>Organizasyon - Cocuk Ad/Soyad :</b></td>" +
+                        "<td id='OrganizasyonCocuk'>" + $(this).data("cocukadsoyad") + "</td>" +
+                        "<td class='w-25'><b>Organizasyon - Anne/Baba :</b> </td>" +
+                        "<td id='OrganizasyonAnneBaba'>" + $(this).data("annead") + " / " + $(this).data("babaad") + "</td>");
+                }
+                if ($(this).data("modeller") != null) {
+                    $("#OrganizasyonKimin").empty();
+                    $("#OrganizasyonKimin").append("<td class='w-25'><b>Organizasyon - Modeller :</b></td>" +
+                        "<td id='OrganizasyonModeller'>" + $(this).data("modeller") + "</td>" +
+                        "<td class='w-25'><b>Organizasyon - Yetkili :</b> </td>" +
+                        "<td id='OrganizasyonModellerYetkili'>" + $(this).data("yetkiliadsoyad") + " / " + $(this).data("yetkilitel") + "</td>");
+                }
+                if ($(this).data("urunler") != null) {
+                    $("#OrganizasyonKimin").empty();
+                    $("#OrganizasyonKimin").append("<td class='w-25'><b>Organizasyon - Ürünler :</b></td>" +
+                        "<td id='OrganizasyonUrunler'>" + $(this).data("urunler") + "</td>" +
+                        "<td class='w-25'><b>Organizasyon - Yetkili :</b> </td>" +
+                        "<td id='OrganizasyonUrunlerYetkili'>" + $(this).data("yetkiliadsoyad") + " / " + $(this).data("yetkilitel") + "</td>");
+                }
+                if ($(this).data("gelinad") != null || $(this).data("damatad") != null) {
+                    $("#OrganizasyonKimin").empty();
+                    $("#OrganizasyonKimin").append("<td class='w-25'><b>Gelin/Damat :</b></td>" +
+                        "<td id='OrganizasyonGelinDamat'>" + $(this).data("gelinad") + " / " + $(this).data("damatad") + "</td>" +
+                        "<td class='w-25'><b>Gelin/Damat Telefon :</b> </td>" +
+                        "<td id='OrganizasyonGelinDamatTel'>" + $(this).data("gelintel") + " / " + $(this).data("damattel") + "</td>");
+                }
+                document.getElementById("Paketler").innerHTML = $(this).data("paketler");
+                document.getElementById("EkHizmetler").innerHTML = $(this).data("ekhizmetler");
+                document.getElementById("SozlesmeTutari").innerHTML = $(this).data("sozlesmetutar");
+                if ($(this).data("bitti") == true) {
+                    document.getElementById("Durum").innerHTML = $(this).data("durum") + " - Bitti";
+                }
+                else if ($(this).data("iptal") == true) {
+                    document.getElementById("Durum").innerHTML = $(this).data("durum") + " - İptal";
+                }
+                else if ($(this).data("bitti") == false && $(this).data("iptal") == false) {
+                    document.getElementById("Durum").innerHTML = $(this).data("durum");
+                }
+                document.getElementById("OrganizasyonYeri").innerHTML = $(this).data("organizasyonyeri");;
+                document.getElementById("Notlar").innerHTML = $(this).data("notlar");
+            });
+            $("#tb-GelecekOdemeler").on('click', '.gisdetay', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                document.getElementById("DetayGisId").innerHTML = $(this).data("gisid");
+                document.getElementById("DetayTakipNo").innerHTML = $(this).data("takipno");
+                document.getElementById("DetayTarih").innerHTML = $(this).data("tarih");
+                document.getElementById("DetayKategori").innerHTML = $(this).data("kategori");
+                document.getElementById("DetayMusteri").innerHTML = $(this).data("adsoyad");
+                document.getElementById("DetayUcret").innerHTML = $(this).data("ucret");
+                document.getElementById("DetayOdemeSekli").innerHTML = $(this).data("odemesekli");
+                document.getElementById("DetayNotlar").innerHTML = $(this).data("aciklama");
+            });
+            $("#tb-GelecekOdemeler").on('click', '.odemeal', function () {
+                $("#OdemeAl").val($(this).data("alacakid"));
+                $("#OdemeYapan").val($(this).data("odemeyapan"));
+                $("#Aciklama").val($(this).data("aciklama"));
+                $("#OdenecekTutar").val($(this).data("alacaktutar"));
+                $("#OdenenTutar").val($(this).data("alacaktutar"));
+                $("#KalanTutar").val(0);
+            }); // BorcuÖdemeye dönüştür
+            $("#tb-GelecekOdemeler").on('click', '.makbuzyazdir', function () {
+                var id = $(this).data("odemeid");
+                window.open("/Otomasyon/RezervasyonIslemleri/AlinanOdemeMakbuzYazdir/" + id, '_blank');
+            }); // Ödeme Makbuzu Yazdır
+
+            // Alacak Metni için SMS metinleri içinden seçim yapılacak.
+            // SMS gönder butonuna basılınca popup açılacak ve SMS metni seçilmesi istenilecek.
+            // SMS metin listesi bu popup a detayları ile birlikte yüklenecek.
+            $("#tb-GelecekOdemeler").on('click', '.alacaksmsgonder', function () {
+                $("#SMSGonderModalMusteriAdi").html("");
+                $("#SMSGonderTutar").val("");
+                $("#SMSMetni").html("");
+                $("#SmsMetinleri").val("0");
+                musteriadi = $(this).data("musteriadi");
+                musteriid = $(this).data("musteriid");
+                var musteritel = $(this).data("musteritel");
+                smsgondertutar = $(this).data("tutar");
+
+                $("#SMSGonder").val($(this).data("odemeid"));
+                $("#SMSGonder").data("tutar", $(this).data("tutar"));
+                $("#SMSGonder").data("musteriid", $(this).data("musteriid"));
+                $("#SMSGonder").data("odemetarihi", $(this).data("odemetarihi"));
+                $("#SMSGonderModalMusteriAdi").html(musteriadi + " - " + musteritel);
+                $("#SMSGonderTutar").val($(this).data("tutar"));
+                $("#SmsBalonuGoster").attr("style", "display:none");
+            });
+            $("#SmsMetinleri").change(function () {
+                var metin = $(this).find("option:selected").data("smsmetni");
+                odemetarihi = $("#SMSGonder").data("odemetarihi");
+                smsgondertutar = $("#SMSGonder").data("tutar").replace("TL", "").trim();
+                metin = metin.replace("{AdSoyad}", musteriadi);
+                metin = metin.replace("{OdemeTarihi}", odemetarihi);
+                metin = metin.replace("{Tutar}", smsgondertutar);
+                smsmetinid = $(this).find("option:selected").val();
+                //$("#SmsBalonuGoster").attr("style", "display:none");
+                $("#SmsBalonuGoster").removeAttr("style");
+                $("#SMSMetni").html(metin);
+            });
+            $("#SMSGonder").click(function () {
+                Swal.fire(
+                    {
+                        title: "Bilgi SMS'i Gönder",
+                        //text: "< " + giskategori + " > adlı Günlük İş Katergorisi silinsin mi?",
+                        html: "<p style='color:red;font-size:12pt;'><h3> Müşteriye Borç Bilgi SMS'i gönderilsin mi?</h3></p> ",
+                        type: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Gönder!"
+                    }).then(function (result) {
+                        if (result.value) {
+                            var SMSGonderData = new FormData();
+                            SMSGonderData.append("MusteriId", musteriid);
+                            SMSGonderData.append("OdemeTarihi", odemetarihi)
+                            SMSGonderData.append("SmsMetinId", smsmetinid);
+                            SMSGonderData.append("Tutar", smsgondertutar);
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                data: SMSGonderData,
+                                contentType: false,
+                                processData: false,
+                                beforeSend: function () {
+                                    Swal.fire(
+                                        {
+                                            title: "Müşteriye Bilgi SMS'i Gönderiliyor!",
+                                            html: "<strong>Lütfen Bekleyin.</strong>",
+                                            onBeforeOpen: function onBeforeOpen() {
+                                                Swal.showLoading();
+                                            }
+                                        });
+                                },
+                                url: "/Otomasyon/Muhasebe/AlacakOdemeSMSGonder/",
+                                success: function (data) {
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                        swal.close();
+                                        $('#BorcBilgiSMSGonder').modal('hide');
+                                        $("#SMSGonderModalMusteriAdi").html("");
+                                        $("#SMSGonderTutar").val("");
+                                        $("#SMSMetni").html("");
+                                        $("#SmsMetinleri").val("0");
+                                        $("#SmsBalonuGoster").attr("style", "display:none");
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        swal.close();
+                                        $('#BorcBilgiSMSGonder').modal('hide');
+                                        $("#SMSGonderModalMusteriAdi").html("");
+                                        $("#SMSGonderTutar").val("");
+                                        $("#SMSMetni").html("");
+                                        $("#SmsMetinleri").val("0");
+                                        $("#SmsBalonuGoster").attr("style", "display:none");
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            });
+
+            $("#OdemeAl").click(function () {
+                var odemesekli;
+                if ($("#OdemeSekli").val() == "0") {
+                    odemesekli = "Nakit";
+                }
+                else if ($("#OdemeSekli").val() == "1") {
+                    odemesekli = "Kredi Kartı";
+                }
+                else if ($("#OdemeSekli").val() == "2") {
+                    odemesekli = "Banka Havalesi";
+                }
+
+                odenentutar = 0;
+                odenecektutar = 0;
+                kalantutar = 0;
+
+                odenentutar = $("#OdenenTutar").val().replace(" TL", "");
+                odenentutar = odenentutar.replace(".", "");
+                odenentutar = odenentutar.replace(",", ".");
+
+                odenecektutar = $("#OdenecekTutar").val().replace(" TL", "");
+                odenecektutar = odenecektutar.replace(".", "");
+                odenecektutar = odenecektutar.replace(",", ".");
+
+                kalantutar = $("#KalanTutar").val().replace(" TL", "");
+                kalantutar = kalantutar.replace(".", "");
+                kalantutar = kalantutar.replace(",", ".");
+
+                if ($("#OdenenTutar").val() == "0,00 TL") {
+                    $("#OdenenTutar").focus();
+                    $("#OdenenTutarHata").append("<div class='hata' style='color:red'>Bir Tutar giriniz!</div>");
+                }
+                if (parseFloat(odenentutar) > parseFloat(odenecektutar)) {
+                    Swal.fire(
+                        {
+                            title: "Ödeme Uyarı",
+                            html: "<p style='color:red'> Girilen Tutar, Alacak Tutarından büyük olamaz!</p>",
+                            type: "warning",
+                            confirmButtonText: "Tamam"
+                        });
+                }
+                else {
+                    
+                    $('#OdemeAlModal').modal('hide');
+                    id = $(this).val();
+                    var OdenenTutar = $("#OdenenTutar").val().replace(" TL", "");
+                    var KalanTutar = $("#KalanTutar").val().replace(" TL", "");
+                    var OdemeData = new FormData();
+                    OdemeData.append("OdemeTarihi", $("#OdemeTarihi").val());
+                    OdemeData.append("OdenenTutar", OdenenTutar);
+                    OdemeData.append("KalanTutar", KalanTutar);
+                    OdemeData.append("KalanOdemeTarihi", $("#KalanOdemeTarihi").val());
+                    OdemeData.append("OdemeYapan", $("#OdemeYapan").val());
+                    OdemeData.append("Aciklama", $("#Aciklama").val());
+                    OdemeData.append("OdemeSekli", odemesekli);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: OdemeData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Muhasebe/OdemeAl/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                                var id = data.Data;
+                                //alert(id);
+                                window.open("/Otomasyon/RezervasyonIslemleri/AlinanOdemeMakbuzYazdir/" + id, '_blank');
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            dt = $('#tb-GelecekOdemeler').dataTable(
+                {
+                    responsive: true,
+                    "destroy": true,
+                    //"searching": false, // arama kaldır
+                    //"lengthChange": false, // sayfa başına göster kaldır
+                    "createdRow": function (row, data, dataIndex) { // İptal edilmiş ise kırmızı, Ödeme alınmış ise Mavi
+                        //if (data["OdemeAl"] == true) {
+                        //    //$(row).addClass('bg-warning-100 text-white');
+                        //    $('td', row).addClass('bg-success-100 text-black');
+                        //}
+                        if (data["OdemeAl"] == true && data["OdemeTuru"] == "GelecekOdeme") {
+                            //$(row).addClass('bg-warning-100 text-white');
+                            $('td', row).addClass('bg-success-100 text-black');
+                        }
+                        if (data["OdemeAl"] == false && data["OdemeTuru"] == "GelecekOdeme") {
+                            //$(row).addClass('bg-warning-100 text-white');
+                            $('td', row).addClass('bg-warning-100 text-black');
+                        }
+                        if (data["OdemeAl"] == false && data["OdemeTuru"] == "AlinanOdeme") {
+                            //$(row).addClass('bg-warning-100 text-white');
+                            $('td', row).addClass('bg-success-100 text-black');
+                        }
+                    },
+                    //"aaShorting": [[3, "desc"]],
+
+                    "order": [[11, "desc"]],
+                    "columnDefs": [{ "targets": 11, "type": "date-eu" }],
+                    "columns": [
+                        { "data": "FirmaAdi", "autowidth": true, "visible": false, "className": "align-middle" },
+                        { "data": "SubeAdi", "autowidth": true, "visible": false, "className": "align-middle" },
+                        { "data": "Tarih", "autowidth": true, "className": "align-middle" }, // İşlem Tarihi
+                        { "data": "OdemeTarihi", "autowidth": true, "className": "align-middle" }, // Ödeme Tarihi
+                        { // Sözleşme No ; Sözleşme Detay : günlük iş no yok???
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                ekhizmet = row.EkHizmetler.replace(/<span class='fw-700'>/g, "<span>");
+                                paket = row.Paketler.replace(/<span class='fw-700'>/g, "<span>");
+                                if (DetayYetki == "True") {
+                                    if (row.SozlesmeId != 1) {
+                                        return "<a href='#' class='sozlesmedetay' title='Sözleşme Detayları' data-sozlesmeid='" + row.SozlesmeId + "' data-firmaadi='" + row.SozlesmeFirmaAdi + "' data-sozlesmeno='" + row.SozlesmeNo + "'" +
+                                            "data-sozlesmetarih='" + row.SozlesmeTarihi + "' data-opsiyontarihi='" + row.OpsiyonTarihi + "' data-rezervasyontur='" + row.RezervasyonTur + "' data-musteriadisoyadi='" + row.MusteriAdiSoyadi + "' data-musteritelefon='" + row.MusteriCepTel + "'" +
+                                            "data-yetkilipersonel='" + row.YetkiliPersonel + "' data-gorevlipersonel='" + row.GorevliPersonel + "' data-baslangicsaat='" + row.BaslangicSaat + "' data-bitissaat='" + row.BitisSaat + "' data-yetkiliadsoyad='" + row.YetkiliAdSoyad + "'" +
+                                            "data-yetkilitel='" + row.YetkiliTel + "' data-yetkiliemail='" + row.YetkiliEmail + "' data-annead='" + row.AnneAd + "' data-annetel='" + row.AnneTel + "' data=anneemail='" + row.AnneEmail + "' data-babaad='" + row.BabaAd + "'" +
+                                            "data-babatel='" + row.BabaTel + "' data-babaemail='" + row.BabaEmail + "' data-cocukadsoyad='" + row.CocukAdSoyad + "' data-modeller='" + row.Modeller + "' data-urunler='" + row.Urunler + "' data-gelinad='" + row.GelinAd + "'" +
+                                            "data-gelintel='" + row.GelinTel + "' data-gelinemail='" + row.GelinEmail + "' data-damatad='" + row.DamatAd + "' data-damattel='" + row.DamatTel + "' data-damatemail='" + row.DamatEmail + "' data-teklifbit='" + row.TeklifBit + "' data-paketler='" + paket + "'" +
+                                            "data-ekhizmetler='" + ekhizmet + "' data-paketlerfiyat='" + row.PaketlerFiyat + "' data-ekhizmetlerfiyat='" + row.EkHizmetlerFiyat + "' data-sozlesmetutar='" + row.SozlesmeTutar + "' data-organizasyonyeri='" + row.OrganizasyonYeri + "' data-notlar='" + row.SozlesmeNotlar + "'" +
+                                            "data-durum='" + row.Durum + "' data-bitti='" + row.Bitti + "' data-iptal='" + row.Iptal + "' data-toggle='modal' data-target='#SozlesmeDetayModal'>" +
+                                            row.SozlesmeNo +
+                                            "</a>"
+
+                                    }
+                                    if (row.GisId != 1) {
+                                        //return "<a href='#' class='gisdetay' title='Günlük İş Detayları' data-gisid='" + row.GisId + "' data-giskategori='" + row.GisKategori + "' data-gistakipno='" + row.GisTakipNo + "'" +
+                                        //       "data-odemesekli='" + row.OdemeSekli + "' data-aciklama='" + row.Aciklama + "'" +
+                                        //       "data-tarih='" + row.Tarih + "' data-odemeyapan='" + row.OdemeYapanAdSoyad + "' data-iptal='" + row.Iptal + "' data-toggle='modal' data-target='#SozlesmeDetayModal'>" +
+                                        //           row.GisTakipNo +
+                                        //       "</a>"
+
+                                        return "<a href='#' class='gisdetay' title='Günlük İş Detayları' data-gisid='" + row.GisId + "' data-takipno='" + row.GisTakipNo + "'" +
+                                            "data-tarih='" + row.Tarih + "' data-kategori='" + row.GisKategori + "' data-adsoyad='" + row.OdemeYapanAdSoyad + "' data-tckimlik='" + row.MusteriTC + "' data-sabittel='" + row.MusteriSabitTel + "'" +
+                                            "data-ceptel='" + row.MusteriCepTel + "' data-email='" + row.MusteriEmail + "' data-adres='" + row.MusteriAdres + "' data-ucret='" + ParaFormat(row.Tutar) + "'  data-odemesekli='" + row.OdemeSekli + "' data-aciklama='" + row.Aciklama + "'" +
+                                            "data-iptal='" + row.Iptal + "' data-toggle='modal' data-target='#GisDetayModal'>" +
+                                            row.GisTakipNo +
+                                            "</a>"
+
+                                    }
+                                }
+                                else {
+                                    if (row.SozlesmeId != 1) {
+                                        return row.SozlesmeNo
+                                    }
+                                    if (row.GisId != 1) {
+                                        return row.GisTakipNo
+                                    }
+                                }
+                            }
+                        }, // Sözleşme No ; Sözleşme Detay : günlük iş no yok???
+                        {  // Müşteri No; Müşteri Detay
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                if (DetayYetki == "True") {
+                                    return "<a href='#' class='musteridetay' title='Müşteri Detayları' data-musteriid='" + row.MusteriId + "' data-musterikodu='" + row.MusteriKodu + "' data-musteriadisoyadi='" + row.MusteriAdiSoyadi + "'" +
+                                        "data-musteritc='" + row.MusteriTC + "' data-musterisabittel='" + row.MusteriSabitTel + "' data-mustericeptel='" + row.MusteriCepTel + "' data-musteriemail='" + row.MusteriEmail + "'" +
+                                        "data-musteriadres='" + row.MusteriAdres + "' data-musterinotlar='" + row.MusteriNotlar + "'  data-toggle='modal' data-target='#MusteriDetayModal'>" + row.MusteriAdiSoyadi + "</a>"
+                                }
+                                else {
+                                    return row.MusteriAdiSoyadi
+                                }
+                            }
+                        }, // Müşteri No; Müşteri Detay
+                        {
+                            "data": null, "autowidth": true,
+                            "render": function (data, type, row) {
+                                if (row.OdemeTuru == "AlinanOdeme") {
+                                    return "Alınan Ödeme";
+                                }
+                                else if (row.OdemeTuru == "GelecekOdeme") {
+                                    return "Gelecek Ödeme";
+                                }
+                                else if (row.OdemeTuru == "CariTahsilat") {
+                                    return "Cari Tahsilat";
+                                }
+                                else if (row.OdemeTuru == "CariOdeme") {
+                                    return "Cariye Ödeme";
+                                }
+                                else if (row.OdemeTuru == "Kapora") {
+                                    return "Kapora";
+                                }
+                            }
+                        }, // Ödeme Türü
+                        //{ "data": "OdemeTuru", "autowidth": true },
+                        { // Tutar
+                            "data": null,
+                            "className": "align-middle",
+                            "autowidth": true,
+                            "render": function (data, type, row) {
+                                return ParaFormat(row.Tutar)
+                            }
+                        }, // Tutar
+                        { "data": "OdemeAl", "autowidth": true, "visible": false, "className": "align-middle" },
+                        { "data": "Aciklama", "autowidth": true, "className": "align-middle" },
+
+                        {
+                            "data": null,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                islem = "";
+                                if (row.OdemeTuru == "GelecekOdeme") {
+                                    if (SMSYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon mr-1 alacaksmsgonder' data-toggle='modal' data-target='#BorcBilgiSMSGonder' data-alacakid='" + row.Id + "' data-odemetarihi='" + row.OdemeTarihi + "' data-tutar='" + ParaFormat(row.Tutar) + "' data-musteriid='" + row.MusteriId + "' data-musteriadi='" + row.MusteriAdiSoyadi + "' data-musteritel='" + row.MusteriCepTel +"' title='SMS Gönder'>" +
+                                            "<i class='fal fa-mobile-alt'></i>" +
+                                            "</a>"
+                                    }
+                                    if (EkleYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-success btn-icon mr-1 odemeal' data-alacakid='" + row.Id + "' data-alacaktarih='" + row.Tarih + "' data-alacaktutar='" + ParaFormat(row.Tutar) + "' data-aciklama='" + row.Aciklama + "' data-odemeyapan='" + row.MusteriAdiSoyadi + "' data-toggle='modal' data-target='#OdemeAlModal' title='Ödeme Al'>" +
+                                            "<i class='fal fa-plus-octagon'></i>" +
+                                            "</a>"
+                                    }
+                                }
+                                else {
+                                    if (YazdirYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-info btn-icon mr-1 makbuzyazdir' data-odemeid='" + row.Id + "' data-makbuzno='" + row.AlinanOdemeMakbuzNo + "' data-alacaktarih='" + row.Tarih + "' data-alacaktutar='" + ParaFormat(row.Tutar) + "' data-alinanodemeid='" + row.AlinanOdemeId + "'  title='Makbuz Yazdır'>" +
+                                            "<i class='fal fa-print'></i>" +
+                                            "</a>"
+                                    }
+                                }
+                                return islem
+                            }
+                        },  // İşlem
+                        { // Tarih Sıralama Gizli // 11
+                            "data": null,
+                            "autowidth": true,
+                            "visible": false,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                if (row.OdemeAl == true) {
+                                    return row.OdemeTarihi
+                                }
+                                else if (row.OdemeAl == false) {
+                                    return row.Tarih
+                                }
+                            }
+                        }
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Otomasyon/Muhasebe/GelecekOdemelerListesi/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'type': 'POST',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        'sProcessing': 'Yükleniyor... Lütfen Bekleyin',
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+            $("#IlkTarih").keyup(function () {
+                gelecekodemelertoplam = 0; alinanodemelertoplam = 0; dt.api().ajax.url('/Muhasebe/GelecekOdemelerFiltre?' + $('#FiltreForm').serialize()).load();
+                $("#GelecekOdemelerToplam").html(accounting.formatMoney(gelecekodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                $("#AlinanOdemelerToplam").html(accounting.formatMoney(alinanodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+            });
+            $("#IlkTarih").change(function () {
+                gelecekodemelertoplam = 0; alinanodemelertoplam = 0; dt.api().ajax.url('/Muhasebe/GelecekOdemelerFiltre?' + $('#FiltreForm').serialize()).load();
+                $("#GelecekOdemelerToplam").html(accounting.formatMoney(gelecekodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                $("#AlinanOdemelerToplam").html(accounting.formatMoney(alinanodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+            });
+            $("#SonTarih").keyup(function () {
+                gelecekodemelertoplam = 0; alinanodemelertoplam = 0; dt.api().ajax.url('/Muhasebe/GelecekOdemelerFiltre?' + $('#FiltreForm').serialize()).load();
+                $("#GelecekOdemelerToplam").html(accounting.formatMoney(gelecekodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                $("#AlinanOdemelerToplam").html(accounting.formatMoney(alinanodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+            });
+            $("#SonTarih").change(function () {
+                gelecekodemelertoplam = 0; alinanodemelertoplam = 0; dt.api().ajax.url('/Muhasebe/GelecekOdemelerFiltre?' + $('#FiltreForm').serialize()).load();
+                $("#GelecekOdemelerToplam").html(accounting.formatMoney(gelecekodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                $("#AlinanOdemelerToplam").html(accounting.formatMoney(alinanodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+            });
+            $("#GoruntuleTip").change(function () {
+                gelecekodemelertoplam = 0; alinanodemelertoplam = 0; dt.api().ajax.url('/Muhasebe/GelecekOdemelerFiltre?' + $('#FiltreForm').serialize()).load();
+                $("#GelecekOdemelerToplam").html(accounting.formatMoney(gelecekodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                $("#AlinanOdemelerToplam").html(accounting.formatMoney(alinanodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+            });
+            $("#Sube").change(function () {
+                gelecekodemelertoplam = 0; alinanodemelertoplam = 0; dt.api().ajax.url('/Muhasebe/GelecekOdemelerFiltre?' + $('#FiltreForm').serialize()).load();
+                $("#GelecekOdemelerToplam").html(accounting.formatMoney(gelecekodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                $("#AlinanOdemelerToplam").html(accounting.formatMoney(alinanodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+            });
+            $("#FiltreSozlesmeId").change(function () {
+                gelecekodemelertoplam = 0; alinanodemelertoplam = 0; dt.api().ajax.url('/Muhasebe/GelecekOdemelerFiltre?' + $('#FiltreForm').serialize()).load();
+                $("#GelecekOdemelerToplam").html(accounting.formatMoney(gelecekodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                $("#AlinanOdemelerToplam").html(accounting.formatMoney(alinanodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+            });
+            $("#FiltreMusteriId").change(function () {
+                gelecekodemelertoplam = 0; alinanodemelertoplam = 0; dt.api().ajax.url('/Muhasebe/GelecekOdemelerFiltre?' + $('#FiltreForm').serialize()).load();
+                $("#GelecekOdemelerToplam").html(accounting.formatMoney(gelecekodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                $("#AlinanOdemelerToplam").html(accounting.formatMoney(alinanodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+            });
+            $("input[type='search']").keydown(function () {
+                gelecekodemelertoplam = 0; alinanodemelertoplam = 0;
+                $("#GelecekOdemelerToplam").html(accounting.formatMoney(gelecekodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Gelecek Ödemeler Toplamı</small>");
+                $("#AlinanOdemelerToplam").html(accounting.formatMoney(alinanodemelertoplam, "TL", 2, ".", ",", "%v %s") + "<small class='m-0 l-h-n'>Alınan Ödemeler Toplamı</small>");
+            });
+        });
+    </script>
+}

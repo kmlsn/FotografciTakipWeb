@@ -1,0 +1,62 @@
+﻿@using FotografciTakipWeb.Models
+@model List<Sube>
+<div>
+    <a href="#" class="header-icon" data-toggle="dropdown" title="Şube Değiştir">
+        @*<i class="fal fa-retweet-alt"></i>*@
+        <i class="fal fa-repeat-alt"></i>
+    </a>
+    <div class="dropdown-menu dropdown-menu-animated w-auto h-auto">
+        <div class="dropdown-header bg-trans-gradient d-flex justify-content-center align-items-center rounded-top">
+            <h4 class="m-0 text-center color-white">
+                Şube Değiştir
+            </h4>
+        </div>
+        <div class="custom-scroll h-100">
+            <ul class="app-list">
+                @foreach (var item in Model)
+                {
+                    <li>
+                        <a href="#" class="app-list-item-sube hover-white SubeDegistir" data-id="@item.Id">
+                            <span class="icon-stack">
+                                <i class="base base-7 icon-stack-2x opacity-5 color-info-300"></i>
+                                <i class="base base-16 icon-stack-3x opacity-100 color-primary-500"></i>
+                                <i class="fal fa-camera icon-stack-2x opacity-100 color-white "></i>
+                            </span>
+                            <span class="app-list-name">
+                                @item.SubeAdi
+                            </span>
+                        </a>
+                    </li>
+                    @*<li>
+               <a href="#" class="app-list-item text-white border-0 m-0 SubeDegistir" data-id="@item.Id">
+               @*<a href="~/Otomasyon/Default/SubeDegistir/@item.Id" class="app-list-item text-white border-0 m-0">
+               <div class='icon-stack'>
+                   <i class="base base-7 icon-stack-2x opacity-5 color-info-300"></i>
+                   <i class="base base-16 icon-stack-3x opacity-100 color-primary-500"></i>
+                   <i class="fal fa-camera icon-stack-2x opacity-100 color-white "></i>
+               </div>
+               <span class="app-list-name">
+                   @item.SubeAdi
+               </span>
+               </a>
+            </li>*@
+                }
+                @if (ViewBag.KullaniciYetki)
+                {
+                <li>
+                    <a href="#" class="app-list-item-sube hover-white SubeDegistir" data-id="0">
+                        <span class="icon-stack">
+                            <i class="base base-7 icon-stack-2x opacity-5 color-info-300"></i>
+                            <i class="base base-16 icon-stack-3x opacity-100 color-primary-500"></i>
+                            <i class="fal fa-camera icon-stack-2x opacity-100 color-white "></i>
+                        </span>
+                        <span class="app-list-name">
+                            Tüm Şubeler
+                        </span>
+                    </a>
+                </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>

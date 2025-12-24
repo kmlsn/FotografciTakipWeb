@@ -1,0 +1,75 @@
+﻿@using FotografciTakipWeb.Models
+@model List<MusteriMesaj>
+<div>
+    <a href="#" class="header-icon" data-toggle="dropdown" title="Mesajlar">
+        <i class="fal fa-bell"></i>
+        @if (Model.Count == 0)
+        {
+            <span class="badge badge-detached badge-secondary">@Model.Count</span>
+        }
+        else
+        {
+            <span class="badge badge-detached badge-danger">@Model.Count</span>
+        }
+    </a>
+    <div class="dropdown-menu dropdown-menu-animated dropdown-xl">
+        <div class="dropdown-header bg-trans-gradient d-flex justify-content-center align-items-center rounded-top mb-2">
+            @if (@Model.Count == 0)
+            {
+                <h4 class="m-0 text-center color-white">
+                    Yeni mesaj yok!
+                </h4>
+            }
+            else
+            {
+                <h4 class="m-0 text-center color-white">
+                    @Model.Count yeni mesajınız var.
+                </h4>
+            }
+        </div>
+        <div class="tab-content tab-notification">
+            <div class="custom-scroll h-100">
+                <ul class="notification">
+                    @foreach (var item in Model.Where(x => x.OkunduBit == false))
+                    {
+                        <li class="unread">
+                            @if (item.MesajId == null)
+                            {
+                                <a href="@Url.Action("MesajDetay","Dashboard",new { area="Musteri", id=item.Id })" class="d-flex align-items-center">
+                                    <span class="mr-2">
+                                        @*<span class="rounded-circle profile-image d-block " style="background-image:url('/Areas/MesajListesi/Dosyalar/KullaniciProfilResimleri/Default_User.png'); background-size: cover;"></span>*@
+                                        <img class="rounded-circle profile-image d-block " src="@item.Firma.Resim.ResimAdres" />
+                                    </span>
+                                    <span class="d-flex flex-column flex-1 ml-1">
+                                        <span class="name">@item.Musteri.AdiSoyadi</span>
+                                        <span class="msg-a fs-sm text-truncate text-truncate-sm">Konu: @item.Konu</span>
+                                        <span class="fs-nano text-muted mt-1">@item.MesajTarihi.ToShortDateString() @item.MesajTarihi.ToShortTimeString()</span>
+                                    </span>
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("MesajDetay","Dashboard",new { area="Musteri", id=item.MesajId })" class="d-flex align-items-center">
+                                    <span class="mr-2">
+                                        @*<span class="rounded-circle profile-image d-block " style="background-image:url('/Areas/MesajListesi/Dosyalar/KullaniciProfilResimleri/Default_User.png'); background-size: cover;"></span>*@
+                                        <img class="rounded-circle profile-image d-block " src="@item.Firma.Resim.ResimAdres" />
+                                    </span>
+                                    <span class="d-flex flex-column flex-1 ml-1">
+                                        <span class="name">@item.Musteri.AdiSoyadi</span>
+                                        <span class="msg-a fs-sm text-truncate text-truncate-sm">Konu: @item.Konu</span>
+                                        <span class="fs-nano text-muted mt-1">@item.MesajTarihi.ToShortDateString() @item.MesajTarihi.ToShortTimeString()</span>
+                                    </span>
+                                </a>
+                            }
+                        </li>
+                    }
+                </ul>
+            </div>
+
+        </div>
+        <div class="py-2 px-3 bg-faded d-block rounded-bottom text-right border-faded border-bottom-0 border-right-0 border-left-0">
+            <a href="@Url.Action("Mesajlar","Dashboard",new { area="Musteri" })" class="fs-xs fw-500 ml-auto">Tüm Mesajlar</a>
+        </div>
+    </div>
+</div>
+

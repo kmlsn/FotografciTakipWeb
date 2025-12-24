@@ -1,0 +1,29 @@
+﻿@using FotografciTakipWeb.Models
+@model List<DestekTalepleriDetay>
+<div class="dropdown">
+    <a href="#" class="header-icon rounded-circle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fal fa-info"></i>
+        @if (Model.Count == 0)
+        {
+            <span class="badge badge-detached badge-secondary">@Model.Count</span>
+        }
+        else
+        {
+            <span class="badge badge-detached badge-danger">@Model.Count</span>
+        }
+    </a>
+    <div class="dropdown-menu" style="">
+        @*<a class="dropdown-item" id="YeniDestekTalebiEkle" href="#" data-toggle="modal" data-target="#DestekTalebiOlusturModal">Destek Talebi Oluştur</a>*@
+        @*<div class="dropdown-divider"></div>*@
+        <a class="dropdown-item" href="~/Otomasyon/Destek/DestekTalepleri">
+        Destek Talepleri 
+        @if (Model.Count == 0)
+        {
+            <span class="badge badge-detached badge-secondary">@Model.Count</span>
+        }
+        else
+        {
+            <span class="badge badge-detached badge-danger">@Model.Count</span>
+        }</a>
+    </div>
+</div>

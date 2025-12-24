@@ -1,0 +1,772 @@
+﻿
+@{
+    ViewBag.Title = "Tanımlar - Süreçler";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{ 
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Süreç Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="surecadihata">
+                                <label class="form-label" for="surecadi">Süreç Adı <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control form-control-sm" id="surecadi" placeholder="Süreç Adı" name="SurecAdi" maxlength="50" required>
+                                <div class="invalid-feedback">
+                                    Süreç Adını giriniz!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col col-sm-4">
+                                <label class="form-label" for="Sira">Görüntüleme Sırası</label>
+                                <input class="form-control form-control-sm" id="Sira" type="number" name="Sira" value="1" min="1" max="10000">
+                            </div>
+                        </div>
+                        <div class="form-row mt-3">
+                            <div class="col col-sm-4">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="SMSBildirimi" data-deger="SMS Bildirimini Aç">
+                                    <label class="custom-control-label" for="SMSBildirimi">SMS Bildirimini Aç</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="SurecKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-12 mb-3" id="surecduzenlehata">
+                                <label class="form-label" for="surecduzenle">Süreç Adı <span class="text-danger">*</span> </label>
+                                <input type="text" class="form-control" id="surecduzenle" placeholder="Süreç Adı" maxlength="50" name="SurecAdi" required>
+                                <div class="invalid-feedback">
+                                    Süreç Adını giriniz!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col col-sm-4">
+                                <label class="form-label" for="Siraduzenle">Görüntüleme Sırası</label>
+                                <input class="form-control form-control-sm" id="Siraduzenle" type="number" name="Siraduzenle" value="1" min="1" max="10000">
+                            </div>
+                        </div>
+                        <div class="form-row mt-3">
+                            <div class="col col-sm-4">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="SMSBildirimiduzenle" data-deger="SMS Bildirimini Aç">
+                                    <label class="custom-control-label" for="SMSBildirimiduzenle">SMS Bildirimini Aç</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="SurecGuncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<!-- Varsayılan Geğerleri Ekle Modal Penceresi -->
+<div class="modal fade" id="VarsayilanEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Varsayılan Süreçleri Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content" id="varsayilandegerler">
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-1" checked data-deger="Fotoğraf Çekimi Yapıldı">
+                                    <label class="custom-control-label" for="varsayilan-1">Fotoğraf Çekimi Yapıldı</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-2" checked data-deger="Dijitaller Çalışılıyor">
+                                    <label class="custom-control-label" for="varsayilan-2">Dijitaller Çalışılıyor</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-3" checked data-deger="Dijitaller Hazır">
+                                    <label class="custom-control-label" for="varsayilan-3">Dijitaller Hazır</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-4" checked data-deger="Dijitaller Teslim Edildi">
+                                    <label class="custom-control-label" for="varsayilan-4">Dijitaller Teslim Edildi</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-5" checked data-deger="Müşteriye Sunuldu">
+                                    <label class="custom-control-label" for="varsayilan-5">Müşteriye Sunuldu</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-6" checked data-deger="Müşteri Onayında">
+                                    <label class="custom-control-label" for="varsayilan-6">Müşteri Onayında</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-7" checked data-deger="Müşteri Onayladı">
+                                    <label class="custom-control-label" for="varsayilan-7">Müşteri Onayladı</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-8" checked data-deger="Düzeltmeler Yapılıyor">
+                                    <label class="custom-control-label" for="varsayilan-8">Düzeltmeler Yapılıyor</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-9" checked data-deger="Müşteriye Sunuldu (Tekrar)">
+                                    <label class="custom-control-label" for="varsayilan-9">Müşteriye Sunuldu (Tekrar)</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-10" checked data-deger="Müşteri Onayında (Tekrar)">
+                                    <label class="custom-control-label" for="varsayilan-10">Müşteri Onayında (Tekrar)</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-11" checked data-deger="Düzeltmeler Yapılıyor (Tekrar)">
+                                    <label class="custom-control-label" for="varsayilan-11">Düzeltmeler Yapılıyor (Tekrar)</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-12" checked data-deger="Albüm Çalışılıyor">
+                                    <label class="custom-control-label" for="varsayilan-12">Albüm Çalışılıyor</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-13" checked data-deger="Albüm - Müşteri Onayında">
+                                    <label class="custom-control-label" for="varsayilan-13">Albüm - Müşteri Onayında</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-14" checked data-deger="Albüm - Müşteri Onayladı">
+                                    <label class="custom-control-label" for="varsayilan-14">Albüm - Müşteri Onayladı</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-15" checked data-deger="Basımda">
+                                    <label class="custom-control-label" for="varsayilan-15">Basımda</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-16" checked data-deger="Albüm Hazır">
+                                    <label class="custom-control-label" for="varsayilan-16">Albüm Hazır</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-17" checked data-deger="Albüm Teslim Edildi">
+                                    <label class="custom-control-label" for="varsayilan-17">Albüm Teslim Edildi</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-3">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-18" checked data-deger="Diğer">
+                                    <label class="custom-control-label" for="varsayilan-18">Diğer</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="VarsayilanKaydet">Seçilenleri Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Varsayılan Geğerleri Ekle Modal Penceresi -->
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                @if (KullaniciYetki.KayitEkle)
+                {
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle">Yeni Süreç Ekle</button>
+                    <div class="" id="sureclerdisable">
+                        <button class="btn btn-sm btn-default mr-auto waves-effect waves-themed" id="sureclervarsayilan" data-toggle="modal" data-target="#VarsayilanEkleModal">Varsayılan Değerleri Yükle</button>
+                    </div>
+                }
+                @if (KullaniciYetki.KayitDuzenle)
+                {
+                    <button type="button" class="btn btn-sm btn-info" style="margin:10px 10px 10px 17px " id="SiraGuncelle">Tablodaki Sıraları Güncelle</button>
+                }
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtSurecler" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Süreç Adı</th>
+                                <th class="w-10">Sıra</th>
+                                <th class="w-10">Sıra</th>
+                                <th class="w-10">SMS Bildirim</th>
+                                <th class="w-10">Durum</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sureclersatir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script src="~/Areas/Otomasyon/Content/js/bootstrap-input-spinner.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            var Varsayilanlar = new Array();
+            var TabloSiralar = new Array();
+            var TabloIdler = new Array();
+            var varsayilandeger;
+            var sira;
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/SiraGetir/",
+                    success: function (data) {
+                        $("#surecadi").val("");
+                        $("#Sira").val(data);
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            })
+            $("#SurecKaydet").click(function () {
+                if ($("#surecadi").val() == "") {
+                    $("#surecadi").focus();
+                    $("#surecadihata").append("<div class='hata' style='color:red'>Süreç Adını Giriniz.</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var smsbildirim = document.getElementById("SMSBildirimi");
+                    var surec = $("#surecadi").val();
+                    var sms;
+                    if (smsbildirim.checked) {
+                        sms = "aktif"
+                    }
+                    else {
+                        sms = "pasif"
+                    }
+                    var SurecData = new FormData();
+                    SurecData.append("Surec", $("#surecadi").val());
+                    SurecData.append("Sira", $("#Sira").val());
+                    SurecData.append("SMSBildir", sms);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: SurecData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/SurecVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: SurecData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Tanimlar/SurecEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                            {
+                                Swal.fire(
+                                {
+                                    title: "Varolan Kayıt",
+                                    html: "<p><h2 style='font-size:16px; color:red'><strong>Süreç : </strong>" + surec + "</br><h2> Süreç zaten var!</h2>",
+                                    type: "warning"
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtSurecler").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#SurecGuncelle").val($(this).data("sid"))
+                $("#surecduzenle").val($(this).data("surecadi"));
+                $("#Siraduzenle").val($(this).data("sira"));
+                if ($(this).data("smsbildirim") == true) {
+                    $("#SMSBildirimiduzenle").attr("checked", "checked");
+                }
+                else {
+                    $("#SMSBildirimiduzenle").Removeattr("checked");
+                }
+
+            });
+            $("#SurecGuncelle").click(function () {
+                if ($("#surecduzenle").val() == "") {
+                    $("#surecduzenle").focus();
+                    $("#surecduzenlehata").append("<div class='hata' style='color:red'>Süreç Adını Giriniz.</div>");
+                }
+                else {
+                    $('#KayitDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    var smsbildirim = document.getElementById("SMSBildirimiduzenle");
+                    var sms;
+                    if (smsbildirim.checked) {
+                        sms = "aktif"
+                    }
+                    else {
+                        sms = "pasif"
+                    }
+                    var SurecData = new FormData();
+                    SurecData.append("Surec", $("#surecduzenle").val());
+                    SurecData.append("Sira", $("#Siraduzenle").val());
+                    SurecData.append("SMSBildir", sms);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: SurecData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/SurecGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+
+            });
+            $("#dtSurecler").on('click', '.Sil', function () {
+                var id = $(this).data("sid");
+                var surec = $(this).data("surecadi");
+                Swal.fire(
+                {
+                    title: "Kayıt Silinecek",
+                    html: "<p><h2 style='font-size:16px; color:red'><strong>Süreç : </strong>" + surec + "</br><h2> Süreç silinsin mi?</h2>",
+                    type: "error",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Silinsin!",
+                    cancelButtonText: "İptal"
+                }).then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Tanimlar/SurecSil/" + id,
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            });
+            $("#dtSurecler").on('click', '.durumdegistir', function () {
+                var id = $(this).data("sid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/SurecDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#VarsayilanKaydet").click(function () {
+                Varsayilanlar = [];
+                $("input[type=checkbox]").each(function (i) {
+                    varsayilandeger = document.getElementById("varsayilan-" + i);
+                    if (varsayilandeger != null) {
+                        if (varsayilandeger.checked) {
+                            Varsayilanlar.push($("#varsayilan-" + i).data("deger"))
+                        }
+                    }
+                });
+                $('#VarsayilanEkleModal').modal('hide');
+                var SurecData = new FormData();
+                SurecData.append("VarsayilanDegerler", Varsayilanlar);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: SurecData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        Swal.fire(
+                        {
+                            title: "Kayıtlar Ekleniyor!",
+                            html: "<strong>Lütfen Bekleyin.</strong>",
+                            onBeforeOpen: function onBeforeOpen() {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    url: "/Otomasyon/Tanimlar/SurecVarsayilanlariEkle/",
+                    success: function (data) {
+
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            swal.close();
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#SiraGuncelle").click(function () {
+                TabloSiralar = [];
+                TabloIdler = [];
+                $("td").each(function (i) {
+                    var sira = $(this).find($(".tablosira")).val();
+                    var id = $(this).find($(".tablosira")).data("sid");
+                    if (sira != undefined) {
+                        TabloSiralar.push(parseInt(sira));
+                        TabloIdler.push(id);
+                    }
+                });
+                var SurecTabloData = new FormData();
+                SurecTabloData.append("Siralar", TabloSiralar);
+                SurecTabloData.append("Idler", TabloIdler);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: SurecTabloData,
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/SurecTabloSiraGuncelle/",
+                    success: function (data) {
+
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#dtSurecler").on('click', '.smsbildirimdegistir', function () {
+                var id = $(this).data("sid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/SMSBildirimDegistir/" + id,
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            var dt;
+            var islem;
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+
+            dt = $('#dtSurecler').dataTable(
+                    {
+                        responsive: true,
+                        "destroy": true,
+                        "order": [[1, "asc"], [0, "asc"]],
+                        "columns": [
+                                    { "data": "SurecAdi", "autowidth": true, "className": "align-middle" },
+                                    { "data": "Sira", "autowidth": true, "visible": false },
+                                    {
+                                        "data": null,
+                                        "autowidth": true,
+                                        "className": "align-middle",
+                                        "render": function (data, type, row) {
+                                            if (row.KilitBit==false) {
+                                                return "<input class='form-control form-control-sm tablosira' type='number' name='Sira' data-sid='" + row.Id + "' value='" + row.Sira + "' min='2' max='10000'>"
+                                            }
+                                            else
+                                            { return "<input class='form-control form-control-sm tablosira' disabled type='number' name='Sira' data-sid='" + row.Id + "' value='" + row.Sira + "' min='2' max='10000'>" }
+                                        }
+                                    },
+                                    {
+                                        "data": null,
+                                        "autowidth": true,
+                                        "className": "text-center align-middle",
+                                        "targets": -1,
+                                        "render": function (data, type, row) {
+                                            islem = "";
+                                            if (row.KilitBit==false) {
+                                                if (DuzenleYetki == "True") {
+                                                    if (row.SMSBildirim == true) {
+                                                        islem = islem + "<a href='#' class='btn btn-success btn-xs btn-icon waves-effect waves-themed smsbildirimdegistir' data-sid='" + row.Id + "'>" +
+                                                                    "<i class='fal fa-check'></i>" +
+                                                                "</a>"
+                                                    }
+                                                    else {
+                                                        islem = islem + "<a href='#' class='btn btn-danger btn-xs btn-icon waves-effect waves-themed smsbildirimdegistir' data-sid='" + row.Id + "'>" +
+                                                                    "<i class='fal fa-times'></i>" +
+                                                                "</a>"
+                                                    }
+                                                }
+                                                else {
+                                                    if (row.SMSBildirim == true) {
+                                                        islem = islem + "<span class='badge badge-success'><i class='fal fa-check'></span>"
+                                                    }
+                                                    else {
+                                                        islem = islem + "<span class='badge badge-danger'><i class='fal fa-times'></i></span>"
+                                                    }
+                                                }
+                                            }
+                                            return islem
+                                        }
+                                    },
+                                    {
+                                        "data": null,
+                                        "className": "align-middle text-center ",
+                                        "render": function (data, type, row) {
+                                            islem = "";
+                                            if (row.KilitBit == false) {
+                                                if (DuzenleYetki == "True") {
+                                                    if (row.Aktif == true) {
+                                                        //islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                        islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-sid='" + row.Id + "'>Aktif</button>"
+                                                    }
+                                                    else {
+                                                        //islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                        islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-sid='" + row.Id + "'>Pasif</button>"
+                                                    }
+                                                }
+                                                else {
+                                                    if (row.Aktif == true) {
+                                                        islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                        //islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Aktif</button>"
+                                                    }
+                                                    else {
+                                                        islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                        //islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Pasif</button>"
+                                                    }
+                                                }
+                                            }
+                                            return islem
+                                        }
+                                    },
+                                    {
+                                        "data": null,
+                                        "className": "align-middle",
+                                        "render": function (data, type, row) {
+                                            islem = "";
+                                            if (row.KilitBit==false) {
+                                                if (DuzenleYetki == "True") {
+                                                    islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle' data-sid='" + row.Id + "' data-surecadi='" + row.SurecAdi + "' data-smsbildirim='" + row.SMSBildirim + "' data-sira='" + row.Sira + "' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                                                        "<i class='fal fa-edit'></i>" +
+                                                                    "</a>"
+                                                }
+                                                if (SilYetki == "True") {
+                                                    islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon ml-2 Sil'  data-sid='" + row.Id + "' data-surecadi='" + row.SurecAdi + "'>" +
+                                                                        "<i class='fal fa-trash-alt'></i>" +
+                                                                    "</a>"
+                                                }
+                                            }
+                                            return islem
+                                        }
+                                    }
+                        ],
+                        "processing": true,
+                        "ajax": {
+                            "url": "/Otomasyon/Tanimlar/SureclerListesi/",
+                            "contentType": 'application/json; charset=utf-8',
+                            'data': function (data) { return data = JSON.stringify(data); }
+                        },
+                        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                        "oLanguage": {
+                            "sSearchPlaceholder": "Tabloda Ara",
+                            "sZeroRecords": "Kayıt yok.",
+                            "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                            "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                            "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                            "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                            "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                            "oPaginate": {
+                                "sPrevious": "Önceki",
+                                "sNext": "Sonraki",
+                                "sFirst": "İlk",
+                                "sLast": "Son"
+                            }
+                        }
+                    });
+            $("input[type='number']").inputSpinner();
+
+        });
+
+    </script>
+}

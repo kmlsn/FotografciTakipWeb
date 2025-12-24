@@ -1,0 +1,671 @@
+﻿
+@{
+    ViewBag.Title = "Tanımlar - Zaman Dilimleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Zaman Dilimi Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-2 mb-2"></div>
+                            <div class="col-6 mb-2" id="BaslangicZamanhata">
+                                <label class="form-label" for="BaslangicZaman">Başlangıç Saati</label>
+                                <input class="form-control" id="BaslangicZaman" type="time" name="time" value="00:00">
+                            </div>
+                            <div class="col-3 mb-2"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="col-2 mb-2"></div>
+                            <div class="col-6 mb-2" id="BitisZamanhata">
+                                <label class="form-label" for="BitisZaman">Bitiş Saati</label>
+                                <input class="form-control" id="BitisZaman" type="time" name="time" value="00:00">
+                            </div>
+                            <div class="col-3 mb-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="ZamanKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-row">
+                            <div class="col-2 mb-2"></div>
+                            <div class="col-6 mb-2" id="BaslangicZamanDuzenlehata">
+                                <label class="form-label" for="BaslangicZaman">Başlangıç Saati</label>
+                                <input class="form-control" id="BaslangicZamanDuzenle" type="time" name="time" value="00:00">
+                            </div>
+                            <div class="col-3 mb-2"></div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="col-2 mb-2"></div>
+                            <div class="col-6 mb-2" is="BitisZamanDuzenlehata">
+                                <label class="form-label" for="BitisZaman">Bitiş Saati</label>
+                                <input class="form-control" id="BitisZamanDuzenle" type="time" name="time" value="00:00">
+                            </div>
+                            <div class="col-3 mb-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="ZamanGuncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<!-- Varsayılan Geğerleri Ekle Modal Penceresi -->
+<div class="modal fade" id="VarsayilanEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Varsayılan Zaman Dilimlerini Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content" id="varsayilandegerler">
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-1" checked data-baslangic="09:30" data-bitis="13:00">
+                                    <label class="custom-control-label" for="varsayilan-1">09:30 - 13:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-2" checked data-baslangic="11:00" data-bitis="16:00">
+                                    <label class="custom-control-label" for="varsayilan-2">11:00 - 16:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-3" checked data-baslangic="12:00" data-bitis="15:00">
+                                    <label class="custom-control-label" for="varsayilan-3">12:00 - 15:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-4" checked data-baslangic="12:00" data-bitis="16:00">
+                                    <label class="custom-control-label" for="varsayilan-4">12:00 - 16:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-5" checked data-baslangic="13:00" data-bitis="17:00">
+                                    <label class="custom-control-label" for="varsayilan-5">13:00 - 17:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-6" checked data-baslangic="14:00" data-bitis="18:00">
+                                    <label class="custom-control-label" for="varsayilan-6">14:00 - 18:00</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-7" checked data-baslangic="15:00" data-bitis="18:00">
+                                    <label class="custom-control-label" for="varsayilan-7">15:00 - 18:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-8" checked data-baslangic="15:00" data-bitis="19:00">
+                                    <label class="custom-control-label" for="varsayilan-8">15:00 - 19:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-9" checked data-baslangic="16:00" data-bitis="19:00">
+                                    <label class="custom-control-label" for="varsayilan-9">16:00 - 19:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-10" checked data-baslangic="16:00" data-bitis="20:00">
+                                    <label class="custom-control-label" for="varsayilan-10">16:00 - 20:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-11" checked data-baslangic="17:00" data-bitis="21:00">
+                                    <label class="custom-control-label" for="varsayilan-11">17:00 - 21:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-12" checked data-baslangic="17:00" data-bitis="22:00">
+                                    <label class="custom-control-label" for="varsayilan-12">17:00 - 22:00</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-13" checked data-baslangic="18:00" data-bitis="21:00">
+                                    <label class="custom-control-label" for="varsayilan-13">18:00 - 21:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-14" checked data-baslangic="18:00" data-bitis="22:00">
+                                    <label class="custom-control-label" for="varsayilan-14">18:00 - 22:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-15" checked data-baslangic="18:00" data-bitis="23:00">
+                                    <label class="custom-control-label" for="varsayilan-15">18:00 - 23:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-16" checked data-baslangic="19:00" data-bitis="22:00">
+                                    <label class="custom-control-label" for="varsayilan-16">19:00 - 22:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-17" checked data-baslangic="19:00" data-bitis="23:00">
+                                    <label class="custom-control-label" for="varsayilan-17">19:00 - 23:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-18" checked data-baslangic="19:00" data-bitis="00:00">
+                                    <label class="custom-control-label" for="varsayilan-18">19:00 - 00:00</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row mb-2">
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-19" checked data-baslangic="20:00" data-bitis="23:00">
+                                    <label class="custom-control-label" for="varsayilan-19">20:00 - 23:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-20" checked data-baslangic="20:00" data-bitis="00:00">
+                                    <label class="custom-control-label" for="varsayilan-20">20:00 - 00:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-21" checked data-baslangic="20:00" data-bitis="02:00">
+                                    <label class="custom-control-label" for="varsayilan-21">20:00 - 02:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-22" checked data-baslangic="21:00" data-bitis="02:00">
+                                    <label class="custom-control-label" for="varsayilan-22">21:00 - 02:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-23" checked data-baslangic="22:00" data-bitis="03:00">
+                                    <label class="custom-control-label" for="varsayilan-23">22:00 - 03:00</label>
+                                </div>
+                            </div>
+                            <div class="col col-sm-2">
+                                <div class="custom-control custom-checkbox">
+                                    <input type="checkbox" class="custom-control-input" id="varsayilan-24" checked data-baslangic="23:00" data-bitis="03:00">
+                                    <label class="custom-control-label" for="varsayilan-24">23:00 - 03:00</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="VarsayilanKaydet">Seçilenleri Ekle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Varsayılan Geğerleri Ekle Modal Penceresi -->
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                @if (KullaniciYetki.KayitEkle)
+                {
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle">Yeni Zaman Dilimi Ekle</button>
+                    <div class="" id="zamandilimleridisable">
+                        <button class="btn btn-sm btn-default mr-auto waves-effect waves-themed" id="zamandilimlerivarsayilan" data-toggle="modal" data-target="#VarsayilanEkleModal">Varsayılan Değerleri Yükle</button>
+                    </div>
+                }
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <table id="dtZamanDilimleri" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Başlangıç - Bitiş Zamanı</th>
+                                <th class="w-10">Durum</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="zamandilimlerisatir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+
+        $(document).ready(function () {
+            var Baslangic = new Array();
+            var Bitis = new Array();
+            var varsayilandeger;
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $("#BaslangicZaman").val("00:00");
+                $("#BitisZaman").val("00:00");
+            });
+            $("#ZamanKaydet").click(function () {
+                if ($("#BaslangicZaman").val() == "") {
+                    $("#BaslangicZaman").focus();
+                    $("#BaslangicZamanhata").append("<div class='hata' style='color:red'>Başlangıç saatini giriniz.</div>");
+                }
+                else if ($("#BitisZaman").val() == "") {
+                    $("#BitisZaman").focus();
+                    $("#BitisZamanhata").append("<div class='hata' style='color:red'>Bitiş saatini giriniz.</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var baslangic = $("#BaslangicZaman").val();
+                    var bitis = $("#BitisZaman").val();
+                    var ZamanData = new FormData();
+                    ZamanData.append("Baslangic", $("#BaslangicZaman").val());
+                    ZamanData.append("Bitis", $("#BitisZaman").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: ZamanData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/ZamanDilimiVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: ZamanData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Tanimlar/ZamanDilimiEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                            {
+                                Swal.fire(
+                                {
+                                    title: "Varolan Kayıt",
+                                    html: "<p><h2 style='font-size:16px; color:red'><strong>Tarih : </strong>" + baslangic + " - " + bitis + "<h2> Zaman Dilimi zaten var!</h2>",
+                                    type: "warning"
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtZamanDilimleri").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#ZamanGuncelle").val($(this).data("zid"))
+                $("#BaslangicZamanDuzenle").val($(this).data("baslangic"));
+                $("#BitisZamanDuzenle").val($(this).data("bitis"));
+            });
+            $("#ZamanGuncelle").click(function () {
+                if ($("#BaslangicZamanDuzenle").val() == "") {
+                    $("#BaslangicZamanDuzenle").focus();
+                    $("#BaslangicZamanDuzenlehata").append("<div class='hata' style='color:red'>Başlangıç saatini giriniz.</div>");
+                }
+                else if ($("#BitisZamanDuzenle").val() == "") {
+                    $("#BitisZamanDuzenle").focus();
+                    $("#BitisZamanDuzenlehata").append("<div class='hata' style='color:red'>Bitiş saatini giriniz.</div>");
+                }
+                else {
+                    $('#KayitDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    var ZamanData = new FormData();
+                    ZamanData.append("Baslangic", $("#BaslangicZamanDuzenle").val());
+                    ZamanData.append("Bitis", $("#BitisZamanDuzenle").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: ZamanData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/ZamanDilimiGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+
+            });
+            $("#dtZamanDilimleri").on('click', '.Sil', function () {
+                var id = $(this).data("zid");
+                var baslangic = $(this).data("baslangic");
+                var bitis = $(this).data("bitis");
+                Swal.fire(
+                {
+                    title: "Kayıt Silinecek",
+                    html: "<p><h2 style='font-size:16px; color:red'><strong>Tarih : </strong>" + baslangic + " - " + bitis + "<h2> Zaman Dilimi silinsin mi?</h2>",
+                    type: "error",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Silinsin!"
+                }).then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Tanimlar/ZamanDilimiSil/" + id,
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            });
+            $("#dtZamanDilimleri").on('click', '.durumdegistir', function () {
+                var id = $(this).data("zid");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Tanimlar/ZamanDilimiDurumDegistir/" + id,
+                    success: function (data) {
+                        if (data == "degisti") {
+                            dt.api().ajax.reload();
+                        }
+                        else {
+                            alert("HATA");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#VarsayilanKaydet").click(function () {
+                Baslangic = [];
+                Bitis = [];
+                $("input[type=checkbox]").each(function (i) {
+                    varsayilandeger = document.getElementById("varsayilan-" + i);
+                    if (varsayilandeger != null) {
+                        if (varsayilandeger.checked) {
+                            Baslangic.push($("#varsayilan-" + i).data("baslangic"))
+                            Bitis.push($("#varsayilan-" + i).data("bitis"))
+                        }
+                    }
+                });
+                $('#VarsayilanEkleModal').modal('hide');
+                var ZamanData = new FormData();
+                ZamanData.append("VarsayilanBaslangic", Baslangic);
+                ZamanData.append("VarsayilanBitis", Bitis);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: ZamanData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        Swal.fire(
+                        {
+                            title: "Kayıtlar Ekleniyor!",
+                            html: "<strong>Lütfen Bekleyin.</strong>",
+                            onBeforeOpen: function onBeforeOpen() {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    url: "/Otomasyon/Tanimlar/ZamanVarsayilanlariEkle/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            swal.close();
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            dt.api().ajax.reload();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            var dt;
+            var islem;
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            dt = $('#dtZamanDilimleri').dataTable(
+                    {
+                        responsive: true,
+                        "destroy": true,
+                        "columns": [
+                                    {
+                                        "data": null,
+                                        "autowidth": true,
+                                        "render": function (data, type, row) {
+                                            var baslangic = row.BaslangicZaman;
+                                            var baslangicsaat = baslangic.Hours;
+                                            var baslangicdakika = baslangic.Minutes;
+                                            if (baslangicsaat < 10)
+                                            { baslangicsaat = "0" + baslangicsaat }
+                                            if (baslangicdakika < 10)
+                                            { baslangicdakika = "0" + baslangicdakika }
+                                            var bitis = row.BitisZaman;
+                                            var bitissaat = bitis.Hours;
+                                            var bitisdakika = bitis.Minutes;
+                                            if (bitissaat < 10)
+                                            { bitissaat = "0" + bitissaat }
+                                            if (bitisdakika < 10)
+                                            { bitisdakika = "0" + bitisdakika }
+
+                                            return baslangicsaat + ":" + baslangicdakika + " - " + bitissaat + ":" + bitisdakika
+                                        }
+                                    },
+                                    {
+                                        "data": null,
+                                        "className": "align-middle text-center ",
+                                        "render": function (data, type, row) {
+                                            islem = "";
+                                            if (DuzenleYetki == "True") {
+                                                if (row.Aktif == true) {
+                                                    //islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                    islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-zid='" + row.Id + "'>Aktif</button>"
+                                                }
+                                                else {
+                                                    //islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                    islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-zid='" + row.Id + "'>Pasif</button>"
+                                                }
+                                            }
+                                            else {
+                                                if (row.Aktif == true) {
+                                                    islem = islem + "<span class='badge badge-success'>Aktif</span>"
+                                                    //islem = islem + "<button type='button' class='btn btn-xs btn-success color-white waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Aktif</button>"
+                                                }
+                                                else {
+                                                    islem = islem + "<span class='badge badge-danger'>Pasif</span>"
+                                                    //islem = islem + "<button type='button' class='btn btn-xs btn-danger waves-effect waves-themed durumdegistir' title='Durum Değiştir' data-smsmetinid='" + row.Id + "'>Pasif</button>"
+                                                }
+                                            }
+                                            return islem
+                                        }
+                                    },
+                                    {
+                                        "data": null,
+                                        "render": function (data, type, row) {
+                                            var baslangic = row.BaslangicZaman;
+                                            var bitis = row.BitisZaman;
+                                            var baslangicsaat = baslangic.Hours;
+                                            var baslangicdakika = baslangic.Minutes;
+                                            if (baslangicsaat < 10)
+                                            { baslangicsaat = "0" + baslangicsaat }
+                                            if (baslangicdakika < 10)
+                                            { baslangicdakika = "0" + baslangicdakika }
+                                            var bitissaat = bitis.Hours;
+                                            var bitisdakika = bitis.Minutes;
+                                            if (bitissaat < 10)
+                                            { bitissaat = "0" + bitissaat }
+                                            if (bitisdakika < 10)
+                                            { bitisdakika = "0" + bitisdakika }
+                                            islem = "";
+                                            if (DuzenleYetki == "True") {
+                                                islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle'  data-zid='" + row.Id + "' data-baslangic='" + baslangicsaat + ":" + baslangicdakika + "' data-bitis='" + bitissaat + ":" + bitisdakika + "' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                                                    "<i class='fal fa-edit'></i>" +
+                                                                "</a>"
+                                            }
+                                            if (SilYetki == "True") {
+                                                islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon Sil' data-zid=" + row.Id + " data-baslangic='" + baslangicsaat + ":" + baslangicdakika + "' data-bitis='" + bitissaat + ":" + bitisdakika + "' style='background-color:crimson;margin-left:5px'>" +
+                                                                    "<i class='fal fa-trash-alt'></i>" +
+                                                                "</a>"
+                                            }
+                                            return islem
+                                        }
+                                    }
+                        ],
+                        "processing": true,
+                        "ajax": {
+                            "url": "/Otomasyon/Tanimlar/ZamanDilimleriListesi/",
+                            "contentType": 'application/json; charset=utf-8',
+                            'data': function (data) { return data = JSON.stringify(data); }
+                        },
+                        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                        "oLanguage": {
+                            "sSearchPlaceholder": "Tabloda Ara",
+                            "sZeroRecords": "Kayıt yok.",
+                            "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                            "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                            "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                            "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                            "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                            "oPaginate": {
+                                "sPrevious": "Önceki",
+                                "sNext": "Sonraki",
+                                "sFirst": "İlk",
+                                "sLast": "Son"
+                            }
+                        }
+                    });
+        });
+    </script>
+}

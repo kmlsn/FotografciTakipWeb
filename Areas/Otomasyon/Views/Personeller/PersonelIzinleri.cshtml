@@ -1,0 +1,1145 @@
+﻿
+@{
+    ViewBag.Title = "PersonelIzinleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    List<Personel> personellistesi = ViewBag.personeller;
+    List<Sube> SubeListesi = ViewBag.SubeListesi;
+    List<SubeToKullanici> SubeKullanici = ViewBag.SubeKullanici;
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni İzin Ekle - <i id="yenieklepersoneladi"></i>
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-4 form-label text-lg-right">İzin Başlama Tarihi</label>
+                            <div class="col-12 col-lg-6" id="baslamahata">
+                                <div class="input-group">
+                                    <input type="text" class="form-control " value="07/17/2020" id="baslamatarihi">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text fs-xl">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-4 form-label text-lg-right">İzin Bitiş Tarihi</label>
+                            <div class="col-12 col-lg-6" id="bitishata">
+                                <div class="input-group">
+                                    <input type="text" class="form-control " value="07/17/2020" id="bitistarih">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text fs-xl">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-4 form-label text-lg-right">İşe Başlama Tarihi</label>
+                            <div class="col-12 col-lg-6" id="isebaslamahata">
+                                <div class="input-group">
+                                    <input type="text" class="form-control " value="07/17/2020" id="isebaslamatarih">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text fs-xl">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12 col-lg-6">
+                                <h3 class="pl-4">Kullanılacak İzin <span class="badge badge-info" id="kullanilacakizingun">1</span> Gün</h3>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-4 form-label text-lg-right">Açıklama</label>
+                            <div class="col-12 col-lg-6">
+                                <div class="input-group">
+                                    <textarea class="form-control" id="Aciklama" placeholder="Açıklama" rows="3" name="Aciklama" style="overflow:auto;resize:none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Kaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    İzin Düzenle - <i id="duzenlepersoneladi"></i>
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-4 form-label text-lg-right">İzin Başlama Tarihi</label>
+                            <div class="col-12 col-lg-6" id="baslangicduzenlehata">
+                                <div class="input-group">
+                                    <input type="text" class="form-control " value="07/17/2020" id="baslamatarihiduzenle">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text fs-xl">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-4 form-label text-lg-right">İzin Bitiş Tarihi</label>
+                            <div class="col-12 col-lg-6" id="bitisduzenlehata">
+                                <div class="input-group">
+                                    <input type="text" class="form-control " value="07/17/2020" id="bitistarihduzenle">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text fs-xl">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-4 form-label text-lg-right">İşe Başlama Tarihi</label>
+                            <div class="col-12 col-lg-6" id="isebaslamaduzenlehata">
+                                <div class="input-group">
+                                    <input type="text" class="form-control " value="07/17/2020" id="isebaslamatarihduzenle">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text fs-xl">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <div class="col-12 col-lg-6">
+                                <h3 class="pl-4">Kullanılacak İzin <span class="badge badge-info" id="kullanilacakizingunduzenle">1</span> Gün</h3>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-4 form-label text-lg-right">Açıklama</label>
+                            <div class="col-12 col-lg-6">
+                                <div class="input-group">
+                                    <textarea class="form-control" id="Aciklamaduzenle" placeholder="Açıklama" rows="3" name="Aciklama" style="overflow:auto;resize:none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Guncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <form id="FiltreForm">
+                <div class="row col col-12 mt-3" id="date_filter">
+                    <div class="form-group col-sm-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" value="07/17/2020" id="IlkTarih" name="IlkTarih">
+                            <div class="input-group-append">
+                                <span class="input-group-text fs-sm">
+                                    <i class="fal fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <div class="input-group">
+                            <input type="text" class="form-control form-control-sm" value="07/17/2020" id="SonTarih" name="SonTarih">
+                            <div class="input-group-append">
+                                <span class="input-group-text fs-sm">
+                                    <i class="fal fa-calendar-alt"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <select class="custom-select form-control custom-select-sm" id="Sube" name="Sube" title="Görüntülenecek Şube">
+                            <option value="0">Tüm Şubeler</option>
+                            @foreach (var sube in SubeKullanici)
+                            {
+                                if (ViewBag.AktifSubeId == sube.SubeId && sube.Sube.Aktif == true)
+                                {
+                                    <option selected="" value="@sube.Sube.Id">@sube.Sube.SubeAdi</option>
+                                }
+                                else if (sube.Sube.Aktif == true)
+                                {
+                                    <option value="@sube.Sube.Id">@sube.Sube.SubeAdi</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group col-sm-2">
+                        <select class="custom-select form-control custom-select-sm" id="PersonelAdSoyad" name="PersonelId" title="Personel Seçiniz.">
+                            <option selected="" value="0" data-personelid="0">Personel Seçiniz</option>
+                            @foreach (var pers in personellistesi)
+                            {
+                                <option value="@pers.Id" data-personelid="@pers.Id">@pers.AdiSoyadi</option>
+                            }
+                        </select>
+                    </div>
+                    @if (KullaniciYetki.KayitEkle)
+                    {
+                        <div class="form-group col-sm-2" id="IzinEkledisable">
+                            <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" id="IzinEkle"> İzin Ekle </button>
+                        </div>
+                    }
+                </div>
+            </form>
+            <div class="border-bottom mt-0"></div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtPersonelIzin" class="table table-bordered table-sm table-hover table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Firma</th>
+                                <th>Şube</th>
+                                <th>GörevliŞubeler</th>
+                                <th>Personel Adı Soyadı</th>
+                                <th>Görev</th>
+                                <th>İzin Başlama Tarihi</th>
+                                <th>İzin Bitiş Tarihi</th>
+                                <th>İşe Başlama Tarihi</th>
+                                <th class="w-10">Kullanılan İzin(Gün)</th>
+                                <th class="w-10">Kalan İzin (Gün)</th>
+                                <th>Açıklama</th>
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rehbersatir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="text" id="FiltreAyar" style="display:none" data-filtreayar="@ViewBag.FiltreAyar">
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+@section Script
+{
+    <script>
+        var controls = {
+            leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
+            rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
+        }
+        var filtreayar = $('#FiltreAyar').data("filtreayar");
+        var tomorrow;
+        var runDatePicker = function () {
+            $('#baslamatarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#bitistarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#isebaslamatarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", tomorrow);
+            $('#baslamatarihiduzenle').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#bitistarihduzenle').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#isebaslamatarihduzenle').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", tomorrow);
+            //$('#SonTarih').datepicker(
+            //    {
+            //        todayBtn: "linked",
+            //        todayHighlight: true,
+            //        templates: controls,
+            //        language: 'tr',
+            //        autoclose: true
+            //    }).datepicker("setDate", new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0));
+            //$('#IlkTarih').datepicker(
+            //    {
+            //        todayBtn: "linked",
+            //        todayHighlight: true,
+            //        templates: controls,
+            //        language: 'tr',
+            //        autoclose: true
+            //    }).datepicker("setDate", new Date(new Date().getFullYear(), 0, 1));
+            if (filtreayar == "0") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+            } // 1 Gün
+            else if (filtreayar == "1") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() + 7)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() - 7)));
+            } // 1 Hafta Öncesi - 1 Hafta Sonrası
+            else if (filtreayar == "2") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() - 1)));
+            } // 1 Ay Öncesi - 1 Ay Sonrası
+            else if (filtreayar == "3") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
+            } // 1 Yıl Öncesi - 1 Yıl Sonrası
+            else if (filtreayar == "4") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+            } // Ayın başından bu güne
+            else if (filtreayar == "5") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), 0, 1));
+            } // Yılın başından bu güne
+        }
+        $(document).ready(function () {
+            function dateFormat(d) {
+                return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+            }
+            var today = new Date();
+            tomorrow = new Date();
+            tomorrow.setDate(today.getDate() + 1);
+            let bitist;
+            let baslangict;
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            runDatePicker();
+            var PersonelId = $("#PersonelAdSoyad").find("option:selected").val(); // Seçilen GrupId ye göre tablo filtrelenecek
+            var perid = $("#PersonelAdSoyad").find("option:selected").data("personelid");
+            var PersonelAdi = $("#PersonelAdSoyad").find("option:selected ").text();
+            if (PersonelId == "0") {
+                $("#IzinEkledisable").addClass("disabled");
+                document.getElementById("IzinEkle").setAttribute("disabled", "");
+            }
+            else {
+                $("#IzinEkledisable").removeClass("disabled");
+                document.getElementById("IzinEkle").removeAttribute("disabled", "");
+            }
+            var dt;
+            $(":input").inputmask();
+            $('#baslamatarihi').on('focusout', function (e) {
+                if (document.getElementById("bathata") != null) {
+                    document.getElementById("bathata").remove();
+                }
+                if (document.getElementById("bashata") != null) {
+                    document.getElementById("bashata").remove();
+                }
+            });
+            $('#bitistarih').on('focusout', function (e) {
+                if (document.getElementById("bathata") != null) {
+                    document.getElementById("bathata").remove();
+                }
+                if (document.getElementById("bashata") != null) {
+                    document.getElementById("bashata").remove();
+                }
+            });
+            $('#isebaslamatarih').on('focusout', function (e) {
+                if (document.getElementById("bathata") != null) {
+                    document.getElementById("bathata").remove();
+                }
+                if (document.getElementById("bashata") != null) {
+                    document.getElementById("bashata").remove();
+                }
+            });
+            $('#baslamatarihi').on('focus', function (e) {
+                if (document.getElementById("bathata") != null) {
+                    document.getElementById("bathata").remove();
+                }
+                if (document.getElementById("bashata") != null) {
+                    document.getElementById("bashata").remove();
+                }
+            });
+            $('#bitistarih').on('focus', function (e) {
+                if (document.getElementById("bathata") != null) {
+                    document.getElementById("bathata").remove();
+                }
+                if (document.getElementById("bashata") != null) {
+                    document.getElementById("bashata").remove();
+                }
+            });
+            $('#isebaslamatarih').on('focus', function (e) {
+                if (document.getElementById("bathata") != null) {
+                    document.getElementById("bathata").remove();
+                }
+                if (document.getElementById("bashata") != null) {
+                    document.getElementById("bashata").remove();
+                }
+            });
+            $("#PersonelAdSoyad").change(function () {
+                PersonelId = $(this).find("option:selected").val();
+                PersonelAdi = $(this).find("option:selected").text();
+                perid = $(this).find("option:selected").data("personelid");
+                if (PersonelId == "0") {
+                    $("#IzinEkledisable").addClass("disabled");
+                    document.getElementById("IzinEkle").setAttribute("disabled", "");
+                }
+                else {
+                    $("#IzinEkledisable").removeClass("disabled");
+                    document.getElementById("IzinEkle").removeAttribute("disabled", "");
+                }
+            });
+            $("#IzinEkle").click(function () {
+                document.getElementById("yenieklepersoneladi").innerHTML = PersonelAdi;
+            });
+            $("#Kaydet").click(function () {
+                var baslamatarihidizi = $("#baslamatarihi").val().split(".");
+                var baslamatarihi = new Date(baslamatarihidizi[2], baslamatarihidizi[1], baslamatarihidizi[0]);
+
+                var bitistarihdizi = $("#bitistarih").val().split(".");
+                var bitistarih = new Date(bitistarihdizi[2], bitistarihdizi[1], bitistarihdizi[0]);
+
+                var isebaslamatarihdizi = $("#isebaslamatarih").val().split(".");
+                var isebaslamatarih = new Date(isebaslamatarihdizi[2], isebaslamatarihdizi[1], isebaslamatarihdizi[0]);
+
+                if (bitistarih < baslamatarihi) {
+                    $("#baslamahata").append("<div id='bathata' style='color:red'>İzin bitiş tarihi izin başlama tarihinden küçük olamaz. </div>");
+                }
+                if (isebaslamatarih < bitistarih) {
+                    $("#isebaslamahata").append("<div id='bashata' style='color:red'>İşe başlama tarihi izin bitiş tarihinden küçük olamaz. </div>");
+                }
+                if (bitistarih >= baslamatarihi && isebaslamatarih >= bitistarih) {
+                    // kaydetme işlemleri
+                    //GunHesapla($("#baslamatarihi").val(), $("#bitistarih").val());
+
+
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var adsoyad = PersonelAdi;
+                    var IzinData = new FormData();
+                    IzinData.append("PersonelId", perid);
+                    IzinData.append("IzinBaslangic", $("#baslamatarihi").val().toString());
+                    IzinData.append("IzinBitis", $("#bitistarih").val().toString());
+                    IzinData.append("IseBaslama", $("#isebaslamatarih").val().toString());
+                    IzinData.append("Aciklama", $("#Aciklama").val());
+                    //IzinData.forEach((value, key) => { console.log(key + " = " + value) });
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: IzinData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Personeller/IzinVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: IzinData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Personeller/PersonelIzinEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                            {
+                                Swal.fire(
+                                    {
+                                        title: "Varolan Kayıt",
+                                        html: "<p><h2 style='font-size:16px; color:red'><strong>Ad-Soyad : </strong>" + adsoyad + "</h2></p><h2> Bu isime ait bir kayıt mecut! Varolan Kayıt Güncellensin mi?</h2>",
+                                        type: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonText: "Güncelle"
+                                    }).then(function (result) {
+                                        if (result.value) {
+                                            $.ajax({
+                                                type: "POST",
+                                                datatype: 'json',
+                                                data: IzinData,
+                                                contentType: false,
+                                                processData: false,
+                                                url: "/Otomasyon/Personeller/PersonelIzinGuncelle/" + data, // data: controller dan dönen varolan kaydın ID si
+                                                success: function (data) {
+                                                    if (data.Sonuc == false) {
+                                                        alertify.set('notifier', 'delay', 5);
+                                                        alertify.set('notifier', 'position', 'top-center');
+                                                        alertify.error(data.Mesaj);
+                                                    }
+                                                    else if (data.Sonuc == true) {
+                                                        alertify.set('notifier', 'delay', 3);
+                                                        alertify.set('notifier', 'position', 'top-center');
+                                                        alertify.success(data.Mesaj);
+                                                        dt.api().ajax.reload();
+                                                    }
+                                                },
+                                                error: function (err) {
+                                                    alert("HATA");
+                                                }
+                                            });
+                                        }
+                                    });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            }); // Yeni Kayıt Modal KAYDET
+            $("#dtPersonelIzin").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#Guncelle").val($(this).data("id"));
+                $("#baslamatarihiduzenle").val($(this).data("izinbaslama"));
+                $("#bitistarihduzenle").val($(this).data("izinbitis"));
+                $("#isebaslamatarihduzenle").val($(this).data("isebaslama"));
+                $("#baslamatarihiduzenle").datepicker("setDate", $(this).data("izinbaslama"));
+                $("#bitistarihduzenle").datepicker("setDate", $(this).data("izinbitis"));
+                $("#isebaslamatarihduzenle").datepicker("setDate", $(this).data("isebaslama"));
+                var aciklama = $(this).data("aciklama").replace(/\<br \/\>/g, "\r\n")
+                $("#Aciklamaduzenle").val(aciklama);
+                GunHesaplaDuzenle();
+            }); // Kayıt Düzenleme için Modal'a bilgileri yükle
+            $("#Guncelle").click(function () {
+
+                var baslamatarihidizi = $("#baslamatarihiduzenle").val().split(".");
+                var baslamatarihi = new Date(baslamatarihidizi[2], baslamatarihidizi[1], baslamatarihidizi[0]);
+
+                var bitistarihdizi = $("#bitistarihduzenle").val().split(".");
+                var bitistarih = new Date(bitistarihdizi[2], bitistarihdizi[1], bitistarihdizi[0]);
+
+                var isebaslamatarihdizi = $("#isebaslamatarihduzenle").val().split(".");
+                var isebaslamatarih = new Date(isebaslamatarihdizi[2], isebaslamatarihdizi[1], isebaslamatarihdizi[0]);
+
+                if (bitistarih < baslamatarihi) {
+                    $("#baslangicduzenlehata").append("<div id='bathata' style='color:red'>İzin bitiş tarihi izin başlama tarihinden küçük olamaz. </div>");
+                }
+                if (isebaslamatarih < bitistarih) {
+                    $("#isebaslamaduzenlehata").append("<div id='bashata' style='color:red'>İşe başlama tarihi izin bitiş tarihinden küçük olamaz. </div>");
+                }
+                if (bitistarih >= baslamatarihi && isebaslamatarih >= bitistarih) {
+                    $('#KayitDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    var IzinData = new FormData();
+                    //IzinData.append("PersonelId", perid);
+                    IzinData.append("IzinBaslangic", $("#baslamatarihiduzenle").val().toString());
+                    IzinData.append("IzinBitis", $("#bitistarihduzenle").val().toString());
+                    IzinData.append("IseBaslama", $("#isebaslamatarihduzenle").val().toString());
+                    IzinData.append("Aciklama", $("#Aciklamaduzenle").val());
+                    //IzinData.forEach((value, key) => { console.log(key + " = " + value) });
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: IzinData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Personeller/PersonelIzinGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            }); // Kayıt Güncelle Modal GÜNCELLE
+            $("#dtPersonelIzin").on('click', '.Sil', function () {
+                /**
+                  *  izin bitiş tarihi bugünden büyükse;
+                  *  "İZİN HENÜZ BİTMEMİŞ. SİLMEK İSTEDİĞİNİZDEN EMİN MİSİNİZ?"
+                  *  izin bitiş tarihi bugünden küçükse
+                  *  "İZİN TAMAMLANMIŞ. SİLMEK İSTEDİĞİNİZDEN EMİN MİSİNİZ?"
+                **/
+                var id = $(this).data("id");
+                var adsoyad = $(this).data("personelad");
+                var baslama = $(this).data("izinbaslama");
+                var kullanilangun = $(this).data("kullanilangun");
+                var bitis = $(this).data("izinbitis");
+                var bitist = $(this).data("izinbitis");
+                var bugun = dateFormat(new Date());
+                let btarray = bitist.split("."); // gün(0).ay(1).yıl(2)
+                let bgarray = bugun.split("."); // gün(0).ay(1).yıl(2)
+                bitist = btarray[1] + "/" + btarray[0] + "/" + btarray[2];
+                bugun = bgarray[1] + "/" + bgarray[0] + "/" + bgarray[2];
+                let bit = new Date(bitist);
+                let bgn = new Date(bugun);
+                bit.setHours(0, 0, 0, 0);
+                bgn.setHours(0, 0, 0, 0);
+                if (bgn.getTime() <= bit.getTime()) {
+                    Swal.fire(
+                        {
+                            title: "Kayıt Silinecek",
+                            html: "<p>" +
+                                "<h2 style='font-size:16px; color:red'><strong>Ad-Soyad : </strong>" + adsoyad + "</h2></br>" +
+                                "<h2 style='font-size:16px; color:red'><strong>İzin Tarihleri : </strong>" + baslama + " - " + bitis + " (" + kullanilangun + " Gün)</h2>" +
+                                "<h2 style='font-size:16px; color:red'><strong>İZİN HENÜZ BİTMEMİŞ.</strong></h2>" +
+                                "</p>" +
+                                "<h4><strong>SİLMEK İSTEDİĞİNİZDEN EMİN MİSİNİZ?</strong></h4>",
+                            type: "error",
+                            showCancelButton: true,
+                            confirmButtonText: "Evet, Silinsin!"
+                        }).then(function (result) {
+                            if (result.value) {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Personeller/PersonelIzinSil/" + id,
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                        });
+                }
+                else if (bgn.getTime() > bit.getTime()) {
+                    Swal.fire(
+                        {
+                            title: "Kayıt Silinecek",
+                            html: "<p>" +
+                                "<h2 style='font-size:16px; color:red'><strong>Ad-Soyad : </strong>" + adsoyad + "</h2></br>" +
+                                "<h2 style='font-size:16px; color:red'><strong>İzin Tarihleri : </strong>" + baslama + " - " + bitis + " (" + kullanilangun + " Gün)</h2>" +
+                                "<h2 style='font-size:16px; color:red'><strong>İZİN TAMAMLANMIŞ.</strong></h2>" +
+                                "</p>" +
+                                "<h4><strong>SİLMEK İSTEDİĞİNİZDEN EMİN MİSİNİZ?</strong></h4>",
+                            type: "error",
+                            showCancelButton: true,
+                            confirmButtonText: "Evet, Silinsin!"
+                        }).then(function (result) {
+                            if (result.value) {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Personeller/PersonelIzinSil/" + id,
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                        });
+                }
+                else {
+                    Swal.fire(
+                        {
+                            title: "Kayıt Silinecek",
+                            html: "<p>" +
+                                "<h2 style='font-size:16px; color:red'><strong>Ad-Soyad : </strong>" + adsoyad + "</h2></br>" +
+                                "<h2 style='font-size:16px; color:red'><strong>İzin Tarihleri : </strong>" + baslama + " - " + bitis + " (" + kullanilangun + " Gün)</h2>" +
+                                "</p>" +
+                                "<h4>İZİNİ SİLMEK İSTEDİĞİNİZDEN EMİN MİSİNİZ?</h4>",
+                            type: "error",
+                            showCancelButton: true,
+                            confirmButtonText: "Evet, Silinsin!"
+                        }).then(function (result) {
+                            if (result.value) {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Personeller/PersonelIzinSil/" + id,
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                        });
+                }
+
+            }); // Kayıt SİLME
+
+            function GunHesapla() {
+                baslangict = $("#baslamatarihi").val().toString();
+                bitist = $("#bitistarih").val().toString();
+                let bsarray = baslangict.split("."); // gün(0).ay(1).yıl(2)
+                let btarray = bitist.split("."); // gün(0).ay(1).yıl(2)
+                baslangict = bsarray[1] + "/" + bsarray[0] + "/" + bsarray[2];
+                bitist = btarray[1] + "/" + btarray[0] + "/" + btarray[2];
+                let bas = new Date(baslangict);
+                let bit = new Date(bitist);
+                bas.setHours(0, 0, 0, 0);
+                bit.setHours(0, 0, 0, 0);
+                if (bas.getTime() <= bit.getTime()) {
+                    var IzinData = new FormData();
+                    IzinData.append("IzinBaslangic", $("#baslamatarihi").val().toString());
+                    IzinData.append("IzinBitis", $("#bitistarih").val().toString());
+                    IzinData.append("PersonelId", perid);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: IzinData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Personeller/IzınGunSayisiHesapla/",
+                        success: function (data) {
+                            document.getElementById("kullanilacakizingun").innerHTML = data;
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            };
+            function GunHesaplaDuzenle() {
+                baslangict = $("#baslamatarihiduzenle").val().toString();
+                bitist = $("#bitistarihduzenle").val().toString();
+                let bsarray = baslangict.split("."); // gün(0).ay(1).yıl(2)
+                let btarray = bitist.split("."); // gün(0).ay(1).yıl(2)
+                baslangict = bsarray[1] + "/" + bsarray[0] + "/" + bsarray[2];
+                bitist = btarray[1] + "/" + btarray[0] + "/" + btarray[2];
+                let bas = new Date(baslangict);
+                let bit = new Date(bitist);
+                bas.setHours(0, 0, 0, 0);
+                bit.setHours(0, 0, 0, 0);
+                if (bas.getTime() <= bit.getTime()) {
+                    var IzinData = new FormData();
+                    IzinData.append("IzinBaslangic", $("#baslamatarihiduzenle").val().toString());
+                    IzinData.append("IzinBitis", $("#bitistarihduzenle").val().toString());
+                    IzinData.append("PersonelId", perid);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: IzinData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Personeller/IzınGunSayisiHesapla/",
+                        success: function (data) {
+                            document.getElementById("kullanilacakizingunduzenle").innerHTML = data;
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            };
+            $("#baslamatarihi").keyup(function () {
+                GunHesapla();
+            });
+            $("#baslamatarihi").change(function () {
+                GunHesapla();
+            });
+            $("#bitistarih").keyup(function () {
+                let isebaslamat = $("#isebaslamatarih").val().toString();
+                let bitist = $("#bitistarih").val().toString();
+                let ibtarray = isebaslamat.split("."); // gün(0).ay(1).yıl(2)
+                let btarray = bitist.split("."); // gün(0).ay(1).yıl(2)
+                isebaslamat = ibtarray[1] + "/" + ibtarray[0] + "/" + ibtarray[2];
+                bitist = btarray[1] + "/" + btarray[0] + "/" + btarray[2];
+                let ibas = new Date(isebaslamat);
+                ibas.setDate(bit.getDate() + 1)
+                $("#isebaslamatarih").datepicker("setDate", ibas);
+                GunHesapla();
+            });
+            $("#bitistarih").change(function () {
+                let isebaslamat = $("#isebaslamatarih").val().toString();
+                let bitist = $("#bitistarih").val().toString();
+                let ibtarray = isebaslamat.split("."); // gün(0).ay(1).yıl(2)
+                let btarray = bitist.split("."); // gün(0).ay(1).yıl(2)
+                isebaslamat = ibtarray[1] + "/" + ibtarray[0] + "/" + ibtarray[2];
+                bitist = btarray[1] + "/" + btarray[0] + "/" + btarray[2];
+                let ibas = new Date(isebaslamat);
+                let bit = new Date(bitist);
+                ibas.setDate(bit.getDate() + 1)
+                $("#isebaslamatarih").datepicker("setDate", ibas);
+                GunHesapla();
+            });
+            $("#baslamatarihiduzenle").keyup(function () {
+                GunHesaplaDuzenle();
+            });
+            $("#baslamatarihiduzenle").change(function () {
+                GunHesaplaDuzenle();
+            });
+            $("#bitistarihduzenle").keyup(function () {
+                let isebaslamat = $("#isebaslamatarihduzenle").val().toString();
+                let bitist = $("#bitistarihduzenle").val().toString();
+                let ibtarray = isebaslamat.split("."); // gün(0).ay(1).yıl(2)
+                let btarray = bitist.split("."); // gün(0).ay(1).yıl(2)
+                isebaslamat = ibtarray[1] + "/" + ibtarray[0] + "/" + ibtarray[2];
+                bitist = btarray[1] + "/" + btarray[0] + "/" + btarray[2];
+                let ibas = new Date(isebaslamat);
+                ibas.setDate(bit.getDate() + 1)
+                $("#isebaslamatarihduzenle").datepicker("setDate", ibas);
+                GunHesaplaDuzenle();
+            });
+            $("#bitistarihduzenle").change(function () {
+                let isebaslamat = $("#isebaslamatarihduzenle").val().toString();
+                let bitist = $("#bitistarihduzenle").val().toString();
+                let ibtarray = isebaslamat.split("."); // gün(0).ay(1).yıl(2)
+                let btarray = bitist.split("."); // gün(0).ay(1).yıl(2)
+                isebaslamat = ibtarray[1] + "/" + ibtarray[0] + "/" + ibtarray[2];
+                bitist = btarray[1] + "/" + btarray[0] + "/" + btarray[2];
+                let ibas = new Date(isebaslamat);
+                let bit = new Date(bitist);
+                ibas.setDate(bit.getDate() + 1)
+                $("#isebaslamatarihduzenle").datepicker("setDate", ibas);
+                GunHesaplaDuzenle();
+            });
+
+            dt = $('#dtPersonelIzin').dataTable(
+                {
+                    "createdRow": function (row, data, dataIndex) {
+                        if (data["Aktif"] == false) {
+                            //$(row).addClass('bg-warning-100 text-white');
+                            $('td', row).addClass('bg-danger-100');
+                        }
+                    },
+                    responsive: true,
+                    "destroy": true,
+                    "columns": [
+                        { "data": "Firma", "autowidth": true, "visible": false },
+                        { "data": "SubeAdi", "autowidth": true, "visible": false },
+                        { "data": "GorevliSubeler", "autowidth": true, "visible": false },
+                        { "data": "AdSoyad", "autowidth": true },
+                        { "data": "Gorev", "autowidth": true },
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "render": function (data, type, row) {
+                                var baslama = row.IzinBaslama;
+                                var izinbaslama = dateFormat(new Date(parseInt(baslama.match(/\d+/)[0])));
+                                return izinbaslama
+                            }
+                        },
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "render": function (data, type, row) {
+                                var bitis = row.IzinBitis;
+                                var izinbitis = dateFormat(new Date(parseInt(bitis.match(/\d+/)[0])));
+                                return izinbitis
+                            }
+                        },
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "render": function (data, type, row) {
+                                var baslama = row.IseBaslama;
+                                var isebaslama = dateFormat(new Date(parseInt(baslama.match(/\d+/)[0])));
+                                return isebaslama
+                            }
+                        },
+                        { "data": "Gun", "autowidth": true },
+                        { "data": "KalanIzin", "autowidth": true },
+                        { "data": "Aciklama", "autowidth": true },
+                        {
+                            "data": null,
+                            "render": function (data, type, row) {
+                                var baslangic = row.IzinBaslama;
+                                var bitis = row.IzinBitis;
+                                var isebaslama = row.IseBaslama;
+                                var baslangictarih = dateFormat(new Date(parseInt(baslangic.match(/\d+/)[0])));
+                                var bitistarih = dateFormat(new Date(parseInt(bitis.match(/\d+/)[0])));
+                                var isebaslamatarih = dateFormat(new Date(parseInt(isebaslama.match(/\d+/)[0])));
+                                bitist = new Date(parseInt(bitis.match(/\d+/)[0]));
+
+                                islem = "";
+                                if (row.Kilit == false) {
+                                    if (DuzenleYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle' data-id='" + row.Id + "' data-subeadi='" + row.SubeAdi + "'" +
+                                            "data-personelad='" + row.AdSoyad + "' data-gorev='" + row.Gorev + "' data-izinbaslama='" + baslangictarih + "' data-izinbitis='" + bitistarih + "'" +
+                                            "data-isebaslama='" + isebaslamatarih + "' data-aciklama='" + row.Aciklama + "' data-toggle='modal' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                            "<i class='fal fa-edit'></i>" +
+                                            "</a>"
+                                    }
+                                    if (SilYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon Sil' data-id='" + row.Id + "' data-personelad='" + row.AdSoyad +
+                                            "' data-izinbaslama='" + baslangictarih + "' data-izinbitis='" + bitistarih + "' data-kullanilangun='" + row.Gun + "' style='background-color:crimson;margin-left:5px'>" +
+                                            "<i class='fal fa-trash-alt'></i>" +
+                                            "</a>"
+                                    }
+                                }
+                                else {
+                                    if (row.Aktif == true) {
+                                        if (DuzenleYetki == "True") {
+                                            islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle' data-id='" + row.Id + "' data-subeadi='" + row.SubeAdi + "'" +
+                                                "data-personelad='" + row.AdSoyad + "' data-gorev='" + row.Gorev + "' data-izinbaslama='" + baslangictarih + "' data-izinbitis='" + bitistarih + "'" +
+                                                "data-isebaslama='" + isebaslamatarih + "' data-aciklama='" + row.Aciklama + "' data-toggle='modal' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                                "<i class='fal fa-edit'></i>" +
+                                                "</a>"
+                                        }
+                                        if (SilYetki == "True") {
+                                            islem = islem + "<a href='#' class='btn btn-xs btn-danger btn-icon Sil' data-id='" + row.Id + "' data-personelad='" + row.AdSoyad +
+                                                "' data-izinbaslama='" + baslangictarih + "' data-izinbitis='" + bitistarih + "' data-kullanilangun='" + row.Gun + "' style='background-color:crimson;margin-left:5px'>" +
+                                                "<i class='fal fa-trash-alt'></i>" +
+                                                "</a>"
+                                        }
+                                    }
+                                }
+                                return islem
+                            }
+                        }
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Otomasyon/Personeller/PersonelIzinListesi/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "processing": "Yükleniyor... Lütfen Bekleyin",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+            $("#IlkTarih").keyup(function () {
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelIzinListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#IlkTarih").change(function () {
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelIzinListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#SonTarih").keyup(function () {
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelIzinListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#SonTarih").change(function () {
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelIzinListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#PersonelAdSoyad").change(function () {
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelIzinListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+            $("#Sube").change(function () {
+                subeid = $(this).find("option:selected").val();
+                var id = subeid;
+                $("#PersonelAdSoyad").empty();
+                $("#PersonelAdSoyad").append("<option value='0' selected=''> Personel Seçiniz -- Tümü </option>");
+                //if (id > 0) {
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    url: "/Personeller/SubePersonelGetir/" + id,
+                    success: function (data) {
+                        //$.each(data.PersonelList, function (index, item_1) {
+                        //    GorevliPersoneller = GorevliPersoneller + item_1.PersonelAdiSoyadi + " - " + item_1.PersonelGorevi + "<br/>";
+                        //});
+                        console.log(data);
+                        console.log(data.data);
+                        $.each(data.data, function (index, item) {
+                            $("#PersonelAdSoyad").append("<option value=" + item.Id + " data-personelid=" + item.Id + ">" + item.AdiSoyadi + "</option>");
+                        });
+                    }
+                });
+                dt.api().ajax.url('/Otomasyon/Personeller/PersonelIzinListesiFiltre?' + $('#FiltreForm').serialize()).load();
+            });
+        });
+
+    </script>
+}
+

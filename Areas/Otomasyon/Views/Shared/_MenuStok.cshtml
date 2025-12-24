@@ -1,0 +1,166 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool stokyetki = ky.FirstOrDefault(x => x.SayfaId == 5 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 5 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool stokkartlariyetki = ky.FirstOrDefault(x => x.SayfaId == 38 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 38 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool stokgirisiyetki = ky.FirstOrDefault(x => x.SayfaId == 39 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 39 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool stokcikisiyetki = ky.FirstOrDefault(x => x.SayfaId == 40 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 40 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool stokhareketyetki = ky.FirstOrDefault(x => x.SayfaId == 41 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 41 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool stokiadeyetki = ky.FirstOrDefault(x => x.SayfaId == 42 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 42 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool depoislemleriyetki = ky.FirstOrDefault(x => x.SayfaId == 45 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 45 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool depolistesiyetki = ky.FirstOrDefault(x => x.SayfaId == 46 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 46 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool depolararasitransferyetki = ky.FirstOrDefault(x => x.SayfaId == 47 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 47 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool depostokdurumuyetki = ky.FirstOrDefault(x => x.SayfaId == 48 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 48 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool depoyayapilmisgirisleryetki = ky.FirstOrDefault(x => x.SayfaId == 49 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 49 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool depodanyapilmiscikislaryetki = ky.FirstOrDefault(x => x.SayfaId == 50 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 50 && x.Sil == false && x.Aktif == true).SayfaYetki;
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Stok" ? "active open" : "";
+    string altmenustokkartlari = ViewBag.AltMenu == "Stok Kartları" ? "active" : "";
+    string altmenustokgirisi = ViewBag.AltMenu == "Stok Girişi" ? "active" : "";
+    string altmenustokcikisi = ViewBag.AltMenu == "Stok Çıkışı" ? "active" : "";
+    string altmenustokhareket = ViewBag.AltMenu == "Stok Hareketleri" ? "active" : "";
+    string altmenuiade = ViewBag.AltMenu == "Iade" ? "active" : "";
+    string altmenudepoislemleri = ViewBag.AltMenu == "Depo İşlemleri" ? "active open" : "";
+    string altmenu2depolistesi = ViewBag.AltMenu == "Depo Listesi" ? "active" : "";
+    string altmenu2depolararasitransfer = ViewBag.AltMenu == "Depolar Arası Transfer" ? "active" : "";
+    string altmenu2depostokdurumu = ViewBag.AltMenu == "Depo Stok Durumu" ? "active" : "";
+    string altmenu2depoyayapilmisgirisler = ViewBag.AltMenu == "Depoya Yapılmış Girişler" ? "active" : "";
+    string altmenu2depodanyapilmiscikislar = ViewBag.AltMenu == "Depodan Yapılmış Çıkışlar" ? "active" : "";
+
+}
+@if (stokyetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Stok" data-filter-tags="stok">
+            <i class="ni ni-layers"></i>
+            <span class="nav-link-text" data-i18n="nav.stok">Stok</span>
+        </a>
+        <ul>
+            @if (lisans.Stok_StokKartlari)
+            {
+                if (stokkartlariyetki)
+                {
+                    <li class=@altmenustokkartlari>
+                        <a href="~/Otomasyon/Stok/StokKartlari" title="Stok Kartları" data-filter-tags="stok stok kartları">
+                            <span class="nav-link-text" data-i18n="nav.stok_stok_kartlari">Stok Kartları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Stok_StokGirisi)
+            {
+                if (stokgirisiyetki)
+                {
+                    <li class=@altmenustokgirisi>
+                        <a href="~/Otomasyon/Stok/StokGirisi" title="Stok Girişi" data-filter-tags="stok stok girişi">
+                            <span class="nav-link-text" data-i18n="nav.stok_stok_girisi">Stok Girişi</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Stok_StokCikisi)
+            {
+                if (stokcikisiyetki)
+                {
+                    <li class=@altmenustokcikisi>
+                        <a href="~/Otomasyon/Stok/StokCikisi" title="Stok Çıkışı" data-filter-tags="stok stok çıkışı">
+                            <span class="nav-link-text" data-i18n="nav.stok_stok_cikisi">Stok Çıkışı</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Stok_StokHareketleri)
+            {
+                if (stokhareketyetki)
+                {
+                    <li class=@altmenustokhareket>
+                        <a href="~/Otomasyon/Stok/StokHareket" title="Stok Hareketleri" data-filter-tags="stok stok hareket">
+                            <span class="nav-link-text" data-i18n="nav.stok_stok_hareket">Stok Hareketleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Stok_Iade)
+            {
+                if (stokiadeyetki)
+                {
+                    <li class=@altmenuiade>
+                        <a href="~/Otomasyon/Stok/Iade" title="İade" data-filter-tags="stok iade">
+                            <span class="nav-link-text" data-i18n="nav.stok_iade">İade</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Stok_DepoIslemleri)
+            {
+                if (depoislemleriyetki)
+                {
+                    <li class=@altmenudepoislemleri>
+                        <a href="javascript:void(0);" title="Depo İşlemleri" data-filter-tags="stok depo işlemleri">
+                            <span class="nav-link-text" data-i18n="nav.stok_depo_islemleri">Depo İşlemleri</span>
+                        </a>
+                        <ul>
+                            @if (lisans.Stok_DepoIslemleri_DepoListesi)
+                            {
+                                if (depoyayapilmisgirisleryetki)
+                                {
+                                    <li class=@altmenu2depoyayapilmisgirisler>
+                                        <a href="~/Otomasyon/Stok/DepoyaYapilmisGirisler" title="Depoya Yapılmış Girişler" data-filter-tags="stok depo işlemleri depoya yapılan girişler">
+                                            <span class="nav-link-text" data-i18n="nav.stok_depo_islemleri_depoya_yapilmis_girisler">Depoya Yapılmış Girişler</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            @if (lisans.Stok_DepoIslemleri_DepolarArasiTransfer)
+                            {
+                                if (depolararasitransferyetki)
+                                {
+                                    <li class=@altmenu2depolararasitransfer>
+                                        <a href="~/Otomasyon/Stok/DepolarArasiTransfer" title="Depolar Arası Transfer" data-filter-tags="stok depo işlemleri depolar arasi transfer">
+                                            <span class="nav-link-text" data-i18n="nav.stok_depo_islemleri_depolar_arasi_transfer">Depolar Arası Transfer</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            @if (lisans.Stok_DepoIslemleri_DepoStokDurumu)
+                            {
+                                if (depostokdurumuyetki)
+                                {
+                                    <li class=@altmenu2depostokdurumu>
+                                        <a href="~/Otomasyon/Stok/DepoStokDurumu" title="Depo Stok Durumu" data-filter-tags="stok depo işlemleri depo stok durumu">
+                                            <span class="nav-link-text" data-i18n="nav.stok_depo_islemleri_depo_stok_durumu">Depo Stok Durumu</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            @if (lisans.Stok_DepoIslemleri_DepoyaYapılmışGirisler)
+                            {
+                                if (depoyayapilmisgirisleryetki)
+                                {
+                                    <li class=@altmenu2depoyayapilmisgirisler>
+                                        <a href="~/Otomasyon/Stok/DepoyaYapilmisGirisler" title="Depoya Yapılmış Girişler" data-filter-tags="stok depo işlemleri depoya yapılan girişler">
+                                            <span class="nav-link-text" data-i18n="nav.stok_depo_islemleri_depoya_yapilmis_girisler">Depoya Yapılmış Girişler</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                            @if (lisans.Stok_DepoIslemleri_DepodanYapilmisCikislar)
+                            {
+                                if (depodanyapilmiscikislaryetki)
+                                {
+                                    <li class=@altmenu2depodanyapilmiscikislar>
+                                        <a href="~/Otomasyon/Stok/DepodanYapilmisCikisler" title="Depodan Yapılmış Çıkışlar" data-filter-tags="stok depo işlemleri depodan yapılmış çıkışlar">
+                                            <span class="nav-link-text" data-i18n="nav.stok_depo_islemleri_depodan_yapilmis_cikislar">Depodan Yapılmış Çıkışlar</span>
+                                        </a>
+                                    </li>
+                                }
+                            }
+                        </ul>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}

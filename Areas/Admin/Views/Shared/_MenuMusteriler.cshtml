@@ -1,0 +1,72 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool musterileryetki = ky.FirstOrDefault(x => x.SayfaId == 4 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 4 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool musterilistesiyetki = ky.FirstOrDefault(x => x.SayfaId ==34 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId ==34 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool musterimesajlariyetki = ky.FirstOrDefault(x => x.SayfaId == 35 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 35 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool fotografyukleyetki = ky.FirstOrDefault(x => x.SayfaId == 36 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 36 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool musterihesaptakibiyetki = ky.FirstOrDefault(x => x.SayfaId == 37 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 37 && x.Sil == false && x.Aktif == true).SayfaYetki;
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Müşteriler" ? "active open" : "";
+    string altmenumusterilistesi = ViewBag.AltMenu == "Müşteri Listesi" ? "active" : "";
+    string altmenumusterimesajlari = ViewBag.AltMenu == "Müşteri Mesajları" ? "active" : "";
+    string altmenufotografyukle = ViewBag.AltMenu == "Fotoğraf Yükle" ? "active" : "";
+    string altmenumusterihesaptakibi = ViewBag.AltMenu == "Müşteri Hesap Takibi" ? "active" : "";
+}
+@if (musterileryetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Müşteriler" data-filter-tags="müşteriler">
+            <i class="fal fa-portrait"></i>
+            <span class="nav-link-text" data-i18n="nav.musteriler">Müşteriler</span>
+        </a>
+        <ul>
+            @if (lisans.Musteriler_MusteriListesi)
+            {
+                if (musterilistesiyetki)
+                {
+                    <li class=@altmenumusterilistesi>
+                        <a href="~/Admin/Musteriler/MusteriListesi" title="Müşteri Listesi" data-filter-tags="müşteriler müşteri listesi">
+                            <span class="nav-link-text" data-i18n="nav.musteriler_musteri_listesi">Müşteri Listesi</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Musteriler_MusteriMesajlari)
+            {
+                if (musterimesajlariyetki)
+                {
+                    <li class=@altmenumusterimesajlari>
+                        <a href="~/Admin/Musteriler/MusteriMesajlari" title="Müşteri Mesajları" data-filter-tags="müşteriler müşteri mesajları">
+                            <span class="nav-link-text" data-i18n="nav.musteriler_musteri_mesajlari">Müşteri Mesajları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Musteriler_FotografYukle)
+            {
+                if (fotografyukleyetki)
+                {
+                    <li class=@altmenufotografyukle>
+                        <a href="~/Admin/Musteriler/MusteriFotoYukle" title="Fotoğraf Yükle" data-filter-tags="müşteriler fotoğraf yükle">
+                            <span class="nav-link-text" data-i18n="nav.musteriler_fotograf_yukle">Fotoğraf Yükle</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Musteriler_MusteriHesapTakibi)
+            {
+                if (musterihesaptakibiyetki)
+                {
+                    <li class=@altmenumusterihesaptakibi>
+                        <a href="~/Admin/Musteriler/MusteriHesapTakibi" title="Müşteri Hesap Takibi" data-filter-tags="müşteriler müşteri hesap takibi">
+                            <span class="nav-link-text" data-i18n="nav.musteriler_musteri_hesap_takibi">Müşteri Hesap Takibi</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}

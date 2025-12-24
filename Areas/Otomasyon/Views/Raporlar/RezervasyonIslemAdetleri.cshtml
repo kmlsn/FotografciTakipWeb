@@ -1,0 +1,251 @@
+﻿
+@{
+    ViewBag.Title = "Rezervasyon İşlem Adetleri Raporları";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model List<Sozlesme>
+@{
+    var Rezervasyon_Tur = Model.GroupBy(c => c.SozlesmeTarihi.Month).Select(g => new
+    {
+        Ay = g.Key,
+        KesinRezervasyon = (g.Where(a => a.KesinRezervasyonBit == true).Count()),
+        RezevasyonTeklif = (g.Where(a => a.TeklifBit == true).Count()),
+        OpsiyonluRezervasyon = (g.Where(a => a.OpsiyonBit == true).Count())
+    }).ToList();
+    string[] aylar = { "OCAK", "ŞUBAT", "MART", "NİSAN", "MAYIS", "HAZİRAN", "TEMMUZ", "AĞUSTOS", "EYLÜL", "EKİM", "KASIM", "ARALIK" };
+}
+
+@section Head
+{
+    <style type="text/css">
+        .c3-region.fff {
+            fill: red;
+        }
+        .c3-region.foo {
+            fill: green;
+        }
+    </style>
+}
+<div class="col-xl-12">
+    <div class="row">
+        <div class="col-xl-6">
+            <div id="panel-6" class="panel">
+                <div class="panel-hdr">
+                    <h2>
+                        Rezervsyon İşlem Adetleri Raporu
+                    </h2>
+                        @*<div class="form-group col-sm-2">
+                            <select class="custom-select form-control custom-select-sm" id="RaporSuresi" name="RaporSuresi" title="Rapor Süresi">
+                                <option selected="" value="0">Yıllık</option>
+                                <option value="1">Ocak</option>
+                                <option value="2">Şubat</option>
+                                <option value="3">Mart</option>
+                                <option value="4">Nisan</option>
+                                <option value="5">Mayıs</option>
+                                <option value="6">Haziran</option>
+                                <option value="7">Temmuz</option>
+                                <option value="8">Ağustos</option>
+                                <option value="9">Eylül</option>
+                                <option value="10">Ekim</option>
+                                <option value="11">Kasım</option>
+                                <option value="12">Aralık</option>
+                            </select>
+                        </div>*@
+                </div>
+                
+                <div class="panel-container show">
+                    <div class="panel-content">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link fs-lg px-4 active" data-toggle="tab" href="#gelir_gider_rapor_grafik" role="tab" aria-selected="true">
+                                    <i class="fal fa-chart-area text-success"></i>
+                                    <span class="hidden-sm-down ml-1">Grafik</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link fs-lg px-4" data-toggle="tab" href="#gelir_gider_rapor_tablo" role="tab" aria-selected="false">
+                                    <i class="fal fa-table text-primary"></i>
+                                    <span class="hidden-sm-down ml-1">Tablo</span>
+                                </a>
+                            </li>
+                        </ul>
+                        <div class="tab-content border border-top-0 p-3">
+                            <div class="tab-pane fade active show" id="gelir_gider_rapor_grafik" role="tabpanel">
+                                <div id="chart" style="width:100%; height:400px;"></div>
+                            </div>
+                            <div class="tab-pane fade" id="gelir_gider_rapor_tablo" role="tabpanel">
+                                <table id="dt-basic-example" class="table table-bordered table-hover table-striped w-100">
+                                    <thead class="bg-primary-600">
+                                        <tr>
+                                            <th>Aylar</th>
+                                            <th>Kesin Rezervasyon</th>
+                                            <th>Rezervasyon Teklifleri</th>
+                                            <th>Opsiyonlu Rezervasyon</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tablo-rapor">
+                                        @foreach (var item in Rezervasyon_Tur)
+                                        {
+                                            <tr>
+                                                <td>@aylar[item.Ay - 1]</td>
+                                                <td>@item.KesinRezervasyon</td>
+                                                <td>@item.RezevasyonTeklif</td>
+                                                <td>@item.OpsiyonluRezervasyon</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        function ParaFormat(fiyat) {
+            var para_sembol = "TL"
+            var format = new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: 'TRY',
+                minumumFractionDigits: 2
+            })
+            //return format.format(fiyat)
+            return format.format(fiyat).replace('TRY', para_sembol)
+        }
+        $(document).ready(function () {
+            var ay = [];
+            $.ajax({
+                type: "POST",
+                url: "/Raporlar/RezervasyonIslemAdetleriRapor",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                    data = {};
+                    turadi = ["Kesin Rezervasyon", "Rezervasyon Teklifleri", "Opsiyonlu Rezervasyon"];
+                    console.log(response);
+                    $.each(response, function (index, item) {
+                        $.each(item, function (index_1, item_1) {
+                            if (item_1.Ay == '1')
+                            { ay.push("OCAK"); }
+                            else if (item_1.Ay == '2')
+                            { ay.push("ŞUBAT"); }
+                            else if (item_1.Ay == '3')
+                            { ay.push("MART"); }
+                            else if (item_1.Ay == '4')
+                            { ay.push("NİSAN"); }
+                            else if (item_1.Ay == '5')
+                            { ay.push("MAYIS"); }
+                            else if (item_1.Ay == '6')
+                            { ay.push("HAZİRAN"); }
+                            else if (item_1.Ay == '7')
+                            { ay.push("TEMMUZ"); }
+                            else if (item_1.Ay == '8')
+                            { ay.push("AĞUSTOS"); }
+                            else if (item_1.Ay == '9')
+                            { ay.push("EYLÜL"); }
+                            else if (item_1.Ay == '10')
+                            { ay.push("EKİM"); }
+                            else if (item_1.Ay == '11')
+                            { ay.push("KASIM"); }
+                            else if (item_1.Ay == '12')
+                            { ay.push("ARALIK"); }
+                        });
+                    });
+                    var chart = c3.generate({
+                        data: {
+                            json: response.Rezervasyon_Tur,
+                            keys: {
+                                value: ['KesinRezervasyon', 'RezevasyonTeklif', 'OpsiyonluRezervasyon'],
+                            },
+                            columns: ['KesinRezervasyon', 'RezevasyonTeklif', 'OpsiyonluRezervasyon'],
+                            type: 'bar'
+                        },
+                        grid: {
+                            y: {
+                                show: true, lines: [{ value: 0 }]
+                            }
+                        },
+                        bar: {
+                            width: {
+                                ratio: 0.7 // this makes bar width 50% of length between ticks
+                            }
+                        },
+                        axis: {
+                            x: {
+                                type: 'category',
+                                categories: ay
+                            },
+                            y: {
+                                label: {
+                                    text: 'Adet',
+                                    position: 'outer-center'
+                                },
+                            }
+                        },
+                        tooltip: {
+                            order: function (t1, t2, t3) {
+                                return t1.id > t2.id > t3;
+                            }
+                        }
+                    });
+                }
+            });
+           
+            $('#dt-basic-example').dataTable(
+                    {
+                        responsive: true,
+                        lengthChange: false,
+                        "searching": false, // arama kaldır
+                        "lengthChange": false, // sayfa başına göster kaldır
+                        "bPaginate": false,  // Sayfalamayı Kaldırır
+                        //"bLengthChange": false,
+                        //"bFilter": true,
+                        "bInfo": false, // .. kayıtan 1 ile 5 arası yazısını kaldırır.
+                        //"bAutoWidth": false,
+                        "bSort": false, // sıralamayı kapatır
+                        dom:
+                            "<'row mb-3'<'col-sm-12 col-md-6 d-flex align-items-center justify-content-start'f><'col-sm-12 col-md-6 d-flex align-items-center justify-content-end'lB>>" +
+                            "<'row'<'col-sm-12'tr>>" +
+                            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+                        buttons: [
+                            //{
+                            //    extend: 'pdfHtml5',
+                            //    text: 'PDF',
+                            //    titleAttr: 'Generate PDF',
+                            //    className: 'btn-outline-danger btn-sm mr-1'
+                            //},
+                            {
+                                extend: 'excelHtml5',
+                                text: 'Excel',
+                                titleAttr: 'Generate Excel',
+                                className: 'btn-outline-success btn-sm mr-1'
+                            }
+                        ],
+                        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                        "oLanguage": {
+                            'sProcessing': 'Yükleniyor... Lütfen Bekleyin',
+                            "sSearchPlaceholder": "Tabloda Ara",
+                            "sZeroRecords": "Kayıt yok.",
+                            "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                            "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                            "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                            "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                            "oPaginate": {
+                                "sPrevious": "Önceki",
+                                "sNext": "Sonraki",
+                                "sFirst": "İlk",
+                                "sLast": "Son"
+                            }
+                        }
+                    });
+
+        });
+    </script>
+}

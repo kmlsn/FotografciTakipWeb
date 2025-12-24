@@ -1,0 +1,236 @@
+﻿
+@{
+    ViewBag.Title = "Sözleşme Çıktı Ayarları";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model AyarlarSozlesmeCikti
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h3>Sözleşme Çıktı Ayarları</h3>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <form action="/Otomasyon/Ayarlar/SozlesmeCiktiAyarlari" method="post" enctype="multipart/form-data">
+                        @if (Model != null)
+                        {
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.LogoGoster == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="LogoGoster" name="LogoGoster" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="LogoGoster" name="LogoGoster">
+                                    }
+                                    <label class="custom-control-label" for="LogoGoster">Sözleşme çıktısında firma logosunu göster</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.CepTelefonuGoster == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="CepTelefonuGoster" name="CepTelefonuGoster" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="CepTelefonuGoster" name="CepTelefonuGoster">
+                                    }
+                                    <label class="custom-control-label" for="CepTelefonuGoster">Sözleşme çıktısında firma cep telefonunu göster</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.SabitTelefonGoster == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="SabitTelefonGoster" name="SabitTelefonGoster" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="SabitTelefonGoster" name="SabitTelefonGoster">
+                                    }
+                                    <label class="custom-control-label" for="SabitTelefonGoster">Sözleşme çıktısında firma sabit telefonunu göster</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.FaxGoster == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="FaxGoster" name="FaxGoster" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="FaxGoster" name="FaxGoster">
+                                    }
+                                    <label class="custom-control-label" for="FaxGoster">Sözleşme çıktısında firma fax numarasını göster</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.PaketlerGoster == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="PaketlerGoster" name="PaketlerGoster" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="PaketlerGoster" name="PaketlerGoster">
+                                    }
+                                    <label class="custom-control-label" for="PaketlerGoster">Sözleşme çıktısında paketleri göster</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.EkHizmetlerGoster == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="EkHizmetlerGoster" name="EkHizmetlerGoster" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="EkHizmetlerGoster" name="EkHizmetlerGoster">
+                                    }
+                                    <label class="custom-control-label" for="EkHizmetlerGoster">Sözleşme çıktısında ek hizmetleri göster</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.CekimRandevulariGoster == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="CekimRandevulariGoster" name="CekimRandevulariGoster" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="CekimRandevulariGoster" name="CekimRandevulariGoster">
+                                    }
+                                    <label class="custom-control-label" for="CekimRandevulariGoster">Sözleşme çıktısında çekim randevularını göster</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.YapilanOdemelerGoster == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="YapilanOdemelerGoster" name="YapilanOdemelerGoster" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="YapilanOdemelerGoster" name="YapilanOdemelerGoster">
+                                    }
+                                    <label class="custom-control-label" for="YapilanOdemelerGoster">Sözleşme çıktısında yapılan ödemeleri göster</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.KalanOdemelerGoster == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="KalanOdemelerGoster" name="KalanOdemelerGoster" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="KalanOdemelerGoster" name="KalanOdemelerGoster">
+                                    }
+                                    <label class="custom-control-label" for="KalanOdemelerGoster">Sözleşme çıktısında kalan ödemeleri göster</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.MusteriKoduSifreGoster == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="MusteriKoduSifreGoster" name="MusteriKoduSifreGoster" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="MusteriKoduSifreGoster" name="MusteriKoduSifreGoster">
+                                    }
+                                    <label class="custom-control-label" for="MusteriKoduSifreGoster">Sözleşme çıktısında Müşteri Kodu ve Şifresini</label>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    @if (Model.FirmaAdiGoster == true)
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="FirmaAdiGoster" name="FirmaAdiGoster" checked>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" class="custom-control-input" id="FirmaAdiGoster" name="FirmaAdiGoster">
+                                    }
+                                    <label class="custom-control-label" for="FirmaAdiGoster">Sözleşme çıktısı başlığında firma adını göster</label>
+                                </div>
+                            </div>
+                            <input type="text" id="Id" class="form-control" name="Id" maxlength="50" style="display:none" value="@Model.Id">
+                        }
+                        else
+                        {
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="LogoGoster" name="LogoGoster" checked>
+                                    <label class="custom-control-label" for="LogoGoster">Sözleşme çıktısında firma logosunu göster</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="CepTelefonuGoster" name="CepTelefonuGoster" checked>
+                                    <label class="custom-control-label" for="CepTelefonuGoster">Sözleşme çıktısında firma cep telefonunu göster</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="SabitTelefonGoster" name="SabitTelefonGoster" checked>
+                                    <label class="custom-control-label" for="SabitTelefonGoster">Sözleşme çıktısında firma sabit telefonunu göster</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="FaxGoster" name="FaxGoster" checked>
+                                    <label class="custom-control-label" for="FaxGoster">Sözleşme çıktısında firma fax numarasını göster</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="PaketlerGoster" name="PaketlerGoster" checked>
+                                    <label class="custom-control-label" for="PaketlerGoster">Sözleşme çıktısında paketleri göster</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="EkHizmetlerGoster" name="EkHizmetlerGoster" checked>
+                                    <label class="custom-control-label" for="EkHizmetlerGoster">Sözleşme çıktısında ek hizmetleri göster</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="CekimRandevulariGoster" name="CekimRandevulariGoster" checked>
+                                    <label class="custom-control-label" for="CekimRandevulariGoster">Sözleşme çıktısında çekim randevularını göster</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="YapilanOdemelerGoster" name="YapilanOdemelerGoster" checked>
+                                    <label class="custom-control-label" for="YapilanOdemelerGoster">Sözleşme çıktısında yapılan ödemeleri göster</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="KalanOdemelerGoster" name="KalanOdemelerGoster" checked>
+                                    <label class="custom-control-label" for="KalanOdemelerGoster">Sözleşme çıktısında kalan ödemeleri göster</label>
+                                </div>
+                                <div class="form-group col-sm-5 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="MusteriKoduSifreGoster" name="MusteriKoduSifreGoster" checked>
+                                    <label class="custom-control-label" for="MusteriKoduSifreGoster">Sözleşme çıktısında Müşteri Kodu ve Şifresini</label>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="form-group col-sm-5 ml-3 custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" id="FirmaAdiGoster" name="FirmaAdiGoster" checked>
+                                    <label class="custom-control-label" for="FirmaAdiGoster">Sözleşme çıktısı başlığında firma adını göster</label>
+                                </div>
+                            </div>
+                            <input type="text" id="Id" class="form-control" name="Id" maxlength="50" style="display:none" value="0">
+                        }
+                        @if (ViewBag.KullaniciYetki)
+                        {
+                            <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                                <button type="submit" class="btn btn-primary ml-auto waves-effect waves-themed"><i class="fal fa-save mr-2"></i> Kaydet</button>
+                            </div>
+                        }
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            $(":input").inputmask();
+        });
+    </script>
+}
+

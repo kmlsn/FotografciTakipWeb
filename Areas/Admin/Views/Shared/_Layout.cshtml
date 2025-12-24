@@ -1,0 +1,257 @@
+﻿<!DOCTYPE html>
+<!--
+Template Name:  SmartAdmin Responsive WebApp - Template build with Twitter Bootstrap 4
+Version: 4.0.0
+Author: Sunnyat Ahmmed
+Website: http://gootbootstrap.com
+Purchase: https://wrapbootstrap.com/theme/smartadmin-responsive-webapp-WB0573SK0
+License: You must have a valid license purchased only from wrapbootstrap.com (link above) in order to legally use this theme for your project.
+-->
+<html lang="tr" class="root-text-sm">
+<head>
+    <meta charset="utf-8">
+    <title>
+        @ViewBag.Title
+    </title>
+    <meta name="description" content="Basic">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+    <!-- Call App Mode on ios devices -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Remove Tap Highlight on Windows Phone IE -->
+    <meta name="msapplication-tap-highlight" content="no">
+    <!-- base css -->
+    <link rel="apple-touch-icon" sizes="180x180" href="~/Areas/Admin/Content/img/Tetra_Logo_apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/Areas/Admin/Content/img/Tetra_Logo_Favico.ico">
+    @*<link rel="mask-icon" href="~/Areas/Admin/Content/img/favicon/safari-pinned-tab.svg" color="#5bbad5">*@
+
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Admin/Content/css/vendors.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Admin/Content/css/app.bundle.css">
+    <link id="mytheme" rel="stylesheet" href="~/Areas/Admin/Content/css/themes/cust-theme-4.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Admin/Content/css/vendors.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Admin/Content/css/app.bundle.css">
+    <link id="mytheme" rel="stylesheet" href="~/Areas/Admin/Content/css/themes/cust-theme-4.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Admin/Content/css/notifications/sweetalert2/sweetalert2.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Admin/Content/css/datagrid/datatables/datatables.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Admin/Content/css/notifications/toastr/toastr.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Admin/Content/css/formplugins/bootstrap-datepicker/bootstrap-datepicker.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Admin/Content/css/formplugins/select2/select2.bundle.css">
+    @*<link rel="stylesheet" media="screen, print" href="~/Content/css/page-invoice.css">*@
+    <link href="~/Areas/Admin/Content/css/bootstrap-progressbar-3.3.4.min.css" rel="stylesheet" />
+    <link href="~/Areas/Admin/Content/c3-charts/c3.min.css" rel="stylesheet" />
+    <link href="~/Areas/Admin/Content/alertifyjs/css/alertify.min.css" rel="stylesheet" />
+    <link href="~/Areas/Admin/Content/alertifyjs/css/themes/default.min.css" rel="stylesheet" />
+    <link href="~/Areas/Admin/Content/alertifyjs/css/themes/semantic.min.css" rel="stylesheet" />
+    <link href="~/Areas/Admin/Content/alertifyjs/css/themes/bootstrap.min.css" rel="stylesheet" />
+    <link href="~/Areas/Admin/Content/css/bootstrap-colorselector.css" rel="stylesheet" />
+
+
+
+    @RenderSection("Head", false)
+</head>
+<body class="mod-bg-2 mod-nav-link">
+    <!-- DOC: script to save and load page settings -->
+    <script>
+        /**
+         *	This script should be placed right after the body tag for fast execution
+         *	Note: the script is written in pure javascript and does not depend on thirdparty library
+         **/
+        'use strict';
+
+        var classHolder = document.getElementsByTagName("BODY")[0],
+            /**
+             * Load from localstorage
+             **/
+            themeSettings = (localStorage.getItem('themeSettings')) ? JSON.parse(localStorage.getItem('themeSettings')) :
+                {},
+            themeURL = themeSettings.themeURL || '',
+            themeOptions = themeSettings.themeOptions || '';
+        /**
+         * Load theme options
+         **/
+        if (themeSettings.themeOptions) {
+            classHolder.className = themeSettings.themeOptions;
+            console.log("%c✔ Theme settings loaded", "color: #148f32");
+        }
+        else {
+            console.log("Heads up! Theme settings is empty or does not exist, loading default settings...");
+        }
+        if (themeSettings.themeURL && !document.getElementById('mytheme')) {
+            var cssfile = document.createElement('link');
+            cssfile.id = 'mytheme';
+            cssfile.rel = 'stylesheet';
+            cssfile.href = themeURL;
+            document.getElementsByTagName('head')[0].appendChild(cssfile);
+        }
+        /**
+         * Save to localstorage
+         **/
+        var saveSettings = function () {
+            themeSettings.themeOptions = String(classHolder.className).split(/[^\w-]+/).filter(function (item) {
+                return /^(nav|header|mod|display)-/i.test(item);
+            }).join(' ');
+            if (document.getElementById('mytheme')) {
+                themeSettings.themeURL = document.getElementById('mytheme').getAttribute("href");
+            };
+            localStorage.setItem('themeSettings', JSON.stringify(themeSettings));
+        }
+        /**
+         * Reset settings
+         **/
+        var resetSettings = function () {
+            localStorage.setItem("themeSettings", "");
+        }
+
+    </script>
+    <!-- BEGIN Page Wrapper -->
+
+    @if (ViewBag.KalanKontorUyariMesaji == "Kontor az" && ViewBag.KalanKontorUyariMesajiVer==true)
+    {
+        <script type="text/javascript">
+                Swal.fire(
+                    {
+                        title: "HATA",
+                        //text: "Kullanıcı Adı veya Şifre Hatalı",
+                        html: "<strong>SMS Bakiyeniz azaldı. <br/>Lütfen bakiye yüklemesi yapınız.</strong>",
+                        type: "warning",
+                        showCancelButton: false,
+                        confirmButtonText: "Tamam"
+                    });
+        </script>
+    }
+    <div class="page-wrapper">
+        <div class="page-inner">
+            <!-- BEGIN Left Aside -->
+            @Html.Partial("_Menu")
+            <!-- END Left Aside -->
+            <div class="page-content-wrapper">
+                <!-- BEGIN Page Header -->
+                @Html.Partial("_Header")
+                <!-- END Page Header -->
+                <!-- BEGIN Page Content -->
+                <!-- the #js-page-content id is needed for some plugins to initialize -->
+                <main id="js-page-content" role="main" class="page-content">
+                    @*@Html.Partial("_SiteMap2")*@
+                    @*@Html.Partial("_SubHeader")*@
+                    @RenderBody()
+                </main>
+                <!-- this overlay is activated only when mobile menu is triggered -->
+                <div class="page-content-overlay" data-action="toggle" data-class="mobile-nav-on"></div> <!-- END Page Content -->
+                <!-- BEGIN Page Footer -->
+                @Html.Partial("_Footer")
+                <!-- END Page Footer -->
+                <!-- BEGIN Shortcuts -->
+                <!-- Giriş Yapan Kullanıcının Yetkili Olduğu Aktif Şubeler  -->
+                @*@Html.Partial("_SubeListesi")*@
+                @*@{Html.RenderAction("_SubeListesi", "Dashboard");}*@
+                <!-- Giriş Yapan Kullanıcının Yetkili Olduğu Aktif Şubeler  -->
+            </div>
+        </div>
+    </div>
+   
+    <script src="~/Areas/Admin/Content/js/jquery-3.2.1.min.js"></script>
+    <script src="~/Areas/Admin/Content/js/vendors.bundle.js"></script>
+    <script src="~/Areas/Admin/Content/js/app.bundle.js"></script>
+    <script src="~/Areas/Admin/Content/js/datagrid/datatables/datatables.bundle.js"></script>
+    <script src="~/Areas/Admin/Content/js/bootstrap-progressbar.js"></script>
+    <script src="~/Areas/Admin/Content/js/formplugins/inputmask/inputmask.bundle.js"></script>
+    <script src="~/Areas/Admin/Content/js/notifications/sweetalert2/sweetalert2.bundle.js"></script>
+    <script src="~/Areas/Admin/Content/js/dependency/moment/moment.js"></script>
+    <script src="~/Areas/Admin/Content/js/formplugins/bootstrap-datepicker/bootstrap-datepicker.js"></script>
+    <script src="~/Areas/Admin/Content/js/formplugins/bootstrap-datepicker/bootstrap-datepicker.tr.js"></script>
+    <script src="~/Areas/Admin/Content/js/formplugins/select2/select2.bundle.js"></script>
+    <script src="~/Areas/Admin/Content/js/accounting.js"></script>
+    <script src="~/Areas/Admin/Content/alertifyjs/alertify.min.js"></script>
+    <script src="~/Areas/Admin/Content/js/bootstrap-colorselector.js"></script>
+    <script src="~/Areas/Admin/Content/js/tablotarihsirala.js"></script>
+    <script src="~/Areas/Admin/Content/c3-charts/d3-5.8.2.min.js"></script>
+    <script src="~/Areas/Admin/Content/c3-charts/c3.min.js"></script>
+    <script src="~/Areas/Admin/Content/js/accounting.js"></script>
+    <script src="~/Areas/Admin/Content/js/notifications/toastr/toastr.js"></script>
+    <script src="~/Areas/Admin/Content/js/datagrid/datatables/datatables.bundle.js"></script>
+    <script src="~/Areas/Admin/Content/js/datagrid/datatables/datatables.export.js"></script>
+
+    <script>
+        $(document).ready(function () {
+
+            $('#TalepTuru').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $("#talepturuhata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $('#TalepTuru').on('change', function (e) {
+                if ($(this).val != "0") {
+                    $("#talepturuhata").remove();
+                }
+            }); // zorunlu alan kontrolü
+
+            $("#YeniDestekTalebiEkle").click(function () {
+                $("#TalepTuru").val("0");
+                $("#TalepBasligi").val("");
+                $("#TalepMesaj").val("");
+                $("#TalepMesaj").html("");
+            });
+
+            $("#TalebiGonder").click(function () {
+                if (($("#TalepTuru").val() == "0") || ($("#TalepTuru").val() == null)) {
+                    $("#TalepTuru").focus();
+                    $("#TalepTuruHata").append("<div id='talepturuhata' style='color:red'>Talep türünüzü seçiniz.</div>");
+                }
+                else if (($("#TalepBasligi").val() == "")) {
+                    $("#TalepBasligi").focus();
+                    $("#TalepBasligiHata").append("<div class='hata' style='color:red'>Talep başlığını giriniz.</div>");
+                }
+                else if (($("#TalepMesaj").val() == "")) {
+                    $("#TalepMesaj").focus();
+                    $("#TalepMesajHata").append("<div id='hata' style='color:red'>Lütfen mesajınızı yazınız.</div>");
+                }
+                else {
+                    $('#DestekTalebiOlusturModal').modal('hide');
+                    var destekresim = document.getElementById('TalepEkranGorunutusu');
+                    var talepturu = $("#TalepTuru option:selected").text();
+                    var DestekData = new FormData();
+                    DestekData.append("TalepTuru", talepturu);
+                    DestekData.append("TalepBasligi", $("#TalepBasligi").val());
+                    DestekData.append("TalepMesaj", $("#TalepMesaj").val());
+                    // Resim verisini formdata ya eklemek için
+                    for (i = 0; i < destekresim.files.length; i++) {
+                        //Appending each file to FormData object
+                        DestekData.append(destekresim.files[i].name, destekresim.files[i]);
+                    }
+                    // Resim verisini formdata ya eklemek için
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: DestekData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Admin/Destek/DestekEkle/",
+                        success: function (data) {
+                            $('#DestekTalebiOlusturModal').modal('hide');
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 8);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                $("#TalepTuru").val("0");
+                                $("#TalepBasligi").val("");
+                                $("#TalepMesaj").val("");
+                                $("#TalepMesaj").html("");
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+            $('.progress .progress-bar').progressbar();
+        });
+    </script>
+    @RenderSection("Script", false)
+</body>
+</html>

@@ -1,0 +1,880 @@
+﻿
+@{
+    ViewBag.Title = "Fotoğraf Yükle";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@section Head
+{
+    <link href="~/Areas/Otomasyon/Content/dropzone/css/basic.css" rel="stylesheet" />
+    <link href="~/Areas/Otomasyon/Content/dropzone/css/dropzone.css" rel="stylesheet" />
+    <script src="~/Areas/Otomasyon/Content/dropzone/modernizr-2.6.2.js"></script>
+    <link href="~/Areas/Otomasyon/Content/light-box/jquery.zbox.css" rel="stylesheet" />
+    <style type="text/css">
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            margin-top: auto;
+        }
+
+        .form-control {
+            display: flex;
+            flex-direction: column;
+            margin-top: auto;
+        }
+
+        .card-img-top {
+            width: 100%;
+            height: 40vh;
+            object-fit: cover;
+        }
+    </style>
+}
+@using FotografciTakipWeb.Models
+@{
+    List<Musteri> MusteriListesi = ViewBag.Musteriler;
+    List<MusteriFotograf> MusteriFotolari = ViewBag.MusteriFotolari;
+    List<Sozlesme> AktifSozlesmeler = ViewBag.AktifSozlesmeler;
+}
+
+<div class="modal fade" id="FotografYukleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Fotoğraf Yükle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="alert border border-primary bg-transparent text-primary" role="alert" id="FotografYukleModalMusteriAdi">
+
+                    </div>
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <form enctype="multipart/form-data" class="dropzone" id="dropzoneForm">
+                                <input type="hidden" name="MustId" id="MustId" />
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                    <input type="submit" value="Upload" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-bottom"></div>
+            <div id="AltBilgi">
+                @*<div class="alert border-faded bg-transparent text-secondary fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            <div class="alert-icon">
+                                <span class="icon-stack icon-stack-md">
+                                    <i class="base-7 icon-stack-3x color-primary-600"></i>
+                                    <i class="fal fa-check icon-stack-1x text-white"></i>
+                                </span>
+                            </div>
+                            <div class="flex-1">
+                                <span class="h5 color-primary-600">Müşteriye Bilgi Ver!</span>
+                                <br>
+                                2 fotoğraf yüklendi.
+                            </div>
+                            <a href="#" class="btn btn-outline-primary btn-sm btn-w-m active waves-effect waves-themed mr-1">Müşteriye SMS gönder</a>
+                            <a href="#" class="btn btn-outline-primary btn-sm btn-w-m active waves-effect waves-themed">Müşteriye e-posta gönder</a>
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="FotografDegistirModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Fotoğraf Yükle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="alert border border-primary bg-transparent text-primary" role="alert" id="FotografDegistirModalMusteriAdi">
+
+                    </div>
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <form enctype="multipart/form-data" class="dropzone" id="dropzoneFormFotografDegistir">
+                                <input type="hidden" name="MustIdFotografDegistir" id="MustIdFotografDegistir" />
+                                <div class="fallback">
+                                    <input name="file" type="file" multiple />
+                                    <input type="submit" value="Upload" />
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="border-bottom"></div>
+            <div id="AltBilgi">
+                @*<div class="alert border-faded bg-transparent text-secondary fade show" role="alert">
+                        <div class="d-flex align-items-center">
+                            <div class="alert-icon">
+                                <span class="icon-stack icon-stack-md">
+                                    <i class="base-7 icon-stack-3x color-primary-600"></i>
+                                    <i class="fal fa-check icon-stack-1x text-white"></i>
+                                </span>
+                            </div>
+                            <div class="flex-1">
+                                <span class="h5 color-primary-600">Müşteriye Bilgi Ver!</span>
+                                <br>
+                                2 fotoğraf yüklendi.
+                            </div>
+                            <a href="#" class="btn btn-outline-primary btn-sm btn-w-m active waves-effect waves-themed mr-1">Müşteriye SMS gönder</a>
+                            <a href="#" class="btn btn-outline-primary btn-sm btn-w-m active waves-effect waves-themed">Müşteriye e-posta gönder</a>
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="row col col-12 mt-3" id="date_filter">
+                <div class="form-group col-sm-3">
+                    <select class="custom-select form-control custom-select-sm" id="Musteri" name="Musteri" title="Müşteri Seçiniz">
+                        <option selected="" value="0" disabled>Müşteri Seçiniz</option>
+                        @foreach (var musteri in MusteriListesi)
+                        {
+                            if (musteri.AdiSoyadi != "-- Müşterisiz İşlem --")
+                            {
+                                if (ViewBag.MusteriId == musteri.Id)
+                                {
+                                    <option selected="" value="@musteri.Id">@musteri.AdiSoyadi</option>
+                                }
+                                else
+                                {
+                                    <option value="@musteri.Id">@musteri.AdiSoyadi</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group col-sm-3">
+                    @if (AktifSozlesmeler.Count > 0)
+                    {
+                        <select class="custom-select form-control custom-select-sm" id="Sozlesme" name="Sozlesme" title="Sözleşme Seçiniz">
+                            <option selected="" value="0">Sözleşme Seçiniz</option>
+                            @foreach (var item in AktifSozlesmeler)
+                            {
+                                <option value="@item.Id">@item.SozlesmeNo - @item.RezervasyonTarihi.ToShortDateString()</option>
+                            }
+                        </select>
+                    }
+                    else
+                    {
+                        <select class="custom-select form-control custom-select-sm" id="Sozlesme" name="Sozlesme" title="Sözleşme Seçiniz" disabled>
+                            <option selected="" value="0" disabled>Sözleşme Seçiniz</option>
+                        </select>
+                    }
+
+                </div>
+                @if (ViewBag.MusteriId == null)
+                {
+                    <div class="row col-sm-6">
+                        <div class="form-group mr-2 FotografYukleBtnVisible" id="FotografYukleBtnVisible" style="display:none">
+                            <button type="button" class="btn btn-xs btn-primary FotografYukle" data-toggle="modal" data-target="#FotografYukleModal" id="FotografYukle"> Fotoğraf<br /> Yükle </button>
+                        </div>
+                        <div class="form-group mr-2 AciklamaGuncelleBtnVisible" id="AciklamaGuncelleBtnVisible" style="display:none">
+                            <button type="button" class="btn btn-xs btn-info AciklamaGuncelle" id="AciklamaGuncelle"> Açıklamaları<br /> Güncelle </button>
+                        </div>
+                        <div class="form-group mr-2 SmsGonderBtnVisible" id="SmsGonderBtnVisible" style="display:none">
+                            <button type="button" class="btn btn-xs btn-outline-secondary SmsGonder" id="SmsGonder"> Müşteriye<br /> SMS gönder </button>
+                        </div>
+                        <div class="form-group EpostaGonderBtnVisible" id="EpostaGonderBtnVisible" style="display:none">
+                            <button type="button" class="btn btn-xs btn-outline-secondary EpostaGonder" id="EpostaGonder"> Müşteriye<br /> e-posta gönder </button>
+                        </div>
+                    </div>
+
+                }
+                else
+                {
+                    <div class="row col-sm-6">
+                        <div class="form-group mr-2 FotografYukleBtnVisible" id="FotografYukleBtnVisible" style="display:none">
+                            <button type="button" class="btn btn-xs btn-primary FotografYukle" data-toggle="modal" data-target="#FotografYukleModal" id="FotografYukle"> Fotoğraf<br /> Yükle </button>
+                        </div>
+                        <div class="form-group mr-2 AciklamaGuncelleBtnVisible" id="AciklamaGuncelleBtnVisible" style="display:none">
+                            <button type="button" class="btn btn-xs btn-info AciklamaGuncelle" id="AciklamaGuncelle"> Açıklamaları<br /> Güncelle </button>
+                        </div>
+                        <div class="form-group mr-2 SmsGonderBtnVisible" id="SmsGonderBtnVisible" style="display:none">
+                            <button type="button" class="btn btn-xs btn-outline-secondary SmsGonder" id="SmsGonder"> Müşteriye<br /> SMS gönder </button>
+                        </div>
+                        <div class="form-group EpostaGonderBtnVisible" id="EpostaGonderBtnVisible" style="display:none">
+                            <button type="button" class="btn btn-xs btn-outline-secondary EpostaGonder" id="EpostaGonder"> Müşteriye<br /> e-posta gönder </button>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="border-bottom"></div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!--  DropZone Resim Yükleme işlemleri   -->
+                    <input type="hidden" id="MusteriId" value="@ViewBag.MusteriId" />
+                    @if (ViewBag.MusteriId == null)
+                    {
+                        <div id="musteriSecUyari">
+                            <div class="alert alert-danger" role="alert">
+                                Lütfen Müşteri Seçiniz.
+                            </div>
+                        </div>
+                    }
+                    @if (ViewBag.MusteriId != null)
+                    {
+                        <div id="musteriSecUyari">
+                            <div class="alert alert-danger" role="alert">
+                                Lütfen Sözleşme Seçiniz.
+                            </div>
+                        </div>
+                    }
+                    <div class="row" id="MusteriFotografCards">
+
+                    </div>
+                </div>
+            </div>
+
+            @if (ViewBag.MusteriId == null)
+            {
+                <div class="border-bottom"></div>
+                <div class="d-flex flex-row pt-3">
+                    <div class="form-group mr-2 ml-auto FotografYukleBtnVisible" id="FotografYukleAltBtnVisible" style="display:none">
+                        <button type="button" class="btn btn-xs btn-primary FotografYukle" data-toggle="modal" data-target="#FotografYukleModal" id="FotografYukle"> Fotoğraf <br />Yükle </button>
+                    </div>
+                    <div class="form-group mr-2 AciklamaGuncelleBtnVisible" id="AciklamaGuncelleBtnVisible" style="display:none">
+                        <button type="button" class="btn btn-xs btn-info AciklamaGuncelle" id="AciklamaGuncelle"> Açıklamaları <br />Güncelle </button>
+                    </div>
+                    <div class="form-group mr-2 SmsGonderBtnVisible" id="SmsGonderBtnVisible" style="display:none">
+                        <button type="button" class="btn btn-xs btn-outline-secondary SmsGonder" id="SmsGonder"> Müşteriye <br />SMS gönder </button>
+                    </div>
+                    <div class="form-group mr-4 EpostaGonderBtnVisible" id="EpostaGonderBtnVisible" style="display:none">
+                        <button type="button" class="btn btn-xs btn-outline-secondary EpostaGonder" id="EpostaGonder"> Müşteriye <br />e-posta gönder </button>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="border-bottom"></div>
+                <div class="d-flex flex-row pt-3">
+                    <div class="form-group mr-2 ml-auto FotografYukleBtnVisible" id="FotografYukleAltBtnVisible" style="display:none">
+                        <button type="button" class="btn btn-xs btn-primary FotografYukle" data-toggle="modal" data-target="#FotografYukleModal" id="FotografYukle"> Fotoğraf <br />Yükle </button>
+                    </div>
+                    <div class="form-group mr-2 AciklamaGuncelleBtnVisible" id="AciklamaGuncelleBtnVisible" style="display:none">
+                        <button type="button" class="btn btn-xs btn-info AciklamaGuncelle" id="AciklamaGuncelle"> Açıklamaları <br />Güncelle </button>
+                    </div>
+                    <div class="form-group mr-2 SmsGonderBtnVisible" id="SmsGonderBtnVisible" style="display:none">
+                        <button type="button" class="btn btn-xs btn-outline-secondary SmsGonder" id="SmsGonder"> Müşteriye <br />SMS gönder </button>
+                    </div>
+                    <div class="form-group mr-6 EpostaGonderBtnVisible" id="EpostaGonderBtnVisible" style="display:none">
+                        <button type="button" class="btn btn-xs btn-outline-secondary EpostaGonder" id="EpostaGonder"> Müşteriye <br /> e-posta gönder </button>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+
+    <script src="~/Areas/Otomasyon/Content/dropzone/dropzone.js"></script>
+    <script src="~/Areas/Otomasyon/Content/light-box/jquery.zbox.js"></script>
+
+
+    <script type="text/javascript">
+        //burada Dropzone eklentisinin otomatik ayarları almasını engelliyoruz.
+        Dropzone.autoDiscover = false;
+        function dateFormat(d) {
+            var date = new Date(parseInt(d.substr(6)));
+            var Tarih = (date.getDate() + "").padStart(2, "0") + "." + ((date.getMonth() + 1) + "").padStart(2, "0") + "." + date.getFullYear();
+            return Tarih;
+        }
+        $(document).ready(function () {
+            var MusteriId = $("#MusteriId").val();
+            var MusteriAdi = "";
+            var SozlesmeId = $("#SozlesmeId").val();
+            var SozlesmeNo = "";
+            var MusteriAdi = "";
+            var ForografAdi = "";
+            var FotografId = 0;
+            var Notlar = new Array();
+            $(".musterifotograflari").zbox();
+            $(function () {
+                $('#Musteri').select2();
+                $('#Sozlesme').select2();
+            });
+            function ResimYukle() {
+                var MusteriData = new FormData();
+                MusteriData.append("MusteriId", MusteriId);
+                MusteriData.append("SozlesmeId", SozlesmeId);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: MusteriData,
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Musteriler/MusteriFotografListesi",
+                    success: function (data) {
+                        $("#MusteriFotografCards").empty();
+                        if (data.data.length > 0) {
+                            $("#musteriSecUyari").attr("style", "display:none");
+                            $(".AciklamaGuncelleBtnVisible").removeAttr("style");
+                            $(".SmsGonderBtnVisible").removeAttr("style");
+                            $(".EpostaGonderBtnVisible").removeAttr("style");
+
+                            $("#FotografYukleAltBtnVisible").removeAttr("style");
+                            //$(".AciklamaGuncelle").removeAttr("style");
+                            //$(".SmsGonder").removeAttr("style");
+                            //$(".EpostaGonder").removeAttr("style");
+                            $.each(data.data, function (index, item) {
+                                var borderclass = "";
+                                var dissab = "";
+                                var secilmedi = "", duzenle = "", baski = "", kapak = "", poster = "";
+                                if (item.SecildiDurum == "0") {
+                                    borderclass = "border-danger";
+                                }
+                                else if (item.SecildiDurum == "1") {
+                                    borderclass = "border-primary";
+                                }
+                                else if (item.SecildiDurum == "2") {
+                                    borderclass = "border-success";
+                                    dissab = "disabled";
+                                }
+                                if (item.SecildiDurum == "0") {
+                                    secilmedi = "<input type='radio' class='custom-control-input' id='Secilmedi-" + item.Id + "' name='" + item.FotografAdi + "' disabled data-id='Secilmedi-" + item.Id + "' data-fotoid='" + item.Id + "' checked=''>";
+                                }
+                                else {
+                                    secilmedi = "<input type='radio' class='custom-control-input' id='Secilmedi-" + item.Id + "' name='" + item.FotografAdi + "' disabled data-id='Secilmedi-" + item.Id + "' data-fotoid='" + item.Id + "' " + dissab + ">";
+                                }
+                                if (item.SecildiDurum == "1") {
+                                    duzenle = "<input type='radio' class='custom-control-input' id='Duzenle-" + item.Id + "' name='" + item.FotografAdi + "' disabled data-id='Duzenle-" + item.Id + "' data-fotoid='" + item.Id + "' checked=''>";
+                                }
+                                else {
+                                    duzenle = "<input type='radio' class='custom-control-input' id='Duzenle-" + item.Id + "' name='" + item.FotografAdi + "' disabled data-id='Duzenle-" + item.Id + "' data-fotoid='" + item.Id + "' " + dissab + ">";
+                                }
+                                if (item.SecildiDurum == "2") {
+                                    baski = "<input type='radio' class='custom-control-input' id='Baski-" + item.Id + "' name='" + item.FotografAdi + "' disabled data-id='Baski-" + item.Id + "' data-fotoid='" + item.Id + "' checked=''>";
+                                }
+                                else {
+                                    baski = "<input type='radio' class='custom-control-input' id='Baski-" + item.Id + "' name='" + item.FotografAdi + "' disabled data-id='Baski-" + item.Id + "' data-fotoid='" + item.Id + "' " + dissab + ">";
+                                }
+                                if (item.KapakFotograf == true) {
+                                    kapak = "<input type='checkbox' class='custom-control-input' id='KapakFotograf-" + item.Id + "' disabled data-id='Kapak-" + item.Id + "' data-fotoid='" + item.Id + "' checked>";
+                                }
+                                else {
+                                    kapak = "<input type='checkbox' class='custom-control-input' id='KapakFotograf-" + item.Id + "' disabled data-id='Kapak-" + item.Id + "' data-fotoid='" + item.Id + "'>";
+                                }
+                                if (item.PosterFotograf == true) {
+                                    poster = "<input type='checkbox' class='custom-control-input' id='PosterFotograf-" + item.Id + "' disabled data-id='Poster-" + item.Id + "' data-fotoid='" + item.Id + "' checked>";
+                                }
+                                else {
+                                    poster = "<input type='checkbox' class='custom-control-input' id='PosterFotograf-" + item.Id + "' disabled data-id='Poster-" + item.Id + "' data-fotoid='" + item.Id + "'>";
+                                }
+                                $("#MusteriFotografCards").append("<div class='col-sm-3 mt-3'>" +
+                                                                     "<div class='card border " + borderclass + "' id='Card-" + item.Id + "' style='height:100%'>" +
+                                                                         "<a href='" + item.FotografYol + "' target='_blank' data-toggle='lightbox' data-gallery='example-gallery' class='musterifotograflari'>" +
+                                                                             "<img class='card-img-top' src='" + item.FotografYol + "'>" +
+                                                                         "</a>" +
+                                                                         //"<a href='" + item.FotografYol + "' data-toggle='lightbox' data-gallery='example-gallery' class='musterifotograflari'>" +
+                                                                         //     "<img class='card-img-top' src='" + item.FotografYol + "'>" +
+                                                                         //"</a>" +
+                                                                         "<div class='card-body'>" +
+                                                                             "<h5 class='card-title fw-700 mb-2'>" + item.FotografAdi + "</h5>" +
+                                                                             "<p class='card-text mb-2'>" + item.Notlar + "</p>" +
+                                                                             "<textarea class='form-control form-control-sm justify-content-end notlartxt' " + dissab + " id='Notlar-" + item.Id + "' data-fotoid='" + item.Id + "' rows='2' name='Notlar' placeholder='Açıklama' style='overflow:auto;resize:none'>" + item.FotografAciklama + "</textarea>" +
+                                                                             "<div class='frame-wrap mt-3 mb-3'>" +
+                                                                                "<div class='custom-control custom-radio custom-control-inline'>" +
+                                                                                    secilmedi +
+                                                                                    "<label class='custom-control-label' for='Secilmedi-" + item.Id + "'>Seçilmedi</label>" +
+                                                                                "</div>" +
+                                                                                "<div class='custom-control custom-radio custom-control-inline'>" +
+                                                                                    duzenle +
+                                                                                    "<label class='custom-control-label' for='Duzenle-" + item.Id + "'>Düzenleme yapılmalı</label>" +
+                                                                                "</div>" +
+                                                                                "<div class='custom-control custom-radio custom-control-inline'>" +
+                                                                                    baski +
+                                                                                    "<label class='custom-control-label' for='Baski-" + item.Id + "'>Baskı Yapılabilir</label>" +
+                                                                                "</div>" +
+                                                                                "<div class='custom-control custom-checkbox custom-control-inline'>" +
+                                                                                    kapak +
+                                                                                    "<label class='custom-control-label' for='KapakFotograf-" + item.Id + "'>Albüm Kapağı</label>" +
+                                                                                "</div>" +
+                                                                                "<div class='custom-control custom-checkbox custom-control-inline'>" +
+                                                                                    poster +
+                                                                                    "<label class='custom-control-label' for='PosterFotograf-" + item.Id + "'>Poster Fotoğraf</label>" +
+                                                                                "</div>" +
+                                                                             "</div>" +
+                                                                             "<div class='btn-group' id='js-demo-nesting' role='group' aria-label='Fotoğraf İşlem'>" +
+                                                                                "<a href='#' class='btn btn-outline-danger waves-effect waves-themed FotografSil' data-fotografid='" + item.Id + "' data-musteriid='" + item.MusteriId + "' data-fotografadi='" + item.FotografAdi + "'>Sil</a>" +
+                                                                                "<a href='#' class='btn btn-outline-primary waves-effect waves-themed FotografDegistir' data-toggle='modal' data-target='#FotografDegistirModal' data-fotografid='" + item.Id + "' data-musteriid='" + item.MusteriId + "' data-fotografadi='" + item.FotografAdi + "'>Değiştir</a>" +
+                                                                            "</div>" +
+                                                                        "</div>" +
+                                                                 "</div>");
+                            });
+                        }
+                        else {
+                            $("#FotografYukleAltBtnVisible").attr("style", "display:none");
+                            $(".SmsGonderBtnVisible").attr("style", "display:none");
+                            $(".EpostaGonderBtnVisible").attr("style", "display:none");
+                            $(".AciklamaGuncelleBtnVisible").attr("style", "display:none");
+                            $("#musteriSecUyari").removeAttr("style");
+                            $("#musteriSecUyari").empty();
+                            $("#musteriSecUyari").append("<div class='alert alert-warning' role='alert'>" +
+                                                            "Müşterinin önceden yüklenmiş fotoğrafı bulunmuyor." +
+                                                          "</div>");
+
+                        }
+
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            }
+            $("#Musteri").change(function () {
+                $(".AciklamaGuncelleBtnVisible").attr("style", "display:none");
+                $(".SmsGonderBtnVisible").attr("style", "display:none");
+                $(".EpostaGonderBtnVisible").attr("style", "display:none");
+                $(".FotografYukleBtnVisible").attr("style", "display:none");
+                MusteriId = $(this).val();
+                MusteriAdi = $("#Musteri option:selected").text();
+                $("#FotografYukleModalMusteriAdi").html("<b>Müşteri: </b>" + MusteriAdi + " - <b>Sözleşme: </b>" + SozlesmeNo);
+                $("#FotografDegistirModalMusteriAdi").html("<b>Müşteri: </b>" + MusteriAdi + " - <b>Sözleşme: </b>" + SozlesmeNo + " - <b>Fotoğraf: </b>" + ForografAdi);
+                if (MusteriId == 0) {
+                    $("#musteriSecUyari").removeAttr("style");
+                }
+                else if (MusteriId != 0) {
+                    $("#musteriSecUyari").html("<div class='alert alert-danger' role='alert'>Lütfen Sözleşme Seçiniz.</div>");
+                    $("#Sozlesme").removeAttr("disabled");
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        url: "/Otomasyon/Musteriler/AktifSozlesmeler/" + MusteriId,
+                        success: function (durum) {
+                            $("#Sozlesme").empty();
+                            $("#Sozlesme").append("<option selected='' value='0' disabled>Sözleşme Seçiniz</option>");
+                            $.each(durum, function () {
+                                $("#Sozlesme").append("<option value=" + this.SozlesmeId + ">" + this.SozlesmeNo + " - " + dateFormat(this.RezervasyonTarihi) + "</option>");
+                            });
+                        }
+                    });
+                }
+            });
+            $("#Sozlesme").change(function () {
+                SozlesmeId = $(this).val();
+                SozlesmeNo = $("#Sozlesme option:selected").text();
+                MusteriAdi = $("#Musteri option:selected").text();
+                $("#FotografYukleModalMusteriAdi").html("<b>Müşteri: </b>" + MusteriAdi + " - <b>Sözleşme: </b>" + SozlesmeNo);
+                $("#FotografDegistirModalMusteriAdi").html("<b>Müşteri: </b>" + MusteriAdi + " - <b>Sözleşme: </b>" + SozlesmeNo + " - <b>Fotoğraf: </b>" + ForografAdi);
+                if (SozlesmeId == 0) {
+                    $("#Sozlesme").attr("disabled", "disabled");
+                    $("#musteriSecUyari").removeAttr("style");
+                    $(".FotografYukleBtnVisible").attr("style", "display:none");
+                    $(".AciklamaGuncelleBtnVisible").attr("style", "display:none");
+                    $(".SmsGonderBtnVisible").attr("style", "display:none");
+                    $(".EpostaGonderBtnVisible").attr("style", "display:none");
+                }
+                else if (SozlesmeId != 0) {
+                    $("#musteriSecUyari").attr("style", "display:none");
+                    $(".FotografYukleBtnVisible").removeAttr("style");
+                    $(".AciklamaGuncelleBtnVisible").attr("style", "display:none");
+                    $(".SmsGonderBtnVisible").attr("style", "display:none");
+                    $(".EpostaGonderBtnVisible").attr("style", "display:none");
+                    //$(".SmsGonderBtnVisible").removeAttr("style");
+                    //$(".EpostaGonderBtnVisible").removeAttr("style");
+                    $("#Sozlesme").removeAttr("disabled");
+
+                    $("#FotografYukleAltBtnVisible").attr("style", "display:none");
+                    //$(".FotografYukle").removeAttr("style");
+
+                }
+                ResimYukle();
+            });
+            $("#MusteriFotografCards").on('click', '.FotografSil', function () {
+                var fotoid = $(this).data("fotografid");
+                //var musteriid = $(this).data("musteriid");
+                //var fotografadi = $(this).data("fotografadi");
+                //var MusteriFotoKaldir = new FormData();
+                //MusteriFotoKaldir.append("ResimAdi", fotografadi);
+                //MusteriFotoKaldir.append("MusteriId", musteriid);
+                //MusteriFotoKaldir.append("FotografId", fotoid);
+                //MusteriFotoKaldir.forEach((value, key) => { console.log(key + " = " + value) });
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    //data: MusteriFotoKaldir,
+                    //contentType: false,
+                    //processData: false,
+                    url: "/Otomasyon/Musteriler/MusteriFotografSil/" + fotoid,
+                    success: function (data) {
+                        alinanodemetoplam = 0; gelecekodemetoplam = 0;
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            // Fotoğraflari yeniden yükle
+                            ResimYukle()
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#MusteriFotografCards").on('click', '.FotografDegistir', function () {
+                FotografId = $(this).data("fotografid");
+                ForografAdi = $(this).data("fotografadi");
+                $("#FotografDegistirModalMusteriAdi").html("<b>Müşteri: </b>" + MusteriAdi + " - <b>Sözleşme: </b>" + SozlesmeNo + " - <b>Fotoğraf: </b>" + ForografAdi);
+            });
+            $(".AciklamaGuncelle").click(function () {
+                Notlar = [];
+                $(".notlartxt").each(function () {
+                    var fotoid = $(this).data("fotoid");
+                    var secici = "#Notlar-" + fotoid;
+
+                    Foto_id = "Foto_Id:" + fotoid;
+                    Not = "Foto_Not:" + $(secici).val().replace(",", "&");
+
+                    //console.log("FotoId: " + fotoid);
+                    //console.log("secici: " + secici);
+                    //console.log("Foto_Id: " + Foto_id);
+                    //console.log("Foto_Not: " + Not);
+
+                    Notlar.push(Foto_id);
+                    Notlar.push(Not);
+                });
+                var NotlarKaydetData = new FormData();
+                NotlarKaydetData.append("Notlar", Notlar);
+                NotlarKaydetData.append("MusteriId", MusteriId);
+                NotlarKaydetData.append("SozlesmeId", SozlesmeId);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: NotlarKaydetData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        Swal.fire(
+                        {
+                            title: "Açıklamalar Kaydediliyor!",
+                            html: "<strong>Lütfen Bekleyin.</strong>",
+                            onBeforeOpen: function onBeforeOpen() {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    url: "/Otomasyon/Musteriler/NotlarKaydet/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                            swal.close();
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            swal.close();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $(".SmsGonder").click(function () {
+                var SMSGonderData = new FormData();
+                SMSGonderData.append("MusteriId", MusteriId);
+                SMSGonderData.append("SozlesmeId", SozlesmeId);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: SMSGonderData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        Swal.fire(
+                        {
+                            title: "Müşteriye Bilgi SMS'i Gönderiliyor!",
+                            html: "<strong>Lütfen Bekleyin.</strong>",
+                            onBeforeOpen: function onBeforeOpen() {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    url: "/Otomasyon/Musteriler/BilgiSMSGonder/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                            swal.close();
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            swal.close();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $(".EpostaGonder").click(function () {
+                var EpostaGonderData = new FormData();
+                EpostaGonderData.append("MusteriId", MusteriId);
+                EpostaGonderData.append("SozlesmeId", SozlesmeId);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: EpostaGonderData,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function () {
+                        Swal.fire(
+                        {
+                            title: "Müşteriye Bilgi e-postası Gönderiliyor!",
+                            html: "<strong>Lütfen Bekleyin.</strong>",
+                            onBeforeOpen: function onBeforeOpen() {
+                                Swal.showLoading();
+                            }
+                        });
+                    },
+                    url: "/Otomasyon/Musteriler/BilgiEpostaGonder/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                            swal.close();
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            swal.close();
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+
+            var count = 0;
+            var myDropzone = new Dropzone("#dropzoneForm", {
+                url: '/Musteriler/MusteriFotolarYukle',
+                addRemoveLinks: true,
+                uploadMultiple: false,
+                maxFilesize: 20,
+                accept: function (file, done) {
+                    // eğer belirli uzantıda ki dosyaları yüklemek istiyorsak bu fonksiyonu kullanabiliriz, aksi taktirde direk bu bloğu silebilir
+                    // yada bu bloğu boşaltabiliriz, ben sadece fotoğraf yükletmek istediğim için bu örnekten devam ediyorum.
+                    var extension = file.name.substr((file.name.lastIndexOf('.') + 1));
+
+                    if (extension == "JPEG" || extension == "JPG" || extension.toString().toLowerCase() == "jpeg" || extension.toString().toLowerCase() == "jpg" || extension == "PNG" || extension.toString().toLowerCase() == "png") {
+                        done();
+                    }
+                    else {
+                        done('Sadece resim dosyası yükleyebilirsiniz!');
+                        Swal.fire(
+                        {
+                            title: "HATA",
+                            html: "<h2>Sadece resim dosyası yükleyebilirsiniz!</h2>",
+                            type: "error",
+                            showCancelButton: false,
+                            confirmButtonText: "Tamam!"
+                        });
+                    }
+                },
+                error: function (file) {
+                    // bu kısımda eğer dosya yukarıda ki blokta hataya düşerse yükleme ekranımızda görünmemesini sağlayacak
+                    if (!file.accepted) this.removeFile(file);
+                },
+                init: function () {
+
+                    myDropzone = this;
+                    count = 0;
+                    // Her Fotoğraf seçildiğinde seçilen fotoğraf adeti sayılıyor.
+                    this.on("addedfile", function (file) {
+                        count++;
+                    });
+                    //Fotoğraf Yüklendikten Sonra Id döndürme
+                    this.on("success", function (file, responsStr) {
+                        if (responsStr.Sonuc) {
+                            $(file.previewTemplate).find("[data-dz-remove]").attr("data-fotoid", responsStr.FotografId);
+                            ResimYukle();
+                        }
+                    })
+
+                    // Fotoğraflar gönderilirken formData nesnesine Müşteri Id si de eklenerek gönderiliyor.
+                    this.on("sending", function (file, xhr, formData) {
+                        //console.log(count + ' files added');
+                        formData.append("MusteriId", MusteriId);
+                        formData.append("SozlesmeId", SozlesmeId);
+                        //formData.forEach((value, key) => { console.log(key + " = " + value) });
+                        $("#AltBilgi").empty();
+                        $("#AltBilgi").append("<div class='alert border-faded bg-transparent text-secondary fade show' role='alert'>" +
+                            "<div class='d-flex align-items-center'>" +
+                                "<div class='alert-icon'>" +
+                                    "<span class='icon-stack icon-stack-md'>" +
+                                        "<i class='base-7 icon-stack-3x color-primary-600'></i>" +
+                                        "<i class='fal fa-check icon-stack-1x text-white'></i>" +
+                                    "</span>" +
+                                "</div>" +
+                                "<div class='flex-1'>" +
+                                    "<span class='h5 color-primary-600'>Müşteriye Bilgi Ver!</span>" +
+                                    "<br>" +
+                                    count + " adet fotoğraf yüklendi." +
+                                "</div>" +
+                                //"<a href='#' id='SmsGonder' class='btn btn-outline-primary btn-sm btn-w-m active waves-effect waves-themed mr-1' data-musteriid='" + MusteriId + "'>Müşteriye SMS gönder</a>" +
+                                //"<a href='#' id='EpostaGonder' class='btn btn-outline-primary btn-sm btn-w-m active waves-effect waves-themed' data-musteriid='" + MusteriId + "'>Müşteriye e-posta gönder</a>" +
+                            "</div>" +
+                        "</div>");
+                    })
+                    // Dosyayı Sil Butonu işlemleri
+                    this.on("removedfile", function (file) {
+                        var FotografId = $(file.previewTemplate).find("[data-dz-remove]").data("fotoid");
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            //data: MusteriFotoKaldir,
+                            //contentType: false,
+                            //processData: false,
+                            url: "/Otomasyon/Musteriler/MusteriFotolarSil/" + FotografId,
+                            success: function (data) {
+                                alinanodemetoplam = 0; gelecekodemetoplam = 0;
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    // Fotoğrafları yeniden yükle
+                                    ResimYukle();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    });
+                }
+
+            });
+            var myDropzone = new Dropzone("#dropzoneFormFotografDegistir", {
+                url: '/Musteriler/MusteriFotografDegistir',
+                addRemoveLinks: true,
+                uploadMultiple: false,
+                maxFilesize: 20,
+                maxFiles: 1,
+                accept: function (file, done) {
+                    // eğer belirli uzantıda ki dosyaları yüklemek istiyorsak bu fonksiyonu kullanabiliriz, aksi taktirde direk bu bloğu silebilir
+                    // yada bu bloğu boşaltabiliriz, ben sadece fotoğraf yükletmek istediğim için bu örnekten devam ediyorum.
+                    var extension = file.name.substr((file.name.lastIndexOf('.') + 1));
+
+                    if (extension == "JPEG" || extension == "JPG" || extension.toString().toLowerCase() == "jpeg" || extension.toString().toLowerCase() == "jpg" || extension == "PNG" || extension.toString().toLowerCase() == "png") {
+                        done();
+                    }
+                    else {
+                        done('Sadece resim dosyası yükleyebilirsiniz!');
+                        Swal.fire(
+                        {
+                            title: "HATA",
+                            html: "<h2>Sadece resim dosyası yükleyebilirsiniz!</h2>",
+                            type: "error",
+                            showCancelButton: false,
+                            confirmButtonText: "Tamam!"
+                        });
+                    }
+                },
+                error: function (file) {
+                    // bu kısımda eğer dosya yukarıda ki blokta hataya düşerse yükleme ekranımızda görünmemesini sağlayacak
+                    if (!file.accepted) this.removeFile(file);
+                },
+                init: function () {
+
+                    myDropzone = this;
+                    count = 0;
+                    // Her Fotoğraf seçildiğinde seçilen fotoğraf adeti sayılıyor.
+                    this.on("addedfile", function (file) {
+                        count++;
+                    });
+                    //Fotoğraf Yüklendikten Sonra Id döndürme
+                    this.on("success", function (file, responsStr) {
+                        if (responsStr.Sonuc) {
+                            $(file.previewTemplate).find("[data-dz-remove]").attr("data-fotoid", responsStr.FotografId);
+                            ResimYukle();
+                        }
+                    })
+
+                    // Fotoğraflar gönderilirken formData nesnesine Müşteri Id si de eklenerek gönderiliyor.
+                    this.on("sending", function (file, xhr, formData) {
+                        formData.append("MusteriId", MusteriId);
+                        formData.append("SozlesmeId", SozlesmeId);
+                        formData.append("FotografId", FotografId);
+                    })
+                    // Dosyayı Sil Butonu işlemleri
+                    this.on("removedfile", function (file) {
+                        var FotografId = $(file.previewTemplate).find("[data-dz-remove]").data("fotoid");
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            //data: MusteriFotoKaldir,
+                            //contentType: false,
+                            //processData: false,
+                            url: "/Otomasyon/Musteriler/MusteriFotografSil/" + FotografId,
+                            success: function (data) {
+                                alinanodemetoplam = 0; gelecekodemetoplam = 0;
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    // Fotoğrafları yeniden yükle
+                                    ResimYukle();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    });
+                }
+
+            });
+        });
+    </script>
+
+}
+
+
+

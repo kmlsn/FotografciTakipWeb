@@ -1,0 +1,46 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool firmasubeyetki = ky.FirstOrDefault(x => x.SayfaId == 11 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 11 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool firmabilgileriyetki = ky.FirstOrDefault(x => x.SayfaId == 101 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 101 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool subeislemleriyetki = ky.FirstOrDefault(x => x.SayfaId == 102 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 102 && x.Sil == false && x.Aktif == true).SayfaYetki;
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Firma-Şube İşlemleri" ? "active open" : "";
+    string altmenufirmabilgileri = ViewBag.AltMenu == "Firma Bilgileri" ? "active" : "";
+    string altmenusubeislemleri = ViewBag.AltMenu == "Şube İşlemleri" ? "active" : "";
+}
+@if (firmasubeyetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Firma/Şube İşlemleri" data-filter-tags="firma şube işlemleri">
+            <i class="fal fa-code-merge"></i>
+            <span class="nav-link-text" data-i18n="nav.firma_sube_islemleri">Firma/Şube İşlemleri</span>
+        </a>
+        <ul>
+            @if (lisans.FirmaSubeIslemleri_FirmaBilgileri)
+            {
+                if (firmabilgileriyetki)
+                {
+                    <li class=@altmenufirmabilgileri>
+                        <a href="~/Admin/FirmaSubeIslemleri/FirmaBilgileri" title="Firma Bilgileri" data-filter-tags="firma şube işlemleri firma bilgileri">
+                            <span class="nav-link-text" data-i18n="nav.firma_sube_islemleri_firma_bilgileri">Firma Bilgileri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.FirmaSubeIslemleri_SubeIslemleri)
+            {
+                if (subeislemleriyetki)
+                {
+                    <li class=@altmenusubeislemleri>
+                        <a href="~/Admin/FirmaSubeIslemleri/SubeIslemleri" title="Şube İşlemleri" data-filter-tags="firma şube işlemleri sube islemleri">
+                            <span class="nav-link-text" data-i18n="nav.firma_sube_islemleri_sube_islemleri">Şube İşlemleri</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}

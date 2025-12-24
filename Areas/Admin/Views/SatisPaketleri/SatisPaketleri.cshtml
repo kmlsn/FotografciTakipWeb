@@ -1,0 +1,848 @@
+﻿
+@{
+    ViewBag.Title = "Satış Paketleri";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section Head
+{
+    <style>
+        .modal {
+            overflow: auto !important;
+        }
+        /*Açılan ikinci modal ekranda kaymadığı için eklendi*/
+    </style>
+
+}
+@using FotografciTakipWeb.Models
+
+
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="form-group col-sm-4" id="PaketAdiHata">
+                                <label class="form-label" for="PaketAdi">Paket Adı</label>
+                                <input type="text" id="Id" class="form-control  form-control-sm" name="Id" maxlength="50" required style="display:none">
+                                <input type="text" id="PaketAdi" class="form-control  form-control-sm" name="PaketAdi" maxlength="50" required>
+                            </div>
+                            <div class="form-group col-sm-4">
+                                <label class="form-label" for="PaketDetayi">Paket Detayı</label>
+                                <textarea class="form-control form-control-sm" id="PaketDetayi" rows="2" name="PaketDetayi" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                            <div class="form-group col-sm-4">
+                                <label class="form-label" for="Tarih">Tarih</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" value="00/00/0000" id="Tarih">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row pt-3">
+                            <div class="form-group col-sm-2">
+                                <label class="form-label" for="SatisFiyati">Satış Fiyatı </label>
+                                <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control form-control-sm" name="SatisFiyati" maxlength="50" id="SatisFiyati">
+                            </div>
+                            <div class="form-group col-sm-2">
+                                <label class="form-label" for="IndirimliFiyat">İndirimli Fiyat </label>
+                                <input type="text" placeholder="0.00" data-inputmask="'alias': 'currency'" class="form-control form-control-sm" name="IndirimliFiyat" maxlength="50" id="IndirimliFiyat">
+                            </div>
+                            <div class="form-group col-sm-2">
+                                <label class="form-label" for="KDVOrani">Kdv Oranı </label>
+                                <input type="text" placeholder="00" class="form-control form-control-sm" name="KDVOrani" maxlength="2" id="KDVOrani">
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label class="form-label" for="IndirimBitisTarihi">İndirim Bitiş Tarihi</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" value="00/00/0000" id="IndirimBitisTarihi">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label class="form-label" for="PaketTip">Paket Tip</label>
+                                <div class="input-group">
+                                    <div class="frame-wrap">
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" class="custom-control-input" id="PaketTip1" name="PaketTip">
+                                            <label class="custom-control-label" for="PaketTip1">Lisans</label>
+                                        </div>
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" class="custom-control-input" id="PaketTip2" name="PaketTip" checked="">
+                                            <label class="custom-control-label" for="PaketTip2">SMS</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row pt-3" id="SayfalarGoster">
+                            <div class="form-group col-sm-12">
+                                <label class="form-label" for="Sayfalar">Aktif Sayfalar</label>
+                                <div class="panel-content" id="Sayfalar">
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Dashboard" checked data-deger="Dashboard">
+                                                <label class="custom-control-label" for="Dashboard">Dashboard</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="RezervasyonIslemleri" checked data-deger="RezervasyonIslemleri">
+                                                <label class="custom-control-label" for="RezervasyonIslemleri">Rezervasyon İşlemleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="RezervasyonIslemleri_RezervasyonTakvimi" checked data-deger="Rezervasyon İşlemleri - Rezervasyon Takvimi">
+                                                <label class="custom-control-label" for="RezervasyonIslemleri_RezervasyonTakvimi">Rezervasyon Takvimi</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="RezervasyonIslemleri_RezervasyonListesi" checked data-deger="RezervasyonIslemleri_RezervasyonListesi">
+                                                <label class="custom-control-label" for="RezervasyonIslemleri_RezervasyonListesi">Rezervasyon Listesi</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="RezervasyonIslemleri_RezervasyonTeklifleri" checked data-deger="RezervasyonIslemleri_RezervasyonTeklifleri">
+                                                <label class="custom-control-label" for="RezervasyonIslemleri_RezervasyonTeklifleri">Rezervasyon Teklifleri</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="RezervasyonIslemleri_Randevular" checked data-deger="RezervasyonIslemleri_Randevular">
+                                                <label class="custom-control-label" for="RezervasyonIslemleri_Randevular">Randevular</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Muhasebe" checked data-deger="Muhasebe">
+                                                <label class="custom-control-label" for="Muhasebe">Muhasebe</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Muhasebe_GunlukIsler" checked data-deger="Muhasebe_GunlukIsler">
+                                                <label class="custom-control-label" for="Muhasebe_GunlukIsler">Günlük İşler</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Muhasebe_GelirGiderler" checked data-deger="Muhasebe_GelirGiderler">
+                                                <label class="custom-control-label" for="Muhasebe_GelirGiderler">Gelir Giderler</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Muhasebe_AlinanGelecekOdemeler" checked data-deger="Muhasebe_AlinanGelecekOdemeler">
+                                                <label class="custom-control-label" for="Muhasebe_AlinanGelecekOdemeler">Alınan Gelecek Ödemeler</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Muhasebe_KalanBakiyeler" checked data-deger="Muhasebe_KalanBakiyeler">
+                                                <label class="custom-control-label" for="Muhasebe_KalanBakiyeler">Kalan Bakiyeler</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Muhasebe_Kasa" checked data-deger="Muhasebe_Kasa">
+                                                <label class="custom-control-label" for="Muhasebe_Kasa">Kasa</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Muhasebe_Cariler" checked data-deger="Muhasebe_Cariler">
+                                                <label class="custom-control-label" for="Muhasebe_Cariler">Cariler</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Muhasebe_Cariler_CariListesi" checked data-deger="Muhasebe_Cariler_CariListesi">
+                                                <label class="custom-control-label" for="Muhasebe_Cariler_CariListesi">Cari Listesi</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Muhasebe_Cariler_CariHesapTakibi" checked data-deger="Muhasebe_Cariler_CariHesapTakibi">
+                                                <label class="custom-control-label" for="Muhasebe_Cariler_CariHesapTakibi">Cari Hesap Takibi</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Musteriler" checked data-deger="Musteriler">
+                                                <label class="custom-control-label" for="Musteriler">Müşteriler</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Musteriler_MusteriListesi" checked data-deger="Musteriler_MusteriListesi">
+                                                <label class="custom-control-label" for="Musteriler_MusteriListesi">Müşteri Listesi</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Musteriler_MusteriMesajlari" checked data-deger="Musteriler_MusteriMesajlari">
+                                                <label class="custom-control-label" for="Musteriler_MusteriMesajlari">Müşteri Mesajları</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Musteriler_FotografYukle" checked data-deger="Musteriler_FotografYukle">
+                                                <label class="custom-control-label" for="Musteriler_FotografYukle">Fotoğraf Yükle</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Musteriler_MusteriHesapTakibi" checked data-deger="Musteriler_MusteriHesapTakibi">
+                                                <label class="custom-control-label" for="Musteriler_MusteriHesapTakibi">Müşteri Hesap Takibi</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Stok" checked data-deger="Stok">
+                                                <label class="custom-control-label" for="Stok">Stok</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Stok_StokKartlari" checked data-deger="Stok_StokKartlari">
+                                                <label class="custom-control-label" for="Stok_StokKartlari">Stok Kartları</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Stok_StokGirisi" checked data-deger="Stok_StokGirisi">
+                                                <label class="custom-control-label" for="Stok_StokGirisi">Stok Girişi</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Stok_StokCikisi" checked data-deger="Stok_StokCikisi">
+                                                <label class="custom-control-label" for="Stok_StokCikisi">Stok Çıkışı</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Stok_StokHareketleri" checked data-deger="Stok_StokHareketleri">
+                                                <label class="custom-control-label" for="Stok_StokHareketleri">Stok Hareketleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Stok_Iade" checked data-deger="Stok_Iade">
+                                                <label class="custom-control-label" for="Stok_Iade">Stok İade</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Stok_DepoIslemleri" checked data-deger="Stok_DepoIslemleri">
+                                                <label class="custom-control-label" for="Stok_DepoIslemleri">Depo İşlemleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Stok_DepoIslemleri_DepoListesi" checked data-deger="Stok_DepoIslemleri_DepoListesi">
+                                                <label class="custom-control-label" for="Stok_DepoIslemleri_DepoListesi">Depo Listesi</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Stok_DepoIslemleri_DepolarArasiTransfer" checked data-deger="Stok_DepoIslemleri_DepolarArasiTransfer">
+                                                <label class="custom-control-label" for="Stok_DepoIslemleri_DepolarArasiTransfer">Depolar Arası Transfer</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Stok_DepoIslemleri_DepoStokDurumu" checked data-deger="Stok_DepoIslemleri_DepoStokDurumu">
+                                                <label class="custom-control-label" for="Stok_DepoIslemleri_DepoStokDurumu">Depo Stok Durumu</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Stok_DepoIslemleri_DepoyaYapılmışGirisler" checked data-deger="Stok_DepoIslemleri_DepoyaYapılmışGirisler">
+                                                <label class="custom-control-label" for="Stok_DepoIslemleri_DepoyaYapılmışGirisler">Depoya Yapılmış Girişler</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Stok_DepoIslemleri_DepodanYapilmisCikislar" checked data-deger="Stok_DepoIslemleri_DepodanYapilmisCikislar">
+                                                <label class="custom-control-label" for="Stok_DepoIslemleri_DepodanYapilmisCikislar">Depodan Yapılmış Çıkışlar</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Raporlar" checked data-deger="Raporlar">
+                                                <label class="custom-control-label" for="Raporlar">Raporlar</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Raporlar_CekimPaketleriRaporu" checked data-deger="Raporlar_CekimPaketleriRaporu">
+                                                <label class="custom-control-label" for="Raporlar_CekimPaketleriRaporu">Çekim Paketleri Raporu</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Raporlar_RezervasyonIslemAdetleriRaporu" checked data-deger="Raporlar_RezervasyonIslemAdetleriRaporu">
+                                                <label class="custom-control-label" for="Raporlar_RezervasyonIslemAdetleriRaporu">Rezervasyon İşlem Adetleri Raporu</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Raporlar_GelirGiderRaporlari" checked data-deger="Raporlar_GelirGiderRaporlari">
+                                                <label class="custom-control-label" for="Raporlar_GelirGiderRaporlari">Gelir Gider Raporu</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Raporlar_RezervasyonTurleriRaporu" checked data-deger="Raporlar_RezervasyonTurleriRaporu">
+                                                <label class="custom-control-label" for="Raporlar_RezervasyonTurleriRaporu">Rezervasyon Türleri Raporu</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Raporlar_RezervasyonEkHizmetleriRaporu" checked data-deger="Raporlar_RezervasyonEkHizmetleriRaporu">
+                                                <label class="custom-control-label" for="Raporlar_RezervasyonEkHizmetleriRaporu">Ek Hizmetler Raporu</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Raporlar_GelecekOdemelerRaporu" checked data-deger="Raporlar_GelecekOdemelerRaporu">
+                                                <label class="custom-control-label" for="Raporlar_GelecekOdemelerRaporu">Gelecek Ödemeler Raporu</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Raporlar_HaftalikRapor" checked data-deger="Raporlar_HaftalikRapor">
+                                                <label class="custom-control-label" for="Raporlar_HaftalikRapor">Haftalık Rapor</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="TelefonRehberi" checked data-deger="TelefonRehberi">
+                                                <label class="custom-control-label" for="TelefonRehberi">Telefon Rehberi</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="TelefonRehberi_Rehber" checked data-deger="TelefonRehberi_Rehber">
+                                                <label class="custom-control-label" for="TelefonRehberi_Rehber">Rehber</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="TelefonRehberi_ExceldenEkle" checked data-deger="TelefonRehberi_ExceldenEkle">
+                                                <label class="custom-control-label" for="TelefonRehberi_ExceldenEkle">Excelden Rehber Yükle</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Personeller" checked data-deger="Personeller">
+                                                <label class="custom-control-label" for="Personeller">Personeller</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Personeller_PersonelListesi" checked data-deger="Personeller_PersonelListesi">
+                                                <label class="custom-control-label" for="Personeller_PersonelListesi">Personel Listesi</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Personeller_PersonelOdemeleri" checked data-deger="Personeller_PersonelOdemeleri">
+                                                <label class="custom-control-label" for="Personeller_PersonelOdemeleri">Personel Ödemeleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Personeller_PersonelIzinleri" checked data-deger="Personeller_PersonelIzinleri">
+                                                <label class="custom-control-label" for="Personeller_PersonelIzinleri">Personel İzinleri</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Personeller_PersonelIsTakibi" checked data-deger="Personeller_PersonelIsTakibi">
+                                                <label class="custom-control-label" for="Personeller_PersonelIsTakibi">Personel İş Takibi</label>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar" checked data-deger="Tanimlar">
+                                                <label class="custom-control-label" for="Tanimlar">Tanımlar</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_CekimPaketleri" checked data-deger="Tanimlar_CekimPaketleri">
+                                                <label class="custom-control-label" for="Tanimlar_CekimPaketleri">Çekim Paketleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_GelirGiderTurleri" checked data-deger="Tanimlar_GelirGiderTurleri">
+                                                <label class="custom-control-label" for="Tanimlar_GelirGiderTurleri">Gelir Gider Türleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_GunlukIsKategorileri" checked data-deger="Tanimlar_GunlukIsKategorileri">
+                                                <label class="custom-control-label" for="Tanimlar_GunlukIsKategorileri">Günlük İş Kategorileri</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_PersonelGorevleri" checked data-deger="Tanimlar_PersonelGorevleri">
+                                                <label class="custom-control-label" for="Tanimlar_PersonelGorevleri">Personel Gorevleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_RehberGruplari" checked data-deger="Tanimlar_RehberGruplari">
+                                                <label class="custom-control-label" for="Tanimlar_RehberGruplari">Rehber Grupları</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_RezervasyonEkHizmetleri" checked data-deger="Tanimlar_RezervasyonEkHizmetleri">
+                                                <label class="custom-control-label" for="Tanimlar_RezervasyonEkHizmetleri">Rezervasyon Ek Hizmetleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_RezervasyonTurleri" checked data-deger="Tanimlar_RezervasyonTurleri">
+                                                <label class="custom-control-label" for="Tanimlar_RezervasyonTurleri">Rezervasyon Türleri</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_EmailMetinleri" checked data-deger="Tanimlar_EmailMetinleri">
+                                                <label class="custom-control-label" for="Tanimlar_EmailMetinleri">Email Metinleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_SmsMetinleri" checked data-deger="Tanimlar_SmsMetinleri">
+                                                <label class="custom-control-label" for="Tanimlar_SmsMetinleri">Sms Metinleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_SozlesmeSartlari" checked data-deger="Tanimlar_SozlesmeSartlari">
+                                                <label class="custom-control-label" for="Tanimlar_SozlesmeSartlari">Sözleşme Şartları</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_Sureler" checked data-deger="Tanimlar_Sureler">
+                                                <label class="custom-control-label" for="Tanimlar_Sureler">Süreçler</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_TatilGunleri" checked data-deger="Tanimlar_TatilGunleri">
+                                                <label class="custom-control-label" for="Tanimlar_TatilGunleri">Tatil Günleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Tanimlar_ZamanDilimleri" checked data-deger="Tanimlar_ZamanDilimleri">
+                                                <label class="custom-control-label" for="Tanimlar_ZamanDilimleri">Zaman Dilimleri</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Ayarlar" checked data-deger="Ayarlar">
+                                                <label class="custom-control-label" for="Ayarlar">Ayarlar</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Ayarlar_GenelAyarlar" checked data-deger="Ayarlar_GenelAyarlar">
+                                                <label class="custom-control-label" for="Ayarlar_GenelAyarlar">Genel Ayarlar</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Ayarlar_EmailGonderimAyarlari" checked data-deger="Ayarlar_EmailGonderimAyarlari">
+                                                <label class="custom-control-label" for="Ayarlar_EmailGonderimAyarlari">Email Gönderim Ayarları</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Ayarlar_EmailHesapAyarlari" checked data-deger="Ayarlar_EmailHesapAyarlari">
+                                                <label class="custom-control-label" for="Ayarlar_EmailHesapAyarlari">Email Hesap Ayarları</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Ayarlar_ListelemeFiltreAyarlari" checked data-deger="Ayarlar_ListelemeFiltreAyarlari">
+                                                <label class="custom-control-label" for="Ayarlar_ListelemeFiltreAyarlari">Filtre Ayarları</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Ayarlar_SmsGonderimAyarlari" checked data-deger="Ayarlar_SmsGonderimAyarlari">
+                                                <label class="custom-control-label" for="Ayarlar_SmsGonderimAyarlari">Sms Gönderim Ayarları</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Ayarlar_MusteriAyarlari" checked data-deger="Ayarlar_MusteriAyarlari">
+                                                <label class="custom-control-label" for="Ayarlar_MusteriAyarlari">Müşteri Ayarları</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Ayarlar_RezervasyonAyarlari" checked data-deger="Ayarlar_RezervasyonAyarlari">
+                                                <label class="custom-control-label" for="Ayarlar_RezervasyonAyarlari">Rezervasyon Ayarları</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Ayarlar_SozlesmeCiktiAyarlari" checked data-deger="Ayarlar_SozlesmeCiktiAyarlari">
+                                                <label class="custom-control-label" for="Ayarlar_SozlesmeCiktiAyarlari">Sözleşme Çıktı Ayarları</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Ayarlar_Personeller" checked data-deger="Ayarlar_Personeller">
+                                                <label class="custom-control-label" for="Ayarlar_Personeller">Personel Ayarları</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="FirmaSubeIslemleri" checked data-deger="FirmaSubeIslemleri">
+                                                <label class="custom-control-label" for="FirmaSubeIslemleri">Firma Sube İşlemleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="FirmaSubeIslemleri_FirmaBilgileri" checked data-deger="FirmaSubeIslemleri_FirmaBilgileri">
+                                                <label class="custom-control-label" for="FirmaSubeIslemleri_FirmaBilgileri">Firma Bilgileri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="FirmaSubeIslemleri_SubeIslemleri" checked data-deger="FirmaSubeIslemleri_SubeIslemleri">
+                                                <label class="custom-control-label" for="FirmaSubeIslemleri_SubeIslemleri">Şube İşlemleri</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="KullaniciYetkiIslemleri" checked data-deger="KullaniciYetkiIslemleri">
+                                                <label class="custom-control-label" for="KullaniciYetkiIslemleri">Kullanıcı Yetki İşlemleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="KullaniciYetkiIslemleri_KullaniciListesi" checked data-deger="KullaniciYetkiIslemleri_KullaniciListesi">
+                                                <label class="custom-control-label" for="KullaniciYetkiIslemleri_KullaniciListesi">Kullanıcı Listesi</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="KullaniciYetkiIslemleri_KullaniciYetkilendirme" checked data-deger="KullaniciYetkiIslemleri_KullaniciYetkilendirme">
+                                                <label class="custom-control-label" for="KullaniciYetkiIslemleri_KullaniciYetkilendirme">Kullanıcı Yetkilendirme</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="SmsGonder" checked data-deger="SmsGonder">
+                                                <label class="custom-control-label" for="SmsGonder">SMS Gonder</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="SatinAl" checked data-deger="SatinAl">
+                                                <label class="custom-control-label" for="SatinAl">Satın Al</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="SatinAl_PaketSec" checked data-deger="SatinAl_PaketSec">
+                                                <label class="custom-control-label" for="SatinAl_PaketSec">Paket Seç</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="SatinAl_Siparisler" checked data-deger="SatinAl_Siparisler">
+                                                <label class="custom-control-label" for="SatinAl_PaketSec">Siparişler</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Destek" checked data-deger="Destek">
+                                                <label class="custom-control-label" for="Destek">Destek</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Destek_DestekTalepleri" checked data-deger="Destek_DestekTalepleri">
+                                                <label class="custom-control-label" for="Destek_DestekTalepleri">Destek Talepleri</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="Destek_DestekDetay" checked data-deger="Destek_DestekDetay">
+                                                <label class="custom-control-label" for="Destek_DestekDetay">Destek Detay</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="EkModul1" checked data-deger="EkModul1">
+                                                <label class="custom-control-label" for="EkModul1">EkModul1</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="EkModul2" checked data-deger="EkModul2">
+                                                <label class="custom-control-label" for="EkModul2">EkModul2</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="EkModul3" checked data-deger="EkModul3">
+                                                <label class="custom-control-label" for="EkModul3">EkModul3</label>
+                                            </div>
+                                        </div>
+                                        <div class="col col-sm-3">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="EkModul4" checked data-deger="EkModul4">
+                                                <label class="custom-control-label" for="EkModul4">EkModul4</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div class="form-row mb-2">
+                                        <div class="form-group col-sm-2">
+                                            <label class="form-label" for="SubeLimit">Şube Limit</label>
+                                            <input type="text" placeholder="0" class="form-control form-control-sm" name="SubeLimit" maxlength="2" id="SubeLimit">
+                                        </div>
+                                        <div class="form-group col-sm-2">
+                                            <label class="form-label" for="PersonelLimit">Personel Limit</label>
+                                            <input type="text" placeholder="0" class="form-control form-control-sm" name="PersonelLimit" maxlength="2" id="PersonelLimit">
+                                        </div>
+                                        <div class="form-group col-sm-2">
+                                            <label class="form-label" for="KullaniciLimit">Kullanıcı Limit</label>
+                                            <input type="text" placeholder="0" class="form-control form-control-sm" name="KullaniciLimit" maxlength="2" id="KullaniciLimit">
+                                        </div>
+                                        <div class="form-group col-sm-2">
+                                            <label class="form-label" for="SMSMiktar">SMS Miktar</label>
+                                            <input type="text" placeholder="0" class="form-control form-control-sm" name="SMSMiktar" maxlength="2" id="SMSMiktar">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Guncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtpersoneller" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Id</th>
+                                <th>Paket Adı</th>
+                                <th>Paket Detayı</th>
+                                <th>Paket Tip</th>
+                                <th>Satış Fiyatı</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (SatisFiyatlari paket in Model)
+                            {
+                                <tr>
+                                    <td>@paket.Id</td>
+                                    <td>@paket.PaketAdi</td>
+                                    <td>@Html.Raw(paket.PaketDetayi)</td>
+                                    <td>@paket.PaketTip</td>
+                                    <td>@paket.SatisFiyati.ToString("C").Replace("₺", "") TL</td>
+                                    <td><button type="button" class="btn btn-default btn-sm waves-effect waves-themed" data-paketid="@paket.Id" data-toggle="modal" data-target="#KayitDuzenleModal">Düzenle</button></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        var controls = {
+            leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
+            rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
+        }
+
+        var runDatePicker = function () {
+            $('#IndirimBitisTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#Tarih').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+        }
+
+        $(document).ready(function () {
+            runDatePicker();
+
+            $(":input").inputmask();
+            function dateFormat(d) {
+                return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+            }
+            $("#SatisFiyati").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+            $("#IndirimliFiyat").inputmask("currency",
+                {
+                    placeholder: "0.00", // Varsayılan değer
+                    prefix: "", // öndeki değer
+                    suffix: " TL", // sondaki değer
+                    rightAlign: false, // sağa-sola yaslama
+                    radixPoint: ",", // kuruş ayıracı
+                    groupSeparator: "." // binlik ayıracı
+                });
+
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+
+
+        });
+
+    </script>
+}
+
+
+

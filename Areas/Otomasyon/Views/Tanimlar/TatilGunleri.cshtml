@@ -1,0 +1,481 @@
+﻿@{
+    ViewBag.Title = "Tanımlar - Tatil Günleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+}
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="YeniKayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Yeni Tatil Günü Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Baslangıç Tarihi</label>
+                            <div class="col-12 col-lg-6" id="baslangichata">
+                                <div class="input-group">
+                                    <input type="text" class="form-control " value="07/17/2020" id="baslangic">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text fs-xl">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Bitiş Tarihi</label>
+                            <div class="col-12 col-lg-6" id="bitishata">
+                                <div class="input-group">
+                                    <input type="text" class="form-control " value="07/17/2020" id="bitis">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text fs-xl">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Açıklama</label>
+                            <div class="col-12 col-lg-8">
+                                <div class="input-group">
+                                    <textarea class="form-control" id="aciklama" placeholder="Açıklama" rows="3" name="Aciklama" style="overflow:auto;resize:none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="TatilKaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Yeni Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Kayıt Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Baslangıç Tarihi</label>
+                            <div class="col-12 col-lg-6" id="baslangicduzenlehata">
+                                <div class="input-group">
+                                    <input type="text" class="form-control " value="07/17/2020" id="baslangicduzenle">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text fs-xl">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Bitiş Tarihi</label>
+                            <div class="col-12 col-lg-6" id="bitisduzenlehata">
+                                <div class="input-group">
+                                    <input type="text" class="form-control " value="07/17/2020" id="bitisduzenle">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text fs-xl">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Açıklama</label>
+                            <div class="col-12 col-lg-8">
+                                <div class="input-group">
+                                    <textarea class="form-control" id="aciklamaduzenle" placeholder="Açıklama" rows="3" name="Aciklama" style="overflow:auto;resize:none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="TatilGuncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                @if (KullaniciYetki.KayitEkle)
+                {
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#YeniKayitEkleModal" style="margin:10px 10px 10px 17px " id="YeniEkle">Yeni Tatil Günü Ekle</button>
+                }
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtTatiller" class="table table-bordered table-hover table-sm table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th class="w-25">Başlangıç</th>
+                                <th class="w-25">Bitiş</th>
+                                <th>Açıklama</th>
+                                <th class="w-10">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tatillersatir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+    {
+    <script>
+        var controls = {
+            leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
+            rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
+        }
+        var runDatePicker = function () {
+            $('#baslangic').datepicker(
+               {
+                   todayBtn: "linked",
+                   todayHighlight: true,
+                   templates: controls,
+                   autoclose: true,
+                   language: 'tr',
+
+               }).datepicker("setDate", new Date());
+            $('#bitis').datepicker(
+               {
+                   todayBtn: "linked",
+                   todayHighlight: true,
+                   templates: controls,
+                   autoclose: true,
+                   language: 'tr'
+               }).datepicker("setDate", new Date());
+            $('#baslangicduzenle').datepicker(
+               {
+                   todayBtn: "linked",
+                   todayHighlight: true,
+                   templates: controls,
+                   autoclose: true,
+                   language: 'tr'
+               }).datepicker("setDate", new Date());
+            $('#bitisduzenle').datepicker(
+               {
+                   todayBtn: "linked",
+                   todayHighlight: true,
+                   templates: controls,
+                   autoclose: true,
+                   language: 'tr'
+               }).datepicker("setDate", new Date());
+        }
+
+        $(document).ready(function () {
+
+            runDatePicker();
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            });
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $("#baslangic").datepicker("setDate", new Date());
+                $("#bitis").datepicker("setDate", new Date());
+                $("#aciklama").val("");
+            });
+            $("#TatilKaydet").click(function () {
+                var baslangictarih = $("#baslangic").val().split('.');
+                var bitistarih = $("#bitis").val().split('.');
+                baslangictarih = baslangictarih[2] + baslangictarih[1] + baslangictarih[0];
+                bitistarih = bitistarih[2] + bitistarih[1] + bitistarih[0];
+
+                if ($("#baslangic").val() == "") {
+                    $("#baslangichata").append("<div class='hata' style='color:red'>Başlangıç Tarihini Giriniz.</div>");
+                }
+                else if ($("#bitis").val() == "") {
+                    $("#bitishata").append("<div class='hata' style='color:red'>Bitiş Tarihini Giriniz.</div>");
+                }
+                else if (parseInt(baslangictarih) > parseInt(bitistarih)) {
+                    $("#bitishata").append("<div class='hata' style='color:red'>Bitiş Tarihini Başlangıç tarihinden Geri Olamaz.</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var baslangic = $("#baslangic").val().toString();
+                    var bitis = $("#bitis").val().toString();
+                    var aciklama = $("#aciklama").val().toString();
+                    var TatilData = new FormData();
+                    TatilData.append("Baslangic", $("#baslangic").val().toString());
+                    TatilData.append("Bitis", $("#bitis").val().toString());
+                    TatilData.append("Aciklama", $("#aciklama").val().toString());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: TatilData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/TatilGunuVarMi/",
+                        success: function (data) {
+                            if (data == "Yok") // Bu isimde aktif bir paket yoksa yeni paket eklenecek
+                            {
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: TatilData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/Tanimlar/TatilGunuEkle/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {
+                                            alertify.set('notifier', 'delay', 5);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.error(data.Mesaj);
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            alertify.set('notifier', 'delay', 3);
+                                            alertify.set('notifier', 'position', 'top-center');
+                                            alertify.success(data.Mesaj);
+                                            dt.api().ajax.reload();
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                            else if (data != "Yok") // Aynı isimde  aktif bir paket var ise uyarı ver ve gücelleme sor
+                            {
+                                Swal.fire(
+                                {
+                                    title: "Varolan Kayıt",
+                                    html: "<p><h2 style='font-size:16px; color:red'><strong>Tarih : </strong>" + baslangic + " - " + bitis + "</br><strong>Açıklama : </strong>" + aciklama + "</h2></p><h2> Tatil Günü zaten var!</h2>",
+                                    type: "warning",
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtTatiller").on('click', '.Duzenle', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                $("#TatilGuncelle").val($(this).data("tid"))
+                $("#baslangicduzenle").val($(this).data("baslangic"));
+                $("#bitisduzenle").val($(this).data("bitis"));
+                var aciklama = $(this).data("aciklama").replace(/\<br \/\>/g, "\r\n")  // textarea daki bilgi veri tabanına kaydedilirken "\r\n" karakterleri "<br />" tagına dönüştürülmüştü, bura da da tersi yapılıyor.
+                $("#aciklamaduzenle").val(aciklama);
+                $('#baslangicduzenle').datepicker("setDate", $(this).data("baslangic"));
+                $('#bitisduzenle').datepicker("setDate", $(this).data("bitis"));
+            });
+            $("#TatilGuncelle").click(function () {
+                var baslangictarih = $("#baslangicduzenle").val().split('.');
+                var bitistarih = $("#bitisduzenle").val().split('.');
+                baslangictarih = baslangictarih[2] + baslangictarih[1] + baslangictarih[0];
+                bitistarih = bitistarih[2] + bitistarih[1] + bitistarih[0];
+
+                if ($("#baslangicduzenle").val() == "") {
+                    $("#baslangicduzenlehata").append("<div class='hata' style='color:red'>Başlangıç Tarihini Giriniz.</div>");
+                }
+                else if ($("#bitisduzenle").val() == "") {
+                    $("#bitisduzenlehata").append("<div class='hata' style='color:red'>Bitiş Tarihini Giriniz.</div>");
+                }
+                else if (parseInt(baslangictarih) > parseInt(bitistarih)) {
+                    $("#bitisduzenlehata").append("<div class='hata' style='color:red'>Bitiş Tarihini Başlangıç tarihinden Geri Olamaz.</div>");
+                }
+                else {
+                    $('#KayitDuzenleModal').modal('hide');
+                    var id = $(this).val();
+                    var baslangic = $("#baslangicduzenle").val();
+                    var bitis = $("#bitisduzenle").val();
+                    var aciklama = $("#aciklamaduzenle").val();
+                    var TatilData = new FormData();
+                    TatilData.append("Baslangic", $("#baslangicduzenle").val());
+                    TatilData.append("Bitis", $("#bitisduzenle").val());
+                    TatilData.append("Aciklama", $("#aciklamaduzenle").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: TatilData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Tanimlar/TatilGunuGuncelle/" + id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+
+                }
+            });
+            $("#dtTatiller").on('click', '.Sil', function () {
+                var id = $(this).data("tid");
+                var baslangic = $(this).data("baslangic");
+                var bitis = $(this).data("bitis");
+                var aciklama = $(this).data("aciklama");
+                Swal.fire(
+                {
+                    title: "Kayıt Silinecek",
+                    html: "<p><h2 style='font-size:16px; color:red'><strong>Tarih : </strong>" + baslangic + " - " + bitis + "</br><strong>Açıklama : </strong>" + aciklama + "</h2></p><h2> Tatil Günü silinsin mi?</h2>",
+                    type: "error",
+                    showCancelButton: true,
+                    confirmButtonText: "Evet, Silinsin!",
+                    cancelButtonText: "İptal"
+                }).then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Tanimlar/TatilGunuSil/" + id,
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    alertify.set('notifier', 'delay', 3);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.success(data.Mesaj);
+                                    dt.api().ajax.reload();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+            });
+            function dateFormat(d) {
+                //console.log(d);
+                //console.log((d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear());
+                return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+            }
+            var dt;
+            var islem="";
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            dt = $('#dtTatiller').dataTable(
+                    {
+                        responsive: true,
+                        "destroy": true,
+                        "columns": [
+                                    {
+                                        "data": "Baslangic",
+                                        "autowidth": true,
+                                        "className": "align-middle",
+                                        "render": function (data, type, row) {
+                                            var baslangic = row.Baslangic;
+                                            var baslangictarih = dateFormat(new Date(parseInt(baslangic.match(/\d+/)[0])));
+                                            return baslangictarih
+                                        }
+                                    },
+                                    {
+                                        "data": "Bitis",
+                                        "autowidth": true,
+                                        "className": "align-middle",
+                                        "render": function (data, type, row) {
+                                            var bitis = row.Bitis;
+                                            var bitistarih = dateFormat(new Date(parseInt(bitis.match(/\d+/)[0])));
+                                            return bitistarih
+                                        }
+                                    },
+                                    { "data": "Aciklama", "autowidth": true, "className": "align-middle" },
+                                    {
+                                        "data": null,
+                                        "className": "align-middle",
+                                        "render": function (data, type, row) {
+                                            islem = "";
+                                            var baslangic = row.Baslangic;
+                                            var bitis = row.Bitis;
+                                            var baslangictarih = dateFormat(new Date(parseInt(baslangic.match(/\d+/)[0])));
+                                            var bitistarih = dateFormat(new Date(parseInt(bitis.match(/\d+/)[0])));
+                                            if (DuzenleYetki == "True") {
+                                                islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon Duzenle' data-tid='" + row.Id + "' data-baslangic='" + baslangictarih + "' data-bitis='" + bitistarih + "' data-aciklama='" + row.Aciklama + "' data-toggle='modal' data-target='#KayitDuzenleModal'>" +
+                                                                    "<i class='fal fa-edit'></i>" +
+                                                                "</a>"
+                                            }
+                                            if (SilYetki == "True") {
+                                                islem = islem +  "<a href='#' class='btn btn-xs btn-danger btn-icon Sil' data-tid='" + row.Id + "' data-baslangic='" + baslangictarih + "' data-bitis='" + bitistarih + "' data-aciklama='" + row.Aciklama + "' style='background-color:crimson;margin-left:5px'>" +
+                                                                    "<i class='fal fa-trash-alt'></i>" +
+                                                                 "</a>"
+                                            }
+                                            return islem
+                                        }
+                                    }
+                        ],
+                        "processing": true,
+                        "ajax": {
+                            "url": "/Otomasyon/Tanimlar/TatilGunleriListesi/",
+                            "contentType": 'application/json; charset=utf-8',
+                            'data': function (data) { return data = JSON.stringify(data); }
+                        },
+                        "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                        "oLanguage": {
+                            "sSearchPlaceholder": "Tabloda Ara",
+                            "sZeroRecords": "Kayıt yok.",
+                            "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                            "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                            "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                            "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                            "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                            "oPaginate": {
+                                "sPrevious": "Önceki",
+                                "sNext": "Sonraki",
+                                "sFirst": "İlk",
+                                "sLast": "Son"
+                            }
+                        }
+                    });
+        });
+    </script>
+}

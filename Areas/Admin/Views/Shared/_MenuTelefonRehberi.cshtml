@@ -1,0 +1,45 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool telefonrehberiyetki = ky.FirstOrDefault(x => x.SayfaId == 7 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 7 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rehberiyetki = ky.FirstOrDefault(x => x.SayfaId == 65 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 65 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool exceldenaktaryetki = ky.FirstOrDefault(x => x.SayfaId == 66 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 66 && x.Sil == false && x.Aktif == true).SayfaYetki;
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Telefon Rehberi" ? "active open" : "";
+    string altmenurehber = ViewBag.AltMenu == "Rehber" ? "active" : "";
+}
+@if (telefonrehberiyetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Telefon Rehberi" data-filter-tags="telefon rehberi">
+            <i class="ni ni-phone"></i>
+            <span class="nav-link-text" data-i18n="nav.telefon_rehberi">Telefon Rehberi</span>
+        </a>
+        <ul>
+            @if (lisans.TelefonRehberi_Rehber)
+            {
+                if (rehberiyetki)
+                {
+                    <li class=@altmenurehber>
+                        <a href="~/Admin/TelefonRehberi/Rehber" title="Rehber" data-filter-tags="telefon rehberi rehber">
+                            <span class="nav-link-text" data-i18n="nav.telefon_rehberi_rehber">Rehber</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.TelefonRehberi_ExceldenEkle)
+            {
+                if (exceldenaktaryetki)
+                {
+                    <li class=@altmenurehber>
+                        <a href="~/Admin/TelefonRehberi/ExceldenEkle" title="Excel''den Ekle" data-filter-tags="telefon rehberi excelden ekle">
+                            <span class="nav-link-text" data-i18n="nav.telefon_rehberi_excenden_ekle">Excel'den Ekle</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}

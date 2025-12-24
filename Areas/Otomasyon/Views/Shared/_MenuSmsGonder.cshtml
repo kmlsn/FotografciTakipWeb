@@ -1,0 +1,18 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool smsgonderyetki = ky.FirstOrDefault(x => x.SayfaId == 13 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 13 && x.Sil == false && x.Aktif == true).SayfaYetki;
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "SMS Gönder" ? "active" : "";
+}
+@if (smsgonderyetki)
+{
+    <li class=@ustmenuclass>
+        <a href="~/Otomasyon/Dashboard/SmsGonder" title="SMS Gönder" data-filter-tags="sms gönder">
+            <i class="ni ni-speech"></i>
+            <span class="nav-link-text" data-i18n="nav.sms_gonder">SMS Gönder</span>
+        </a>
+    </li>
+}
+

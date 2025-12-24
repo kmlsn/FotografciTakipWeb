@@ -1,0 +1,1282 @@
+﻿@{
+    ViewBag.Title = "Randevular";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    List<Personel> Personeller = ViewBag.Personeller;
+    List<Musteri> Musteriler = ViewBag.Musteriler;
+    List<SubeToKullanici> SubeKullanici = ViewBag.SubeKullanici;
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DetayYetki = KullaniciYetki.KayitDetayi.ToString();
+    string DuzenleYetki = KullaniciYetki.KayitDuzenle.ToString();
+    string SilYetki = KullaniciYetki.KayitSil.ToString();
+    string SubeId = Session["AktifSubeId"].ToString();
+    char[] sube_id = SubeId.ToCharArray();
+}
+
+@section Head
+{
+    <style type="text/css">
+        a {
+            color: black;
+        }
+
+        .swal2-container {
+            display: -webkit-box;
+            display: flex;
+            position: fixed;
+            z-index: 300000; /*Uyarı penceresini herşeyin önüne getimek için*/
+        }
+    </style>
+}
+<!-- Kayıt Ekle Modal Penceresi -->
+<div class="modal fade" id="KayitEkleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Randevu Ekle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="MusteriHata">
+                                <label class="form-label" for="Musteri">Musteri</label>
+                                <select class="custom-select form-control custom-select-sm" id="Musteri" name="Musteri" title="Musteri seçiniz">
+                                    <option selected="" value="0" disabled>Müşteri Seçiniz</option>
+                                    @foreach (var musteri in Musteriler)
+                                    {
+                                        <option value="@musteri.Id">@musteri.AdiSoyadi</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="RandevuTarihi">Randevu Tarihi</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" value="07/17/2020" id="RandevuTarihi">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text fs-sm">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="SozlesmeNoHata">
+                                <label class="form-label" for="SozlesmeNo">Sözleşme No</label>
+                                <select class="custom-select form-control custom-select-sm" id="SozlesmeNo" name="SozlesmeNo" title="Sözleşme seçiniz">
+                                    <option selected="" value="0" disabled>Sözleşme Seçiniz</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-sm-3" id="BaslangicZamanHata">
+                                <label class="form-label" for="BaslangicZaman">Başlangıç Saati</label>
+                                <input class="form-control" id="BaslangicZaman" type="time" name="time" value="00:00">
+                            </div>
+                            <div class="form-group col-sm-3" id="BitisZamanHata">
+                                <label class="form-label" for="BitisZaman">Bitiş Saati</label>
+                                <input class="form-control" id="BitisZaman" type="time" name="time" value="00:00">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="RezervasyonTuru">Rezervasyon Türü</label>
+                                <input type="text" id="RezervasyonTuru" class="form-control form-control-sm" name="RezervasyonTuru" disabled>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <div class="custom-control custom-checkbox mt-4">
+                                    <input type="checkbox" class="custom-control-input" id="CekimRandevu" checked="">
+                                    <label class="custom-control-label" for="CekimRandevu">Cekim Randevusu</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="Aciklama">Açıklama</label>
+                                <textarea class="form-control form-control-sm" id="Aciklama" rows="4" name="Aciklama" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                            <div class="form-group col-sm-6" id="PersonelIdHata">
+                                <div id="panel-1" class="panel">
+                                    <div class="card-header py-1">
+                                        <h5 style="padding-top:5px">
+                                            Personeller
+                                        </h5>
+                                    </div>
+                                    <div class="panel-container show">
+                                        <div class="panel-content" id="randevueklepersonellist">
+                                            <div id="rendevuekle_personeller_liste">
+                                                <div class="input-group mb-g sticky-top bg-faded">
+                                                    <!-- üstte sabitlemek için class a "sticky-top bg-faded" eklendi -->
+                                                    <input type="text" class="form-control form-control form-control-sm shadow-inset-2" id="rendevuekle_personeller_liste_arama" placeholder="Personel ara">
+                                                    <div class="input-group-append">
+                                                        <div class="input-group-text">
+                                                            <i class="fal fa-search fs-sm"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <ul class="list-group" id="PersonelListesi">
+                                                    @foreach (var personel in Personeller)
+                                                    {
+                                                        <li class="list-group-item-changed">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input" id="randevu-@personel.Id" data-persid="randevu-@personel.Id">
+                                                                <label class="custom-control-label" data-filter-tags="@personel.AdiSoyadi.ToLower()" for="randevu-@personel.Id">@personel.AdiSoyadi - @personel.PersonelGorevleri.Gorev</label>
+                                                            </div>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Kaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Ekle Modal Penceresi -->
+<!-- Kayıt Güncelle Modal Penceresi -->
+<div class="modal fade" id="KayitDuzenleModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Randevu Güncelle
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="MusteriDuzenle">Müşteri</label>
+                                <input type="text" id="MusteriDuzenle" class="form-control form-control-sm" name="MusteriDuzenle" disabled>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="RandevuTarihiDuzenle">Randevu Tarihi</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control form-control-sm" value="07/17/2020" id="RandevuTarihiDuzenle">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text fs-sm">
+                                            <i class="fal fa-calendar-alt"></i>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="SozlesmeNoDuzenle">Sözleşme No</label>
+                                <input type="text" id="SozlesmeNoDuzenle" class="form-control form-control-sm" name="SozlesmeNoDuzenle" disabled>
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label class="form-label" for="BaslangicZamanDuzenle">Başlangıç Zamanı</label>
+                                <input class="form-control" id="BaslangicZamanDuzenle" type="time" name="time" value="00:00">
+                            </div>
+                            <div class="form-group col-sm-3">
+                                <label class="form-label" for="BitisZamanDuzenle">Bitiş Zamanı</label>
+                                <input class="form-control" id="BitisZamanDuzenle" type="time" name="time" value="00:00">
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="RezervasyonTuruDuzenle">Rezervasyon Türü</label>
+                                <input type="text" id="RezervasyonTuruDuzenle" class="form-control form-control-sm" name="RezervasyonTuruDuzenle" disabled>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <div class="custom-control custom-checkbox mt-4">
+                                    <input type="checkbox" class="custom-control-input" id="CekimRandevuDuzenle" checked="">
+                                    <label class="custom-control-label" for="CekimRandevuDuzenle">Cekim Randevusu</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label class="form-label" for="AciklamaDuzenle">Açıklama</label>
+                                <textarea class="form-control form-control-sm" id="AciklamaDuzenle" rows="4" name="AciklamaDuzenle" style="overflow:auto;resize:none"></textarea>
+                            </div>
+                            <div class="form-group col-sm-6" id="PersonelIdDuzenleHata">
+                                <div id="panel-1" class="panel">
+                                    <div class="card-header py-1">
+                                        <h5 style="padding-top:5px">
+                                            Personeller
+                                        </h5>
+                                    </div>
+                                    <div class="panel-container show">
+                                        <div class="panel-content" id="randevueklepersonellist">
+                                            <div id="rendevuduzenle_personeller_liste">
+                                                <div class="input-group mb-g sticky-top bg-faded">
+                                                    <!-- üstte sabitlemek için class a "sticky-top bg-faded" eklendi -->
+                                                    <input type="text" class="form-control form-control form-control-sm shadow-inset-2" id="rendevuduzenle_personeller_liste_arama" placeholder="Personel ara">
+                                                    <div class="input-group-append">
+                                                        <div class="input-group-text">
+                                                            <i class="fal fa-search fs-sm"></i>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <ul class="list-group" id="PersonelListesiDuzenle">
+                                                    @foreach (var personel in Personeller)
+                                                    {
+                                                        <li class="list-group-item-changed">
+                                                            <div class="custom-control custom-checkbox">
+                                                                <input type="checkbox" class="custom-control-input" id="randevuduzenle-@personel.Id" data-persid="randevuduzenle-@personel.Id">
+                                                                <label class="custom-control-label" data-filter-tags="@personel.AdiSoyadi.ToLower()" for="randevuduzenle-@personel.Id">@personel.AdiSoyadi - @personel.PersonelGorevleri.Gorev</label>
+                                                            </div>
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Guncelle">Güncelle</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Kayıt Güncelle Modal Penceresi -->
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <form id="FiltreForm">
+                    <div class="row col col-12 mt-3" id="date_filter">
+                        <div class="form-group col-sm-2">
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-sm" value="07/17/2020" id="IlkTarih" name="IlkTarih">
+                                <div class="input-group-append">
+                                    <span class="input-group-text fs-sm">
+                                        <i class="fal fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-2">
+                            <div class="input-group">
+                                <input type="text" class="form-control form-control-sm" value="07/17/2020" id="SonTarih" name="SonTarih">
+                                <div class="input-group-append">
+                                    <span class="input-group-text fs-sm">
+                                        <i class="fal fa-calendar-alt"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-2">
+                            <select class="custom-select form-control custom-select-sm" id="Goruntule" name="Goruntule" title="Görüntülenecek Sözleşme Kriteri">
+                                <option selected="" value="0">Tüm Randevular</option>
+                                <option value="1">Aktif Randevular</option>
+                                <option value="2">İptal Randevular</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-sm-2">
+                            <select class="custom-select form-control custom-select-sm" id="Sube" name="Sube" title="Görüntülenecek Şube">
+                                <option value="0">Tüm Şubeler</option>
+                                @foreach (var sube in SubeKullanici)
+                                {
+                                    if (Convert.ToInt64(Session["AktifSubeId"]) == sube.SubeId && sube.Sube.Aktif == true)
+                                    {
+                                        <option selected="" value="@sube.Sube.Id">@sube.Sube.SubeAdi</option>
+                                    }
+                                    else if (sube.Sube.Aktif == true)
+                                    {
+                                        <option value="@sube.Sube.Id">@sube.Sube.SubeAdi</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group col-sm-2">
+                            <select class="custom-select form-control custom-select-sm" id="Personel" name="Personel" title="Görüntülenecek Personel">
+                                <option selected="" value="0">Tüm Personeller</option>
+                                @foreach (var personel in Personeller)
+                                {
+                                    // personel aktif şubede görevli değilse listede gösterme
+
+                                    if (SubeId == "0")
+                                    {
+                                        <option value="@personel.Id">@personel.AdiSoyadi</option>
+                                    }
+                                    else
+                                    {
+                                        if (personel.GorevliSubeler.IndexOf(sube_id[0]) != -1)
+                                        {
+                                            <option value="@personel.Id">@personel.AdiSoyadi</option>
+                                        }
+                                    }
+                                }
+                            </select>
+                        </div>
+                        @if (KullaniciYetki.KayitEkle == true)
+                        {
+                            <div class="form-group col-sm-2">
+                                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#KayitEkleModal" id="RandevuEkle">Randevu Ekle </button>
+                            </div>
+                        }
+                    </div>
+                </form>
+                <input type="text" id="FiltreAyar" style="display:none" data-filtreayar="@ViewBag.FiltreAyar">
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="tb-Randevular" class="table table-sm table-bordered table-hover table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Sözleşme No</th> @*0*@
+                                <th>Müşteri Adı Soyadı</th> @*1*@
+                                <th>Görevli Personeller</th> @*2*@
+                                <th>Rezervasyon Türü</th> @*3*@
+                                <th>Randevu Tarihi</th> @*4*@
+                                <th>Başlangıç Saati</th> @*5*@
+                                <th>Bitiş Saati</th> @*6*@
+                                <th>ÇekimRandevu?</th> @*7*@
+                                <th>Açıklama</th> @*8*@
+                                <th class="w-5">İşlem</th> @*9*@
+                                <th style="display:none">Randevu Tarihi</th> @*10*@
+                                <th style="display:none">Sozleşme No</th> @*11*@
+                                <th style="display:none">İptal Bit</th> @*12*@
+                                <th style="display:none">SubeId</th> @*13*@
+                            </tr>
+                        </thead>
+                        <tbody id="teklif-satir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<input type="text" id="KullaniciYetkiKayitDuzenle" class="form-control" name="Id" maxlength="50" style="display:none" value="@DuzenleYetki">
+<input type="text" id="KullaniciYetkiKayitSil" class="form-control" name="Id" maxlength="50" style="display:none" value="@SilYetki">
+<input type="text" id="KullaniciYetkiKayitDetayi" class="form-control" name="Id" maxlength="50" style="display:none" value="@DetayYetki">
+@section Script
+{
+    <script src="~/Areas/Otomasyon/Content/js/tablotarihsirala.js"></script>
+    <script src="~/Areas/Otomasyon/Content/js/dependency/moment/moment.js"></script>
+    <script>
+        var dt;
+        var filtreayar = $('#FiltreAyar').data("filtreayar");
+        var controls = {
+            leftArrow: '<i class="fal fa-angle-left" style="font-size: 1.25rem"></i>',
+            rightArrow: '<i class="fal fa-angle-right" style="font-size: 1.25rem"></i>'
+        }
+        var runDatePicker = function () {
+            if (filtreayar == "0") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+            } // 1 Gün
+            else if (filtreayar == "1") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() + 7)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setDate(new Date().getDate() - 7)));
+            } // 1 Hafta Öncesi - 1 Hafta Sonrası
+            else if (filtreayar == "2") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setMonth(new Date().getMonth() - 1)));
+            } // 1 Ay Öncesi - 1 Ay Sonrası
+            else if (filtreayar == "3") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() + 1)));
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().setFullYear(new Date().getFullYear() - 1)));
+            } // 1 Yıl Öncesi - 1 Yıl Sonrası
+            else if (filtreayar == "4") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+            } // Ayın başından bu güne
+            else if (filtreayar == "5") {
+                $('#SonTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $('#IlkTarih').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date(new Date().getFullYear(), 0, 1));
+            } // Yılın başından bu güne
+
+            $('#RandevuTarihiDuzenle').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+            $('#RandevuTarihi').datepicker(
+                {
+                    todayBtn: "linked",
+                    todayHighlight: true,
+                    templates: controls,
+                    language: 'tr',
+                    autoclose: true
+                }).datepicker("setDate", new Date());
+        }
+
+        $(document).ready(function () {
+            function dateFormat(d) {
+                return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+            }
+            function timeFormat(t) {
+                var saat = t.getHours();
+                var dakika = t.getMinutes();
+                var zaman = saat + ":" + dakika
+                return zaman;
+            }
+            runDatePicker();
+            var MusteriId = 0, MusteriIdDuzenle = 0, SozlesmeId = 0, SozlesmeNo = 0, CekimRandevu = "Aktif"; CekimRandevuDuzenle = "Aktif";/*durum = "Aktif";*/
+            var RandevuAciklama = "";
+            var RandevuPersonelIdArray = new Array();
+            var RandevuDuzenlePersonelIdArray = new Array();
+            var PersonelGuncelleSecilenID = new Array();
+
+            var RandevuPersonelListesi = $("#PersonelListesi :checkbox");
+            RandevuPersonelListesi.on("change", function () {
+                SecilenRandevuPersonel();
+            });
+            function SecilenRandevuPersonel() {
+                while (RandevuPersonelIdArray.length > 0) {
+                    RandevuPersonelIdArray.pop();
+                }
+                RandevuPersonelListesi.filter(":checked").each(function () {
+                    var persid = $(this).data("persid").replace("randevu-", "");
+                    //RandevuPersonelIdArray.push($(this).data("persid").replace("randevu-", ""));
+                    RandevuPersonelIdArray.push(persid);
+                });
+                //console.log(RandevuPersonelIdArray);
+            }
+
+            var RandevuDuzenlePersonelListesi = $("#PersonelListesiDuzenle :checkbox");
+            RandevuDuzenlePersonelListesi.on("change", function () {
+                SecilenRandevuDuzenlePersonel();
+            });
+            function SecilenRandevuDuzenlePersonel() {
+                RandevuDuzenlePersonelIdArray = [];
+                //while (RandevuDuzenlePersonelIdArray.length > 0) {
+                //    RandevuDuzenlePersonelIdArray.pop();
+                //}
+
+                RandevuDuzenlePersonelListesi.filter(":checked").each(function () {
+                    var persid = $(this).data("persid").replace("randevuduzenle-", "");
+                    //RandevuDuzenlePersonelIdArray.push($(this).data("persid").replace("randevuduzenle-", ""));
+                    RandevuDuzenlePersonelIdArray.push(persid);
+                });
+            }
+
+            $('#PersonelListesi').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $("#personelhata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $('#PersonelListesiDuzenle').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $("#personelhataduzenle").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $(function () {
+                $('#Musteri').select2({
+                    dropdownParent: $('#KayitEkleModal')
+                });
+                $('#SozlesmeNo').select2({
+                    dropdownParent: $('#KayitEkleModal')
+                });
+            });
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            });
+            $('#Musteri').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $(".musteriidhata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $('#SozlesmeNo').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $(".sozlesmehata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $('#SozlesmeNo').on('change', function (e) {
+                if ($(this).val != "0") {
+                    $(".sozlesmehata").remove();
+                }
+            }); // zorunlu alan kontrolü
+
+            $("#CekimRandevu").on('click', function () {
+                if ($(this).is(':checked')) {
+                    CekimRandevu = "Aktif";
+                    $("#CekimYeriLabel").html("Çekim Yeri");
+                }
+                else {
+                    CekimRandevu = "Pasif";
+                    $("#CekimYeriLabel").html("Organizasyon Yeri");
+                }
+            });
+            $("#CekimRandevuDuzenle").on('click', function () {
+                if ($(this).is(':checked')) {
+                    CekimRandevuDuzenle = "Aktif";
+                }
+                else {
+                    CekimRandevuDuzenle = "Pasif";
+                }
+            });
+            $("#tb-Randevular").on('click', '.duzenle', function () {
+                var sec = $("input[type=checkbox]");
+                $.each(sec, function (index, item) {
+                    if (($(this).is(":disabled") == false)) {
+                        $(item).prop("checked", true);
+                        $(item).prop("checked", false);
+                    }
+                }); // Tüm peronellerin tikler kaldırılıyor
+                var idler = $(this).data("personelid");
+                PersonelGuncelleSecilenID = [];
+                if (typeof (idler) === 'number') {
+                    PersonelGuncelleSecilenID.push(idler);
+                }
+                else {
+                    PersonelGuncelleSecilenID = idler.split(",");
+                }
+                for (var i = 0; i < PersonelGuncelleSecilenID.length; i++) {
+                    var Secici = "#randevuduzenle-" + PersonelGuncelleSecilenID[i];
+                    $(Secici).prop("checked", true);
+                }
+                if ($(this).data("cekimrandevu") == true) {
+                    $("#CekimRandevuDuzenle").prop("checked", true);
+                }
+                RandevuDuzenlePersonelIdArray = $(this).data("personelid");
+                $("#Guncelle").val($(this).data("randevuid"))
+                $("#BaslangicZamanDuzenle").val($(this).data("baslangicsaat"));
+                $("#BitisZamanDuzenle").val($(this).data("bitissaat"));
+                $("#SozlesmeNoDuzenle").val($(this).data("sozlesmeno"));
+                $("#MusteriDuzenle").val($(this).data("musteri"));
+                $("#RezervasyonTuruDuzenle").val($(this).data("rezervasyonturu"));
+                $("#RandevuTarihiDuzenle").val($(this).data("randevutarihi"));
+                var aciklama = $(this).data("aciklama").replace(/\<br \/\>/g, "\r\n")
+                $("#AciklamaDuzenle").val(aciklama);
+                $('#KayitDuzenleModal').modal('show');
+            });
+            $("#tb-Randevular").on('click', '.randevuiptal', function () {
+                var id = $(this).data("randevuid");
+                var t = $(this).data("randevutarihi");
+                var bt = $(this).data("baslangicsaat");
+                var bit = $(this).data("bitissaat");
+                Swal.fire(
+                    {
+                        title: "Randevu İptal",
+                        //text: "< " + giskategori + " > adlı Günlük İş Katergorisi silinsin mi?",
+                        html: "<p style='color:red;font-weight:bold;font-size:12pt;'>&laquo; " + t + " - " + bt + "-" + bit + " &raquo;</p> <p style='color:red;font-size:12pt;'><h3> Randevu iptal edilsin mi?</h3></p> ",
+                        type: "error",
+                        showCancelButton: true,
+                        confirmButtonText: "Evet, İptal Et!",
+                        cancelButtonText: "İptal"
+                    }).then(function (result) {
+                        if (result.value) {
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                contentType: false,
+                                processData: false,
+                                url: "/Otomasyon/RezervasyonIslemleri/CekimRandevuIptal/" + id,
+                                success: function (data) {
+                                    if (data.Sonuc == false) {
+                                        alertify.set('notifier', 'delay', 5);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.error(data.Mesaj);
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        alertify.set('notifier', 'delay', 3);
+                                        alertify.set('notifier', 'position', 'top-center');
+                                        alertify.success(data.Mesaj);
+                                        dt.api().ajax.reload();
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    });
+            }); // Çekim Randevusu İptal
+            $("#Guncelle").click(function () {
+                var id = $(this).val();
+                var rezervasyontarih = $("#RandevuTarihiDuzenle").val();
+                var TatilKontrolData = new FormData();
+                TatilKontrolData.append("RezervasyonTarihi", $("#RandevuTarihiDuzenle").val());
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: TatilKontrolData,
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/RezervasyonIslemleri/TatilKotrol/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            Swal.fire(
+                                {
+                                    title: "Dikkat",
+                                    html: "<p><h2 style='font-size:16px; color:red'><strong>Rezervasyon Tarihi : </strong>" + rezervasyontarih + "</h2></p><h4> " + data.Mesaj + "</h4>",
+                                    type: "warning",
+                                    confirmButtonText: "Tamam"
+                                });
+                            //sonuctatilkontrolcekim = "çalışamaz";
+                        }
+                        else if (data.Sonuc == true) {
+                            //sonuctatilkontrolcekim = "çalışabilir";
+                            var PersonelData = new FormData();
+                            PersonelData.append("RezervasyonTarihi", $("#RandevuTarihiDuzenle").val());
+                            PersonelData.append("PersonelIdArray", RandevuDuzenlePersonelIdArray);
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                data: PersonelData,
+                                contentType: false,
+                                processData: false,
+                                url: "/Otomasyon/RezervasyonIslemleri/PersonelIzinKontrol/",
+                                success: function (data) {
+                                    if (data.Sonuc == false) {  //sonucizinkontrol = "çalışamaz";
+                                        var personelAdi = "";
+                                        $.each(data.CalisamazPersonel, function (index, pers) {
+                                            personelAdi = personelAdi + pers.AdiSoyadi + "<br/>";
+                                        });
+                                        Swal.fire(
+                                            {
+                                                title: "Dikkat",
+                                                html: "<p><h4 style='font-size:16px; color:red'> Aşağıdaki Personel(ler) rezervasyon tarihinde izinliler</h4></p> <p><h2> <strong> " + personelAdi + " </strong><h2> </p>",
+                                                type: "warning",
+                                                confirmButtonText: "Tamam"
+                                            });
+                                    }
+                                    else if (data.Sonuc == true) {
+                                        //sonucizinkontrolcekim = "çalışabilir";
+                                        //var PersonelId = $("#CekimPersonelId").find("option:selected").val();
+                                        var ZamanDilimiId = 0
+                                        //var Personel = $("#CekimPersonelId").find("option:selected").text();
+                                        var BaslangicSaati = $("#BaslangicZamanDuzenle").val();
+                                        var BitisSaati = $("#BitisZamanDuzenle").val();
+                                        var Tarih = $("#RandevuTarihiDuzenle").val();
+                                        var GorevlendirmeKontrolData = new FormData();
+                                        GorevlendirmeKontrolData.append("RezervasyonTarihi", $("#RandevuTarihiDuzenle").val());
+                                        GorevlendirmeKontrolData.append("PersonelIdArray", RandevuDuzenlePersonelIdArray);
+                                        GorevlendirmeKontrolData.append("ZamanDilimiId", ZamanDilimiId);
+                                        GorevlendirmeKontrolData.append("BaslangicSaati", BaslangicSaati);
+                                        GorevlendirmeKontrolData.append("BitisSaati", BitisSaati);
+                                        GorevlendirmeKontrolData.append("RandevuId", id);
+                                        $.ajax({
+                                            type: "POST",
+                                            datatype: 'json',
+                                            data: GorevlendirmeKontrolData,
+                                            contentType: false,
+                                            processData: false,
+                                            url: "/Otomasyon/RezervasyonIslemleri/GorevlendirmeKontrol/",
+                                            success: function (data) {
+                                                if (data.Sonuc == false) {
+                                                    var personelAdi = "";
+                                                    $.each(data.CalisamazPersonel, function (index, pers) {
+                                                        personelAdi = personelAdi + pers.AdiSoyadi + "<br/>";
+                                                    });
+                                                    Swal.fire(
+                                                        {
+                                                            title: "Dikkat",
+                                                            html: "<p><h4 style='font-size:16px; color:red'> Aşağıdaki Personel(ler) rezervasyon tarihinde başka bir randevu için görevlendirilmiş.</h4></p> <p><h2> <strong> " + personelAdi + " </strong><h2> </p>",
+                                                            type: "warning",
+                                                            confirmButtonText: "Tamam"
+                                                        });
+                                                    //sonucgorevlendirmekontrol = "çalışamaz";
+                                                }
+                                                else if (data.Sonuc == true) {
+                                                    //sonucgorevlendirmekontrolcekim = "çalışabilir";
+                                                    $('#KayitDuzenleModal').modal('hide');
+                                                    var BaslangicSaati = $("#BaslangicZamanDuzenle").val();
+                                                    var BitisSaati = $("#BitisZamanDuzenle").val();
+                                                    var Tarih = $("#RandevuTarihiDuzenle").val();
+                                                    var RandevuData = new FormData();
+                                                    RandevuData.append("CekimRandevu", CekimRandevuDuzenle);
+                                                    RandevuData.append("RandevuBaslik", $("#RezervasyonTuruDuzenle").val());
+                                                    RandevuData.append("PersonelIdArray", RandevuDuzenlePersonelIdArray);
+                                                    RandevuData.append("RandevuTarihi", Tarih);
+                                                    RandevuData.append("BaslangicSaat", BaslangicSaati);
+                                                    RandevuData.append("BitisSaat", BitisSaati);
+                                                    RandevuData.append("Aciklama", $("#AciklamaDuzenle").val());
+                                                    $.ajax({
+                                                        type: "POST",
+                                                        datatype: 'json',
+                                                        data: RandevuData,
+                                                        contentType: false,
+                                                        processData: false,
+                                                        url: "/Otomasyon/RezervasyonIslemleri/RandevuGuncelle/" + id,
+                                                        success: function (data) {
+                                                            if (data.Sonuc == false) {
+                                                                alertify.set('notifier', 'delay', 5);
+                                                                alertify.set('notifier', 'position', 'top-center');
+                                                                alertify.error(data.Mesaj);
+                                                            }
+                                                            else if (data.Sonuc == true) {
+                                                                alertify.set('notifier', 'delay', 3);
+                                                                alertify.set('notifier', 'position', 'top-center');
+                                                                alertify.success(data.Mesaj);
+                                                                dt.api().ajax.reload();
+                                                            }
+                                                        },
+                                                        error: function (err) {
+                                                            alert("HATA");
+                                                        }
+                                                    });
+                                                }
+                                            },
+                                            error: function (err) {
+                                                alert("HATA");
+                                            }
+                                        });
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#Kaydet").click(function () {
+                if (($("#Musteri").val() == "0") || $("#Musteri").val() == null) {
+                    $("#Musteri").focus();
+                    $("#MusteriHata").append("<div class='musteriidhata' style='color:red'>Müşteri seçiniz.</div>");
+                }
+                else if (($("#SozlesmeNo").val() == "0") || ($("#SozlesmeNo").val() == null)) {
+                    $("#SozlesmeNo").focus();
+                    $("#SozlesmeNoHata").append("<div class='sozlesmehata' style='color:red'>Sözleşme seçiniz.</div>");
+                }
+                else if (($("#BaslangicZaman").val() == $("#BitisZaman").val())) {
+                    $("#BaslangicZaman").focus();
+                    $("#BaslangicZamanHata").append("<div class='hata' style='color:red'>Başlangıç ve Bitiş zamanları aynı olamaz.</div>");
+                }
+                //else if ($("#BaslangicZaman").val() == "00:00") {
+                //    $("#BaslangicZaman").focus();
+                //    $("#BaslangicZamanHata").append("<div class='hata' style='color:red'>Başlangıç saatini giriniz.</div>");
+                //}
+                //else if ($("#BitisZaman").val() == "00:00") {
+                //    $("#BitisZaman").focus();
+                //    $("#BitisZamanHata").append("<div class='hata' style='color:red'>Bitiş saatini giriniz.</div>");
+                //}
+                else if (RandevuPersonelIdArray.length == 0) {
+                    $("#PersonelIdHata").append("<div id='personelhata' style='color:red'>Lütfen bir personel seçiniz.</div>");
+                }
+                else {
+                    var rezervasyontarih = $("#RandevuTarihi").val();
+                    var TatilKontrolData = new FormData();
+                    TatilKontrolData.append("RezervasyonTarihi", $("#RandevuTarihi").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: TatilKontrolData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/RezervasyonIslemleri/TatilKotrol/",
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                Swal.fire(
+                                    {
+                                        title: "Dikkat",
+                                        html: "<p><h2 style='font-size:16px; color:red'><strong>Rezervasyon Tarihi : </strong>" + rezervasyontarih + "</h2></p><h4> " + data.Mesaj + "</h4>",
+                                        type: "warning",
+                                        confirmButtonText: "Tamam"
+                                    });
+                                //sonuctatilkontrolcekim = "çalışamaz";
+                            }
+                            else if (data.Sonuc == true) {
+                                //sonuctatilkontrolcekim = "çalışabilir";
+                                //var PersonelId = $("#CekimPersonelId").find("option:selected").val();
+                                //var Personel = $("#CekimPersonelId").find("option:selected").text();
+                                var PersonelData = new FormData();
+                                PersonelData.append("RezervasyonTarihi", $("#RandevuTarihi").val());
+                                PersonelData.append("PersonelIdArray", RandevuPersonelIdArray);
+                                $.ajax({
+                                    type: "POST",
+                                    datatype: 'json',
+                                    data: PersonelData,
+                                    contentType: false,
+                                    processData: false,
+                                    url: "/Otomasyon/RezervasyonIslemleri/PersonelIzinKontrol/",
+                                    success: function (data) {
+                                        if (data.Sonuc == false) {  //sonucizinkontrol = "çalışamaz";
+                                            var personelAdi = "";
+                                            $.each(data.CalisamazPersonel, function (index, pers) {
+                                                personelAdi = personelAdi + pers.AdiSoyadi + "<br/>";
+                                            });
+                                            Swal.fire(
+                                                {
+                                                    title: "Dikkat",
+                                                    html: "<p><h4 style='font-size:16px; color:red'> Aşağıdaki Personel(ler) rezervasyon tarihinde izinliler</h4></p> <p><h2> <strong> " + personelAdi + " </strong><h2> </p>",
+                                                    type: "warning",
+                                                    confirmButtonText: "Tamam"
+                                                });
+                                        }
+                                        else if (data.Sonuc == true) {
+                                            //sonucizinkontrolcekim = "çalışabilir";
+                                            //var PersonelId = $("#CekimPersonelId").find("option:selected").val();
+                                            var ZamanDilimiId = 0
+                                            //var Personel = $("#CekimPersonelId").find("option:selected").text();
+                                            var BaslangicSaati = $("#BaslangicZaman").val();
+                                            var BitisSaati = $("#BitisZaman").val();
+                                            var Tarih = $("#RandevuTarihi").val();
+                                            var GorevlendirmeKontrolData = new FormData();
+                                            GorevlendirmeKontrolData.append("RezervasyonTarihi", $("#RandevuTarihi").val());
+                                            GorevlendirmeKontrolData.append("PersonelIdArray", RandevuPersonelIdArray);
+                                            GorevlendirmeKontrolData.append("ZamanDilimiId", ZamanDilimiId);
+                                            GorevlendirmeKontrolData.append("BaslangicSaati", BaslangicSaati);
+                                            GorevlendirmeKontrolData.append("BitisSaati", BitisSaati);
+                                            $.ajax({
+                                                type: "POST",
+                                                datatype: 'json',
+                                                data: GorevlendirmeKontrolData,
+                                                contentType: false,
+                                                processData: false,
+                                                url: "/Otomasyon/RezervasyonIslemleri/GorevlendirmeKontrol/",
+                                                success: function (data) {
+                                                    if (data.Sonuc == false) {
+                                                        var personelAdi = "";
+                                                        $.each(data.CalisamazPersonel, function (index, pers) {
+                                                            personelAdi = personelAdi + pers.AdiSoyadi + "<br/>";
+                                                        });
+                                                        Swal.fire(
+                                                            {
+                                                                title: "Dikkat",
+                                                                html: "<p><h4 style='font-size:16px; color:red'> Aşağıdaki Personel(ler) rezervasyon tarihinde başka bir randevu için görevlendirilmiş.</h4></p> <p><h2> <strong> " + personelAdi + " </strong><h2> </p>",
+                                                                type: "warning",
+                                                                confirmButtonText: "Tamam"
+                                                            });
+                                                    }
+                                                    else if (data.Sonuc == true) {
+                                                        $('#KayitEkleModal').modal('hide');
+                                                        var RandevuData = new FormData();
+                                                        RandevuData.append("CekimRandevu", CekimRandevu);
+                                                        RandevuData.append("RandevuBaslik", $("#RezervasyonTuru").val());
+                                                        RandevuData.append("MusteriId", MusteriId);
+                                                        RandevuData.append("SozlesmeId", SozlesmeId);
+                                                        RandevuData.append("SozlesmeNo", SozlesmeNo);
+                                                        //RandevuData.append("PersonelId", $("#PersonelId").val());
+                                                        RandevuData.append("PersonelIdArray", RandevuPersonelIdArray);
+                                                        RandevuData.append("RandevuTarihi", $("#RandevuTarihi").val());
+                                                        RandevuData.append("BaslangicZaman", $("#BaslangicZaman").val());
+                                                        RandevuData.append("BitisZaman", $("#BitisZaman").val());
+                                                        RandevuData.append("Aciklama", $("#Aciklama").val());
+                                                        $.ajax({
+                                                            type: "POST",
+                                                            datatype: 'json',
+                                                            data: RandevuData,
+                                                            contentType: false,
+                                                            processData: false,
+                                                            url: "/Otomasyon/RezervasyonIslemleri/RandevuEkle/",
+                                                            success: function (data) {
+                                                                if (data.Sonuc == false) {
+                                                                    alertify.set('notifier', 'delay', 5);
+                                                                    alertify.set('notifier', 'position', 'top-center');
+                                                                    alertify.error(data.Mesaj);
+                                                                }
+                                                                else if (data.Sonuc == true) {
+                                                                    alertify.set('notifier', 'delay', 3);
+                                                                    alertify.set('notifier', 'position', 'top-center');
+                                                                    alertify.success(data.Mesaj);
+                                                                    dt.api().ajax.reload();
+                                                                }
+                                                            },
+                                                            error: function (err) {
+                                                                alert("HATA");
+                                                            }
+                                                        });
+                                                    }
+                                                },
+                                                error: function (err) {
+                                                    alert("HATA");
+                                                }
+                                            });
+                                        }
+                                    },
+                                    error: function (err) {
+                                        alert("HATA");
+                                    }
+                                });
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+
+            $("#RandevuEkle").click(function () {
+                $("#Musteri").select2("val", "0");
+                $("#SozlesmeNo").select2("val", "0");
+                $('#RandevuTarihi').datepicker(
+                    {
+                        todayBtn: "linked",
+                        todayHighlight: true,
+                        templates: controls,
+                        language: 'tr',
+                        autoclose: true
+                    }).datepicker("setDate", new Date());
+                $("#BaslangicZaman").val("00:00");
+                $("#BitisZaman").val("00:00");
+                $("#RezervasyonTuru").val("");
+                $("#Aciklama").val("");
+                var sec = $("#PersonelListesi :checkbox");
+                $.each(sec, function (index, item) {
+                    if (($(this).is(":disabled") == false)) {
+                        $(item).prop("checked", true);
+                        $(item).prop("checked", false);
+                    }
+                }); // Tüm peronellerin tikler kaldırılıyor
+
+            });
+            function parseDateValue(rawDate) {
+                var dateArray = rawDate.split(".");
+                var parsedDate = dateArray[2] + dateArray[1] + dateArray[0];
+                return parsedDate;
+            }
+            var DuzenleYetki = $("#KullaniciYetkiKayitDuzenle").val();
+            var DetayYetki = $("#KullaniciYetkiKayitDetayi").val();
+            var SilYetki = $("#KullaniciYetkiKayitSil").val();
+            $("#Musteri").change(function () {
+                if ($(this).val != "0") {
+                    $(".musteriidhata").remove();
+                    MusteriId = $(this).find("option:selected").val();
+                    $("#SozlesmeNo").empty();
+                    $("#SozlesmeNo").append("<option selected value='0' disabled>Sözleşme Seçiniz </option>");
+                    if (MusteriId > 0) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            url: "/RezervasyonIslemleri/SozlesmeGetir/" + MusteriId,
+                            success: function (durum) {
+                                $.each(durum, function () {
+                                    var cekimyapilacak = "";
+                                    var cekimyeri = "";
+                                    if (this.GelinDamat != "")
+                                        cekimyapilacak = this.GelinDamat;
+                                    else if (this.Yetkili != "")
+                                        cekimyapilacak = this.Yetkili;
+                                    else if (this.Urunler != "")
+                                        cekimyapilacak = this.Urunler;
+                                    else if (this.Modeller != "")
+                                        cekimyapilacak = this.Modeller;
+                                    else if (this.Cocuk != "")
+                                        cekimyapilacak = this.Cocuk;
+                                    else
+                                        cekimyapilacak = "bos";
+                                    if (this.CekimYeri != "")
+                                        cekimyeri = this.CekimYeri;
+                                    else
+                                        cekimyeri = "bos";
+                                    $("#SozlesmeNo").append("<option value=" + this.Id + " data-cekimyapilacak='" + cekimyapilacak + "' data-cekimyeri='" + cekimyeri + "' data-rezervasyontur='" + this.RezervasyonTuru + "' data-sozlesmeno='" + this.SozlesmeNo + "'>" + this.SozlesmeNo + " - " + dateFormat(new Date(parseInt(this.SozlesmeTarihi.match(/\d+/)[0]))) + " - " + this.RezervasyonTuru + "</option>");
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+
+            $("#SozlesmeNo").change(function () {
+                $("#RezervasyonTuru").val($(this).find("option:selected").data("rezervasyontur"));
+                SozlesmeId = $(this).find("option:selected").val();
+                SozlesmeNo = $(this).find("option:selected").data("sozlesmeno");
+                var cekimyapilacak = $(this).find("option:selected").data("cekimyapilacak");
+                var cekimyeri = $(this).find("option:selected").data("cekimyeri");
+                RandevuAciklama = RandevuAciklama + "Sözleşme No:" + SozlesmeNo;
+                if (cekimyapilacak != "bos") {
+                    RandevuAciklama = RandevuAciklama + "\nÇekim Yapılacak: " + cekimyapilacak;
+                }
+                if (cekimyeri != "bos") {
+                    RandevuAciklama = RandevuAciklama + "\nÇekim Yeri: " + cekimyeri;
+                }
+                $("#Aciklama").val(RandevuAciklama);
+                RandevuAciklama = "";
+             
+
+            });
+            var islem;
+            dt = $('#tb-Randevular').dataTable(
+                {
+                    responsive: true,
+                    "destroy": true,
+                    "ordering": true,
+                    "columnDefs": [{ "targets": 10, "type": "date-eu" }],
+                    //"searching": false, // arama kaldır
+                    //"lengthChange": false, // sayfa başına göster kaldır
+                    //"order": [[9, "asc"], [10, "asc"], [11, "asc"], [12, "asc"]],
+                    //"order": [[9, "desc"], [10, "asc"]],
+                    "order": [[10, "asc"]],
+                    "createdRow": function (row, data, dataIndex) {
+                        if (data["Iptal"] == true) {
+                            //$(row).addClass('bg-warning-100 text-white');
+                            $('td', row).addClass('bg-danger-600 text-white');
+                            $('a', row).addClass('text-white');
+                        }
+                    },
+                    "columns": [
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                //ekhizmet = row.EkHizmetler.replace(/<span class='fw-700'>/g, "<span>");
+                                //paket = row.Paketler.replace(/<span class='fw-700'>/g, "<span>");
+                                //if (DetayYetki == "True") {
+                                //    return "<a href='#' class='sozlesmedetay' title='Sözleşme Detayları' data-sozlesmeid='" + row.Id + "' data-firmaadi='" + row.FirmaAdi + "' data-sozlesmeno='" + row.SozlesmeNo + "'" +
+                                //              "data-sozlesmetarih='" + row.SozlesmeTarihi + "' data-opsiyontarihi='" + row.OpsiyonTarihi + "' data-rezervasyontur='" + row.RezervasyonTur + "' data-musteriadisoyadi='" + row.MusteriAdiSoyadi + "' data-musteritelefon='" + row.MusteriCepTel + "'" +
+                                //              "data-yetkilipersonel='" + row.YetkiliPersonel + "' data-gorevlipersonel='" + row.GorevliPersonel + "' data-baslangicsaat='" + row.BaslangicSaat + "' data-bitissaat='" + row.BitisSaat + "' data-yetkiliadsoyad='" + row.YetkiliAdSoyad + "'" +
+                                //              "data-yetkilitel='" + row.YetkiliTel + "' data-yetkiliemail='" + row.YetkiliEmail + "' data-annead='" + row.AnneAd + "' data-annetel='" + row.AnneTel + "' data=anneemail='" + row.AnneEmail + "' data-babaad='" + row.BabaAd + "'" +
+                                //              "data-babatel='" + row.BabaTel + "' data-babaemail='" + row.BabaEmail + "' data-cocukadsoyad='" + row.CocukAdSoyad + "' data-modeller='" + row.Modeller + "' data-urunler='" + row.Urunler + "' data-gelinad='" + row.GelinAd + "'" +
+                                //              "data-gelintel='" + row.GelinTel + "' data-gelinemail='" + row.GelinEmail + "' data-damatad='" + row.DamatAd + "' data-damattel='" + row.DamatTel + "' data-damatemail='" + row.DamatEmail + "' data-teklifbit='" + row.TeklifBit + "' data-paketler='" + paket + "'" +
+                                //              "data-ekhizmetler='" + ekhizmet + "' data-paketlerfiyat='" + row.PaketlerFiyat + "' data-ekhizmetlerfiyat='" + row.EkHizmetlerFiyat + "' data-sozlesmetutar='" + row.SozlesmeTutar + "' data-organizasyonyeri='" + row.OrganizasyonYeri + "' data-notlar='" + row.Notlar + "'" +
+                                //              "data-durum='" + row.Durum + "' data-bitti='" + row.Bitti + "' data-iptal='" + row.Iptal + "' data-toggle='modal' data-target='#SozlesmeDetayModal'>" +
+                                //                  row.SozlesmeNo +
+                                //              "</a>"
+                                //}
+                                //else {
+                                //    return row.SozlesmeNo
+                                //}
+                                return row.SozlesmeNo
+                            }
+                        }, // Sözleşme No   {0}
+                        { "data": "Musteri", "autowidth": true, "className": "align-middle" }, // Müşteri {1}
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                var PersonelAdSoyad = "";
+                                $.each(row.Personeller, function (index, personel) {
+                                    PersonelAdSoyad = PersonelAdSoyad + personel.PersonelAdSoyad + "<br />";
+                                    //console.log(personel.PersonelAdSoyad)
+                                });
+                                return PersonelAdSoyad;
+                            }
+                        }, //Personel {2}
+                        { "data": "Baslik", "autowidth": true, "className": "align-middle" }, //Başlık  {3}
+                        {
+                            "data": "BaslangicTarih",
+                            "autowidth": true,
+                            "className": "align-middle"
+                        }, // Randevu Tarih {4}
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                return row.BaslangicSaat
+                            }
+                        }, // Başlangıç Saati {5}
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                return row.BitisSaat
+                            }
+                        }, // Bitiş Saati {6}
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                islem = "";
+                                if (row.Cekim == true)
+                                    islem = "<h4><span class='badge badge-info'>Çekim</br>Randevusu</span></h4>"
+                                else
+                                    islem = "<h4><span class='badge badge-success'>Rezervasyon</br>Randevusu</span></h4>"
+                                return islem
+                            }
+                        }, // Bitiş Saati {6}
+                        { "data": "Aciklama", "autowidth": true, "className": "align-middle" }, // Açıklama {7}
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                //console.log(data);
+                                //console.log(dataToSet);
+                                islem = "";
+
+                                //-------- Personel Listesi
+                                var PersId = new Array();
+                                $.each(row.Personeller, function (index, personel) {
+                                    PersId.push(personel.PersonelId);
+                                });
+                                //-------- Personel Listesi
+
+                                if (row.Iptal == false) {
+                                    //if (DuzenleYetki == "True") {
+                                    //    islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon mr-1 mt-1 duzenle' data-randevuid='" + row.Id + "' data-sozlesmeno='" + row.SozlesmeNo + "' data-musteri='" + row.Musteri + "'" +
+                                    //        "data-personelid='" + PersId + "' data-rezervasyonturu='" + row.Baslik + "' data-randevutarihi='" + tarih + "' data-baslangicsaat='" + baslangic + "' data-bitissaat='" + bitis + "'" +
+                                    //        "data-aciklama='" + row.Aciklama + "' data-cekimrandevu='" + row.Cekim + "' data-toggle='modal' data-target='#KayitDuzenleModal' title='Düzenle'>" +
+                                    //        "<i class='fal fa-edit'></i>" +
+                                    //        "</a>"
+                                    //}
+                                    if (DuzenleYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-primary btn-icon mr-1 mt-1 duzenle' data-randevuid='" + row.Id + "' data-sozlesmeno='" + row.SozlesmeNo + "' data-musteri='" + row.Musteri + "'" +
+                                            "data-personelid='" + PersId + "' data-rezervasyonturu='" + row.Baslik + "' data-randevutarihi='" + row.BaslangicTarih + "' data-baslangicsaat='" + row.BaslangicSaat + "' data-bitissaat='" + row.BitisSaat + "'" +
+                                            "data-aciklama='" + row.Aciklama + "' data-cekimrandevu='" + row.Cekim + "' title='Düzenle'>" +
+                                            "<i class='fal fa-edit'></i>" +
+                                            "</a>"
+                                    }
+                                    if (SilYetki == "True") {
+                                        islem = islem + "<a href='#' class='btn btn-xs btn-warning btn-icon mr-1 mt-1 randevuiptal' data-randevuid='" + row.Id + "' data-randevutarihi='" + row.BaslangicTarih + "' data-baslangicsaat='" + row.BaslangicSaat + "' data-bitissaat='" + row.BitisSaat + "' title='İptal'>" +
+                                            "<i class='fal fa-times-circle'></i>" +
+                                            "</a>"
+                                    }
+                                }
+                                return islem
+                            }
+                        },  // İşlem {8}
+                        {
+                            "data": "BaslangicTarih",
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "visible": false
+                        }, // Başlangıç Tarihi // {9}
+                        { "data": "SozlesmeNo", "autowidth": true, "visible": false },  // İşlem No // {10}
+                        { "data": "Iptal", "autowidth": true, "visible": false }, // İptal {11}
+                        { "data": "SubeId", "autowidth": true, "visible": false } // SubeId {12}
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": "/Otomasyon/RezervasyonIslemleri/RandevularListe/",
+                        "contentType": 'application/json; charset=utf-8',
+                        'type': 'POST',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        'sProcessing': 'Yükleniyor... Lütfen Bekleyin',
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+            $("#IlkTarih").keyup(function () { dt.api().ajax.url('/RezervasyonIslemleri/RandevularFiltre?' + $('#FiltreForm').serialize()).load(); });
+            $("#IlkTarih").change(function () { dt.api().ajax.url('/RezervasyonIslemleri/RandevularFiltre?' + $('#FiltreForm').serialize()).load(); });
+            $("#SonTarih").keyup(function () { dt.api().ajax.url('/RezervasyonIslemleri/RandevularFiltre?' + $('#FiltreForm').serialize()).load(); });
+            $("#SonTarih").change(function () { dt.api().ajax.url('/RezervasyonIslemleri/RandevularFiltre?' + $('#FiltreForm').serialize()).load(); });
+            $("#Goruntule").change(function () { dt.api().ajax.url('/RezervasyonIslemleri/RandevularFiltre?' + $('#FiltreForm').serialize()).load(); });
+            $("#Personel").change(function () { dt.api().ajax.url('/RezervasyonIslemleri/RandevularFiltre?' + $('#FiltreForm').serialize()).load(); });
+            $("#Sube").change(function () { dt.api().ajax.url('/RezervasyonIslemleri/RandevularFiltre?' + $('#FiltreForm').serialize()).load(); });
+        });
+    </script>
+}

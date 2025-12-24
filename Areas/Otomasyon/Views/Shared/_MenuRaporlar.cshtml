@@ -1,0 +1,125 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool raporlaryetki = ky.FirstOrDefault(x => x.SayfaId == 6 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 6 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool cekimpaketleriraporlariyetki = ky.FirstOrDefault(x => x.SayfaId == 53 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 53 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool islemadetleriraporlariyetki = ky.FirstOrDefault(x => x.SayfaId == 54 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 54 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool gelirgiderraporlariyetki = ky.FirstOrDefault(x => x.SayfaId == 55 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 55 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rezervasyonturleriraporlariyetki = ky.FirstOrDefault(x => x.SayfaId == 56 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 56 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool gelecekodemelerraporlariyetki = ky.FirstOrDefault(x => x.SayfaId == 57 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 57 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool haftalikraporyetki = ky.FirstOrDefault(x => x.SayfaId == 58 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 58 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rezervasyonekhizmetleriraporlariyetki = ky.FirstOrDefault(x => x.SayfaId == 59 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 59 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool performansraporyetki = ky.FirstOrDefault(x => x.SayfaId == 60 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 60 && x.Sil == false && x.Aktif == true).SayfaYetki;
+
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Raporlar" ? "active open" : "";
+    string altmenucekimpaketleriraporlari = ViewBag.AltMenu == "Çekim Paketleri Raporu" ? "active" : "";
+    string altmenurezervasyonislemadetleriraporlari = ViewBag.AltMenu == "Rezervasyon İşlem Adetleri" ? "active" : "";
+    string altmenugelirgiderraporlari = ViewBag.AltMenu == "Gelir-Gider Raporları" ? "active" : "";
+    string altmenurezervasyonturleriraporu = ViewBag.AltMenu == "Rezervasyon Türleri Raporu" ? "active" : "";
+    string altmenugelecekodemelerraporu = ViewBag.AltMenu == "Gelecek Ödemeler Raporu" ? "active" : "";
+    string altmenuhaftalikrapor = ViewBag.AltMenu == "Haftalık Rapor" ? "active" : "";
+    string altmenurezervasyonekhizmetraporu = ViewBag.AltMenu == "Rezervasyon Ek Hizmetler Raporu" ? "active" : "";
+    string altmenuperformansrapor = ViewBag.AltMenu == "Personel Performans Raporu" ? "active" : "";
+}
+@if (raporlaryetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Raporlar" data-filter-tags="raporlar">
+            <i class="fal fa-chart-pie"></i>
+            <span class="nav-link-text" data-i18n="nav.raporlar">Raporlar</span>
+        </a>
+        <ul>
+            @if (lisans.Raporlar_CekimPaketleriRaporu)
+            {
+                if (cekimpaketleriraporlariyetki)
+                {
+                    <li class=@altmenucekimpaketleriraporlari>
+                        <a href="~/Otomasyon/Raporlar/PaketlerRaporu" title="Çekim Paketleri Raporu" data-filter-tags="raporlar cekim paketleri raporu">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_cekim_paketleri_raporu">Çekim Paketleri Raporu</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_RezervasyonIslemAdetleriRaporu)
+            {
+                if (islemadetleriraporlariyetki)
+                {
+                    <li class=@altmenurezervasyonislemadetleriraporlari>
+                        <a href="~/Otomasyon/Raporlar/RezervasyonIslemAdetleri" title="Rezervasyon İşlem Adetleri" data-filter-tags="raporlar rezervasyon işlem adetleri">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_rezervasyon_islem_adetleri">Rezervasyon İşlem Adetleri</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_GelirGiderRaporlari)
+            {
+                if (gelirgiderraporlariyetki)
+                {
+                    <li class=@altmenugelirgiderraporlari>
+                        <a href="~/Otomasyon/Raporlar/GelirGiderRaporlari" title="Gelir-Gider Raporları" data-filter-tags="raporlar gelir gider raporları">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_aylik_gelir_gider_raporlari">Gelir-Gider Raporları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_RezervasyonTurleriRaporu)
+            {
+                if (rezervasyonturleriraporlariyetki)
+                {
+                    <li class=@altmenurezervasyonturleriraporu>
+                        <a href="~/Otomasyon/Raporlar/RezervasyonTurleriRaporu" title="Rezervasyon Türleri Raporu" data-filter-tags="raporlar rezervasyon türleri raporu">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_rezervasyon_turleri_raporu">Rezervasyon Türleri Raporu</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_RezervasyonEkHizmetleriRaporu)
+            {
+                if (rezervasyonekhizmetleriraporlariyetki)
+                {
+                    <li class=@altmenurezervasyonekhizmetraporu>
+                        <a href="~/Otomasyon/Raporlar/EkHizmetlerRaporu" title="Rezervasyok Ek Hizmetler Raporu" data-filter-tags="raporlar rezervasyon ek hizmetler raporu">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_rezervasyon_ek_hizmetler_raporu">Rezervasyok Ek Hizmetler Raporu</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_GelecekOdemelerRaporu)
+            {
+                if (gelecekodemelerraporlariyetki)
+                {
+                    <li class=@altmenugelecekodemelerraporu>
+                        <a href="~/Otomasyon/Raporlar/GelecekOdemelerRaporu" title="Gelecek Ödemeler Raporu" data-filter-tags="raporlar gelecek ödemeler raporu">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_gelecek_odemeler_raporu">Gelecek Ödemeler Raporu</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_HaftalikRapor)
+            {
+                if (haftalikraporyetki)
+                {
+                    <li class=@altmenuhaftalikrapor>
+                        <a href="~/Otomasyon/Raporlar/HaftalikRapor" title="Haftalık Rapor" data-filter-tags="raporlar haftalık rapor">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_haftalik_rapor">Haftalık Rapor</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Raporlar_PersonelPerformansRaporu)
+            {
+                if (performansraporyetki)
+                {
+                    <li class=@altmenuperformansrapor>
+                        <a href="~/Otomasyon/Raporlar/PersonelPerformansRaporu" title="Personel Performans Raporu" data-filter-tags="raporlar personel performans raporu">
+                            <span class="nav-link-text" data-i18n="nav.raporlar_personel_performans_raporu">Personel Performans Raporu</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}

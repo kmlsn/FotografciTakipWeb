@@ -1,0 +1,654 @@
+﻿
+@{
+    ViewBag.Title = "Sms Gönder";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+
+@{
+    List<RehberGrup> rehberGrup = ViewBag.RehberGrup;
+}
+
+<div class="row">
+    <div class="col-md-12 col-sm-12 col-xs-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h3> SMS Gönder</h3>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li class="nav-item"><a class="nav-link fs-lg px-4 active" data-toggle="tab" href="#tab_direction-1" role="tab">Listeye Sms Gönder</a></li>
+                        <li class="nav-item"><a class="nav-link fs-lg px-4" data-toggle="tab" href="#tab_direction-2" role="tab">Rehberden Sms Gönder</a></li>
+                    </ul>
+                    <div class="tab-content p-3">
+                        <div class="tab-pane fade show active" id="tab_direction-1" role="tabpanel">
+                            <div class="row">
+                                <div class="form-group col-xl-8">
+                                    <div class="row">
+                                        <div class="form-group col-md-6">
+                                            <label class="form-label" for="AdSoyad">Ad - Soyad</label>
+                                            <input type="text" id="AdSoyad" class="form-control form-control-sm" name="AdSoyad" maxlength="50">
+                                        </div>
+                                        <div class="form-group col-md-4" id="TelefonNoHata">
+                                            <label class="form-label" for="TelefonNo">Cep Telefonu</label>
+                                            <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="TelefonNo" id="TelefonNo" required>
+                                        </div>
+                                        <div class="form-group col-md-2" style="margin: auto auto;">
+                                            <button type="button" class="btn btn-sm btn-outline-primary waves-effect waves-themed" id="TelefonEkle">
+                                                Ekle
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-12">
+                                            <table class="table table-bordered table-sm table-responsive-sm table-hover m-0 mb-2" id="tb-telefonlistesi">
+                                                <thead class="thead-themed">
+                                                    <tr>
+                                                        <th class="text-center w-30">Ad - Soyad</th>
+                                                        <th class="text-center w-20">Telefon</th>
+                                                        <th class="text-center w-30">Mesaj</th>
+                                                        <th class="text-center w-10">Durum</th>
+                                                        <th class="text-center w-10">İşlem</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="TelefonNo-satir">
+                                                    <tr>
+                                                        @*<td class="text-right fw-700"></td>
+                                                        <td class="text-right fw-700"></td>
+                                                        <td class="text-right fw-700"></td>
+                                                        <td class="text-right fw-700"></td>
+                                                        <td class="text-right fw-700"></td>*@
+                                                        <td colspan="5">
+                                                            <div class="alert border border-primary bg-transparent text-primary m-0 text-sm-center" id="ListeMesaj" role="alert">
+                                                                Listeye Ekleme Yapınız.!
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-xl-4">
+                                    <div class="form-group col-sm-12">
+                                        <label class="form-label" for="MesajMetni">Mesaj İçeriği</label>
+                                        <textarea class="form-control" id="MesajMetni" rows="6" name="MesajMetni" style="overflow:auto;resize:none"></textarea>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="alert alert-primary alert-dismissible">
+                                            <div class="d-flex flex-start w-100">
+                                                <div class="mr-2">
+                                                    <span class="icon-stack icon-stack-lg">
+                                                        <i class="base base-6 icon-stack-3x opacity-100 color-primary-500"></i>
+                                                        <i class="base base-10 icon-stack-2x opacity-100 color-primary-300 fa-flip-vertical"></i>
+                                                        <i class="fal fa-info icon-stack-1x opacity-100 color-white"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex flex-fill">
+                                                    <div class="flex-fill">
+                                                        <span class="h5">Parametre</span>
+                                                        <br>
+                                                        <span class="text-primary">Ad - Soyad: </span> <span class="text-danger">{AdSoyad}</span><br />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row col col-md-12">
+                                <div class="form-check-inline ml-auto">
+                                    <button type="button" class="btn btn-primary waves-effect waves-themed" id="SmsGonderListe">
+                                        SMS Gönder
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="tab_direction-2" role="tabpanel">
+                            <div class="row">
+                                <div class="form-group col-xl-8">
+                                    <div class="row">
+                                        <div class="form-group pr-3" id="RehberGrupIdHata">
+                                            <label class="form-label" for="RehberGrupId">Rehber Grubu</label>
+                                            <select class="custom-select form-control custom-select-sm" id="RehberGrupId" name="RehberGrupId">
+                                                <option selected="" value="0">Rehber Grubunu Seçiniz</option>
+                                                @foreach (var rehbergrup in rehberGrup)
+                                                {
+                                                    <option value="@rehbergrup.Id">@rehbergrup.GrupAdi</option>
+                                                }
+                                            </select>
+                                        </div>
+                                        <div class="form-group" id="RehberIdHata">
+
+
+                                            @*<label class="form-label" for="RehberId">Kişi</label>
+                                                <select class="custom-select form-control custom-select-sm" id="RehberId" name="RehberId">
+                                                    <option selected="" value="0">Kişi Seçiniz</option>
+                                                    @foreach (var rehbergrup in rehberGrup)
+                                                    {
+                                                        <option value="@rehbergrup.Id">@rehbergrup.GrupAdi</option>
+                                                    }
+                                                </select>*@
+                                        </div>
+                                    </div>
+                                    <div class="row" id="tabloekle">
+                                        <div class="form-group col-md-12"  id="datatablekaldir">
+                                            @* <table class="table table-bordered table-sm table-responsive-sm table-hover m-0 mb-2" id="tb-rehberlistesi">*@
+
+                                            <table id="tb-rehberlistesi" class="table table-sm table-bordered table-hover table-striped w-100">
+                                                <thead class="thead-themed">
+                                                    <tr>
+                                                        <th class="text-center w-30">Ad - Soyad</th>
+                                                        <th class="text-center w-20">Telefon</th>
+                                                        <th class="text-center w-30">Mesaj</th>
+                                                        <th class="text-center w-10">Durum</th>
+                                                        <th class="text-center w-10">Seç</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="RehberListe-satir">
+                                                    <tr>
+                                                        <td class="text-right fw-700"></td>
+                                                            <td class="text-right fw-700"></td>
+                                                            <td class="text-right fw-700"></td>
+                                                            <td class="text-right fw-700"></td>
+                                                            <td class="text-right fw-700"></td>
+                                                       
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-xl-4">
+                                    <div class="form-group col-sm-12">
+                                        <label class="form-label" for="MesajMetniRehber">Mesaj İçeriği</label>
+                                        <textarea class="form-control" id="MesajMetniRehber" rows="6" name="MesajMetniRehber" style="overflow:auto;resize:none"></textarea>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="alert alert-primary alert-dismissible">
+                                            <div class="d-flex flex-start w-100">
+                                                <div class="mr-2">
+                                                    <span class="icon-stack icon-stack-lg">
+                                                        <i class="base base-6 icon-stack-3x opacity-100 color-primary-500"></i>
+                                                        <i class="base base-10 icon-stack-2x opacity-100 color-primary-300 fa-flip-vertical"></i>
+                                                        <i class="fal fa-info icon-stack-1x opacity-100 color-white"></i>
+                                                    </span>
+                                                </div>
+                                                <div class="d-flex flex-fill">
+                                                    <div class="flex-fill">
+                                                        <span class="h5">Parametre</span>
+                                                        <br>
+                                                        <span class="text-primary">Ad - Soyad: </span> <span class="text-danger">{AdSoyad}</span><br />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row col col-md-12">
+                                        <div class="form-check-inline ml-auto">
+                                            <button type="button" class="btn btn-primary waves-effect waves-themed" id="SmsGonderRehber">
+                                                SMS Gönder
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            var RehberGrupId = 0;
+            var url = "/Otomasyon/Dashboard/RehberGetir/" + RehberGrupId;
+            var dt;
+            var islem;
+            var secilenRehberID = [];
+            $('#js_change_tab_direction input').on('change', function () {
+                var newclass = $('input[name=radioNameTabDirection]:checked', '#js_change_tab_direction').val();
+                $('#js_change_tab_direction').parent('.panel-tag').next('.nav.nav-tabs').removeClass().addClass(newclass);
+            });
+            $('#slimtest2').slimScroll(
+                {
+                    position: 'right',
+                    height: '250px',
+                    railVisible: true,
+                    alwaysVisible: true
+                });
+            $(":input").inputmask();
+            $('#TelefonNo').on('focusout', function (e) {
+                if ($(this).val != "0" || $(this).val() != undefined) {
+                    $("#TelNoHata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $('input').on('focusout keydown paste', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            var TelefonListIdArray = [];
+           
+            $("#TelefonEkle").click(function () {
+
+                if ($("#TelefonNo").val() == "") {
+                    $("#TelefonNo").focus();
+                    $("#TelefonNoHata").append("<div id='TelNoHata' style='color:red'>Lütfen Telefon Numarası Giriniz.</div>");
+                }
+                else {
+                    //var result = $("#TelefonNo").val().indexOf("_");
+                    var regex = /^(((\+|00)?(90)|0)[-| ]?)?((5\d{2})[-| ]?(\d{3})[-| ]?(\d{2})[-| ]?(\d{2}))$/gm
+                    var phoneNumber = $("#TelefonNo").val().replace("(", "").replace(")", "").replace("-", "").replace(" ", "");
+                    var isValid = regex.test(phoneNumber);
+                    if (isValid == false) {
+                        $("#TelefonNo").focus();
+                        $("#TelefonNoHata").append("<div id='TelNoHata' style='color:red'>Lütfen Doğru Telefon Numarası Giriniz.</div>");
+                    }
+                    else {
+                        // Ad-Soyad tabloya eklenecek
+                        var TelefonListeData = new FormData();
+                        TelefonListeData.append("TelefonNo", $("#TelefonNo").val());
+                        TelefonListeData.append("AdSoyad", $("#AdSoyad").val().replace("-", ""));
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            data: TelefonListeData,
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/Dashboard/SmsGonderListeEkle/",
+                            success: function (data) {
+                                if (data.Sonuc == false) {
+                                    alertify.set('notifier', 'delay', 5);
+                                    alertify.set('notifier', 'position', 'top-center');
+                                    alertify.error(data.Mesaj);
+                                }
+                                else if (data.Sonuc == true) {
+                                    $("#TelefonNo-satir").empty();
+                                    TelefonListIdArray = [];
+                                    $.each(data.data, function (index, item) {
+                                        TelefonListIdArray.push(item.Id);
+                                        var Adsoyad, Mesaj, Durum;
+                                        if (item.AdSoyad == undefined) {
+                                            Adsoyad = "<td></td>";
+                                        }
+                                        else {
+                                            Adsoyad = "<td>" + item.AdSoyad + "</td>";
+                                        }
+                                        if (item.MesajIcerigi == undefined) {
+                                            Mesaj = "<td></td>";
+                                        }
+                                        else {
+                                            Mesaj = "<td>" + item.MesajIcerigi + "</td>";
+                                        }
+                                        if (item.Durum == undefined) {
+                                            Durum = "<td></td>";
+                                        }
+                                        else {
+                                            Durum = "<td>" + item.Durum + "</td>";
+                                        }
+                                        $("#TelefonNo-satir").append("<tr>" +
+                                            Adsoyad +
+                                            "<td>" + item.TelefonFormatli + "</td>" +
+                                            Mesaj +
+                                            Durum +
+                                            "<td class='text-center'>" +
+                                            "<input type='button' value='Sil' class='btn btn-xs btn-danger btn-icon mr-1 telefonnosil' data-id='" + item.Id + "' data-adsoyad='" + item.AdSoyad + "' data-telefon='" + item.TelefonFormatli + "'/>" +
+                                            "</td>" +
+                                            "</tr>");
+                                        $("#TelefonNo").val("");
+                                        $("#AdSoyad").val("");
+                                    });
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                }
+
+            });
+            $("#tb-telefonlistesi").on('click', '.telefonnosil', function () {
+                var ArraySil = $(this).data("adsoyad") + "-" + $(this).data("telefon").replace(" ", "").replace("(", "").replace(")", "").replace("-", "");
+                var Arrayindex = TelefonArray.indexOf(ArraySil);
+                //TelefonArray.remove(Arrayindex);
+                //delete TelefonArray[Arrayindex];
+                if (Arrayindex > -1) {
+                    TelefonArray.splice(Arrayindex, 1);
+                }
+
+                console.log(Arrayindex);
+                console.log(TelefonArray);
+                var id = $(this).data("id");
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Dashboard/SmsListeTelefonSil/" + id,
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            $("#TelefonNo-satir").empty();
+                            $.each(data.data, function (index, item) {
+                                var Adsoyad, Mesaj, Durum;
+                                if (item.AdSoyad == undefined) {
+                                    Adsoyad = "<td></td>";
+                                }
+                                else {
+                                    Adsoyad = "<td>" + item.AdSoyad + "</td>";
+                                }
+                                if (item.MesajIcerigi == undefined) {
+                                    Mesaj = "<td></td>";
+                                }
+                                else {
+                                    Mesaj = "<td>" + item.MesajIcerigi + "</td>";
+                                }
+                                if (item.Durum == undefined) {
+                                    Durum = "<td></td>";
+                                }
+                                else {
+                                    Durum = "<td>" + item.Durum + "</td>";
+                                }
+                                $("#TelefonNo-satir").append("<tr>" +
+                                    Adsoyad +
+                                    "<td>" + item.TelefonFormatli + "</td>" +
+                                    Mesaj +
+                                    Durum +
+                                    "<td class='text-center'>" +
+                                    "<input type='button' value='Sil' class='btn btn-xs btn-danger btn-icon mr-1 telefonnosil' data-id='" + item.Id + "' data-adsoyad='" + item.AdSoyad + "' data-telefon='" + item.TelefonFormatli + "'/>" +
+                                    "</td>" +
+                                    "</tr>");
+                                $("#TelefonNo").val("");
+                                $("#AdSoyad").val("");
+                            });
+                        }
+                    },
+                    error: function (err) {
+
+                        alert("HATA");
+                    }
+                });
+            }); // Alınan Ödeme Sil
+            $("#SmsGonderListe").click(function () {
+                var SmsData = new FormData();
+                SmsData.append("TelefonListId", TelefonListIdArray);
+                SmsData.append("MesajMetni", $("#MesajMetni").val());
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: SmsData,
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Dashboard/HizliSmsGonder/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            $("#TelefonNo-satir").empty();
+                            $.each(data.data, function (index, item) {
+                                var Adsoyad, Mesaj, Durum;
+                                if (item.AdSoyad == undefined) {
+                                    Adsoyad = "<td></td>";
+                                }
+                                else {
+                                    Adsoyad = "<td>" + item.AdSoyad + "</td>";
+                                }
+                                if (item.MesajIcerigi == undefined) {
+                                    Mesaj = "<td></td>";
+                                }
+                                else {
+                                    Mesaj = "<td>" + item.MesajIcerigi + "</td>";
+                                }
+                                if (item.Durum == undefined) {
+                                    Durum = "<td></td>";
+                                }
+                                else {
+                                    Durum = "<td>" + item.Durum + "</td>";
+                                }
+                                $("#TelefonNo-satir").append("<tr>" +
+                                    Adsoyad +
+                                    "<td>" + item.TelefonFormatli + "</td>" +
+                                    Mesaj +
+                                    Durum +
+                                    "<td class='text-center'>" +
+                                    //"<a href='#' class='btn btn-xs btn-danger btn-icon mr-1 telefonnosil' value='Delete' title='Telefon No Sil'>" +
+                                    "<input type='button' value='Sil' class='btn btn-xs btn-danger btn-icon mr-1 telefonnosil' disabled data-id='" + item.Id + "' data-adsoyad='" + item.AdSoyad + "' data-telefon='" + item.TelefonFormatli + "'/>" +
+                                    //"<i class='fal fa-trash-alt'></i>" +
+                                    //"</a>" +
+                                    "</td>" +
+                                    "</tr>");
+                                $("#TelefonNo").val("");
+                                $("#AdSoyad").val("");
+                                TelefonListIdArray.push(item.Id);
+                            });
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#RehberGrupId").change(function () { //Firma Düzenleme Tab'ındaki Seçilen İl'in İlçeleri listeleniyor.
+                var rgId = $(this).find("option:selected").val();
+                RehberGrupId = rgId;
+                url = "/Otomasyon/Dashboard/RehberGetir/" + rgId;
+                dt.api().ajax.url(url).load();
+                dt.fnDraw();
+            });
+
+            dt = $('#tb-rehberlistesi').dataTable(
+                {
+                    responsive: true,
+                    "destroy": true,
+
+                    "columns": [
+                        { "data": "AdSoyad", "autowidth": true, "className": "align-middle", },
+                        //{ "data": "CepTel", "autowidth": true, "className": "align-middle", },
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                var ceptel = row.CepTel.replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                                return ceptel;
+                            }
+                        }, // Gönderilen Mesaj İçeriği
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                //if (row.Mesaj == undefined) {
+                                //    return "";
+                                //}
+                                //else {
+                                //    return row.Mesaj;
+                                //}
+                                return "";
+                            }
+                        }, // Gönderilen Mesaj İçeriği
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                //if (row.Durum == undefined) {
+                                //    return "";
+                                //}
+                                //else {
+                                //    return row.Mesaj;
+                                //}
+                                return "";
+                            }
+                        }, // Mesajın iletim durumu
+
+                        //{
+                        //    "data": null,
+                        //    "autowidth": true,
+                        //    "className": "align-middle",
+                        //    "render": function (data, type, row) {
+                        //        islem = "";
+                        //        islem = islem + "<input type='button' value='Listeye Ekle' class='btn btn-primary listeekle' data-id='" + row.Id + "'/>"
+                        //        return islem;
+                        //    }
+                        //}, // İşlem
+
+                        {
+                            "data": null,
+                            "autowidth": true,
+                            "className": "align-middle",
+                            "render": function (data, type, row) {
+                                islem = "";
+                                islem = islem + "<div class='custom-control custom-checkbox'>" +
+                                    "<input type='checkbox' class='custom-control-input' id='" + row.Id + "'>" +
+                                    "<label class='custom-control-label' for='" + row.Id + "' data-rehberid='" + row.Id + "' value='" + row.Id + "'> Seç</label>" +
+                                    "</div>"
+                                return islem;
+                            }
+                        }, // İşlem
+                    ],
+                    "processing": true,
+                    "ajax": {
+                        "url": url,
+                        "contentType": 'application/json; charset=utf-8',
+                        'type': 'POST',
+                        'data': function (data) { return data = JSON.stringify(data); }
+                    },
+                    "lengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "Tümü"]],
+                    "oLanguage": {
+                        'sProcessing': 'Yükleniyor... Lütfen Bekleyin',
+                        "sSearchPlaceholder": "Tabloda Ara",
+                        "sZeroRecords": "Kayıt yok.",
+                        "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                        "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                        "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                        "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                        "oPaginate": {
+                            "sPrevious": "Önceki",
+                            "sNext": "Sonraki",
+                            "sFirst": "İlk",
+                            "sLast": "Son"
+                        }
+                    }
+                });
+
+            $("#SmsGonderRehber").click(function () {
+               // Şeçilen Rehber Id'leri Array a alınınıyor
+
+                secilenRehberID = [];
+                var SecilenRehberIdListesi = $("#RehberListe-satir :checkbox");
+
+                var len = SecilenRehberIdListesi.length;
+                for (var i = 0; i < len; i++) {
+                    if (SecilenRehberIdListesi[i].checked) {
+                        secilenRehberID.push(SecilenRehberIdListesi[i].id);
+                    }
+                }
+                $('#datatablekaldir').remove(); // Rehberden Bilgileri çeken Tablo kaldırılıyor.
+                   // Sms Gönderilen yeni tablo ekleniyor.
+                $('#tabloekle').append("<div class='form-group col-md-12'>" +
+                    "<table class='table table-bordered table-sm table-responsive-sm table-hover m-0 mb-2' id = 'tb-telefonlistesirehber'>" +
+                    "<thead class='thead-themed'>" +
+                    "<tr>" +
+                    "<th class='text-center w-30'>Ad - Soyad</th>" +
+                    "<th class='text-center w-20'>Telefon</th>" +
+                    "<th class='text-center w-30'>Mesaj</th>" +
+                    "<th class='text-center w-10'>Durum</th>" +
+                    "<th class='text-center w-10'>İşlem</th>" +
+                    "</tr>" +
+                    "</thead>" +
+                    "<tbody id='RehberTelefonNo-satir'>" +
+                    "<tr>" +
+                    "<td class='text-right fw-700'></td>" +
+                    "<td class='text-right fw-700'></td>" +
+                    "<td class='text-right fw-700'></td>" +
+                    "<td class='text-right fw-700'></td>" +
+                    "<td class='text-right fw-700'></td>" +
+                    "</tr>" +
+                    "</tbody>" +
+                    "</table >" +
+                    "</div >");
+              
+                var TelefonRehberData = new FormData();
+                TelefonRehberData.append("RehberIdler", secilenRehberID);
+                TelefonRehberData.append("MesajMetniRehber", $("#MesajMetniRehber").val());
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: TelefonRehberData,
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Dashboard/RehberdenHizliSmsGonder/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            $("#RehberTelefonNo-satir").empty();
+
+                            $.each(data.data, function (index, item) {
+                                var Adsoyad, Mesaj, Durum;
+                                if (item.AdSoyad == undefined) {
+                                    Adsoyad = "<td></td>";
+                                }
+                                else {
+                                    Adsoyad = "<td>" + item.AdSoyad + "</td>";
+                                }
+                                if (item.MesajIcerigi == undefined) {
+                                    Mesaj = "<td></td>";
+                                }
+                                else {
+                                    Mesaj = "<td>" + item.MesajIcerigi + "</td>";
+                                }
+                                if (item.Durum == undefined) {
+                                    Durum = "<td></td>";
+                                }
+                                else {
+                                    Durum = "<td>" + item.Durum + "</td>";
+                                }
+                                $("#RehberTelefonNo-satir").append("<tr>" +
+                                    Adsoyad +
+                                    "<td>" + item.TelefonFormatli + "</td>" +
+                                    Mesaj +
+                                    Durum +
+                                    "<td class='text-center'>" +
+                                    //"<a href='#' class='btn btn-xs btn-danger btn-icon mr-1 telefonnosil' value='Delete' title='Telefon No Sil'>" +
+                                    "<input type='button' value='Sil' class='btn btn-xs btn-danger btn-icon mr-1 telefonnosil' disabled data-id='" + item.Id + "' data-adsoyad='" + item.AdSoyad + "' data-telefon='" + item.TelefonFormatli + "'/>" +
+                                    //"<i class='fal fa-trash-alt'></i>" +
+                                    //"</a>" +
+                                    "</td>" +
+                                    "</tr>");
+                            });
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+
+            });
+        });
+
+    </script>
+}
+
+
+

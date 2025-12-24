@@ -1,0 +1,296 @@
+﻿@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Areas/Musteri/Views/Shared/_Layout.cshtml";
+    ViewBag.AdSoyad = Session["AdSoyad"];
+    ViewBag.Email = Session["Email"];
+    ViewBag.Firma = Session["Firma"];
+    ViewBag.FirmaLogo = Session["FirmaLogo"];
+}
+@section Head
+{
+    <style>
+        .modal {
+            overflow: auto !important; /*Açılan ikinci modal ekranda kaymadığı için eklendi*/
+        }
+    </style>
+}
+@using FotografciTakipWeb.Models
+@model Musteri
+<div class="modal fade" id="SifreDegistirModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Şifre Değiştir
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <form action="#" autocomplete="off">
+                        <div class="panel-content">
+                            <div class="row mb-3">
+                                <div class="form-group col-sm-12" id="EskiSifreHata">
+                                    <label class="form-label" for="EskiSifre">Eski Şifreniz</label>
+                                    <input type="password" id="EskiSifre" class="form-control" placeholder="Eski Şifreniz" required name="Sifre">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="form-group col-sm-12" id="YeniSifreHata">
+                                    <label class="form-label" for="YeniSifre">Yeni Şifreniz</label>
+                                    <input type="password" id="YeniSifre" class="form-control" placeholder="Yeni Şifreniz" required name="Sifre">
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="form-group col-sm-12" id="YeniSifreTekrarHata">
+                                    <label class="form-label" for="YeniSifreTekrar">Yeni Şifreniz(Tekrar)</label>
+                                    <input type="password" id="YeniSifreTekrar" class="form-control" placeholder="Yeni Şifreniz(Tekrar)" required name="Sifre">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="Kaydet">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="main-body">
+        <div class="row gutters-sm">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex flex-column align-items-center text-center">
+                            <img src="~/Areas/Musteri/Dosyalar/MusteriResim/Default_User.png" alt="Profil" class="rounded-circle" width="143">
+                            <div class="mt-3">
+                                <h4>@ViewBag.AdSoyad</h4>
+                                @*<p class="text-secondary mb-1">Full Stack Developer</p>
+                                    <p class="text-muted font-size-sm">Bay Area, San Francisco, CA</p>*@
+                                <button class="btn btn-primary" id="SifreDegistir" data-toggle='modal' data-target='#SifreDegistirModal'>Şifre Değiştir</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-8">
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Ad-Soyad</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.AdiSoyadi
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Email</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.Email
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Telefon</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.CepTel
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Adres</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                @Model.Adres
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">SMS Kabul Durumu</h6>
+                            </div>
+                            <div class="col-sm-3 text-secondary">
+                                @if (Model.SMSKabul)
+                                {
+                                <button type="button" class="btn btn-sm btn-success waves-effect waves-themed" id="SmsDurumDegistir">
+                                    Kabul
+                                    <i class="fal fa-check ml-2"></i>
+                                </button>
+                                }
+                                else
+                                {
+                                <button type="button" class="btn btn-sm btn-danger waves-effect waves-themed" id="SmsDurumDegistir">
+                                    Ret
+                                    <i class="fal fa-times ml-2"></i>
+                                </button>
+                                }
+                            </div>
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Email Kabul Durumu</h6>
+                            </div>
+                            <div class="col-sm-3 text-secondary">
+                                @if (Model.EmailKabul)
+                               {
+                                <button type="button" class="btn btn-sm btn-success waves-effect waves-themed" id="EpostaDurumDegistir">
+                                    Kabul
+                                    <i class="fal fa-check fa ml-2"></i>
+                                </button>
+                               }
+                               else
+                               {
+                                <button type="button" class="btn btn-sm btn-danger waves-effect waves-themed" id="EpostaDurumDegistir">
+                                    Ret
+                                    <i class="fal fa-times  ml-2"></i>
+                                </button>
+                               }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Script
+{
+    <script src="~/Areas/Musteri/Content/light-box/jquery.zbox.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            $("#SmsDurumDegistir").click(function () {
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Musteri/Dashboard/SmsDurumDegistir",
+                    success: function (data) { // Personel ile ilgili diğer tablolarda kayıt var ise silinemeyecek uyarı verecek.
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            window.location.replace("/Musteri/Dashboard/Profil");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#EpostaDurumDegistir").click(function () {
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Musteri/Dashboard/EpostaDurumDegistir",
+                    success: function (data) { // Personel ile ilgili diğer tablolarda kayıt var ise silinemeyecek uyarı verecek.
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                            window.location.replace("/Musteri/Dashboard/Profil");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            $("#Kaydet").click(function () {
+                var eskisifre = $("#EskiSifre").val();
+                var yenisifre = $("#YeniSifre").val();
+                var yenisifretekrar = $("#YeniSifreTekrar").val();
+                console.log("EskiSifre: " + eskisifre);
+                console.log("YeniSifre: " + yenisifre);
+                console.log("YeniSifreTekrar: " + yenisifretekrar);
+                if (eskisifre.length == 0) {
+                    $("#EskiSifre").focus();
+                    $("#EskiSifreHata").append("<div class='hata' style='color:red'>Eski şifrenizi giriniz.</div>");
+                }
+                else if (yenisifre.length == 0) {
+                    $("#YeniSifre").focus();
+                    $("#YeniSifreHata").append("<div class='hata' style='color:red'>Yeni şifrenizi giriniz.</div>");
+                }
+                else if (yenisifre.length < 6) {
+                    $("#YeniSifre").focus();
+                    $("#YeniSifreHata").append("<div class='hata' style='color:red'>Yeni şifrenizi en az 6 karakter olmalıdır.</div>");
+                }
+                else if (yenisifretekrar.length == 0) {
+                    $("#YeniSifreTekrar").focus();
+                    $("#YeniSifreTekrarHata").append("<div class='hata' style='color:red'>Yeni şifrenizi tekrar giriniz.</div>");
+                }
+                else if (yenisifre !== yenisifretekrar) {
+                    $("#YeniSifreTekrar").focus();
+                    $("#YeniSifreTekrarHata").append("<div class='hata' style='color:red'>Şifreler uyuşmuyor.</div>");
+                }
+                else
+                {
+                    var MusteriData = new FormData();
+                    MusteriData.append("EskiSifre", eskisifre);
+                    MusteriData.append("YeniSifre", yenisifre);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: MusteriData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Musteri/Dashboard/SifreDegistir",
+                        success: function (data) { // Personel ile ilgili diğer tablolarda kayıt var ise silinemeyecek uyarı verecek.
+                            if (data.Sonuc == false && data.Mesaj == "Eski şifre yanlış") {
+                                $("#EskiSifre").focus();
+                                $("#EskiSifreHata").append("<div class='hata' style='color:red'>Eski şifrenizi giriniz.</div>");
+                            }
+                            else if (data.Sonuc == false && data.Mesaj != "Eski şifre yanlış") {
+                                $('#SifreDegistirModal').modal('hide');
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                $('#SifreDegistirModal').modal('hide');
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+}
+

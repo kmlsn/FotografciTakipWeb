@@ -1,0 +1,26 @@
+using System;
+using System.Collections.Generic;
+
+namespace FotografciTakipWeb.Models
+{
+    public partial class RolYetki
+    {
+        public long Id { get; set; }
+        public long FirmaId { get; set; }
+        public long RolId { get; set; }
+        public long SayfaId { get; set; }
+        public bool SayfaYetki { get; set; }
+        public bool KayitDetayi { get; set; }
+        public bool KayitEkle { get; set; }
+        public bool KayitDuzenle { get; set; }
+        public bool KayitSil { get; set; }
+        public long OlusturanKullaniciId { get; set; }
+        public System.DateTime OlusturmaTarih { get; set; }
+        public long DegistirenKullaniciId { get; set; }
+        public System.DateTime DegistirmeTarih { get; set; }
+        public bool Aktif { get; set; }
+        public bool Sil { get; set; }
+        public virtual Firma Firma { get; set; }
+        public virtual Rol Rol { get; set; }
+    }
+}

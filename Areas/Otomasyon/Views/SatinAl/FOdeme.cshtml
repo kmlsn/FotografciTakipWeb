@@ -1,0 +1,734 @@
+﻿
+@{
+    ViewBag.Title = "Firma Odeme";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout2.cshtml";
+}
+@using FotografciTakipWeb.Models
+@{
+    Firma frm = ViewBag.Firma;
+    string tel = "", firmaunvan = "";
+    Kullanici kl = ViewBag.Kullanici;
+}
+<div class="modal fade" id="KrediKartiModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="DetayBaslik">İYZİCO ile güvenli öde</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div id="iyzipay-checkout-form" class="responsive"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-8">
+        <div id="panel-2" class="panel">
+            <div class="panel-hdr">
+                <h2>Fatura Bilgileri</h2>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <h3>@frm.FirmaAdi</h3>
+                    @if (!string.IsNullOrEmpty(frm.Adres))
+                    {
+                        <p class="text-wrap">@frm.Adres</p>
+                    }
+                    @if (!string.IsNullOrEmpty(frm.VergiNo))
+                    {
+                        <p class="text-wrap">Vergi Dairesi: @frm.VergiDairesi - Vergi No: @frm.VergiNo</p>
+                    }
+                    @if (!string.IsNullOrEmpty(frm.SabitTel))
+                    {
+                        <p class="text-wrap">@frm.SabitTel</p>
+                    }
+                    @if (!string.IsNullOrEmpty(frm.CepTel))
+                    {
+                        <p class="text-wrap">@frm.CepTel</p>
+                    }
+                </div>
+            </div>
+        </div>
+        <div id="panel-2" class="panel">
+            <div class="panel-hdr">
+                <h2>Ödeme Yöntemi</h2>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <div class="accordion accordion-outline" id="OdemeYontemiSec">
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title custom-control custom-radio ml-4">
+                                    <input type="radio" class="custom-control-input" data-toggle="collapse" data-target="#KrediKarti" aria-expanded="true" id="KrediKartiRadio" name="OdemeYontemi" checked="">
+                                    <label class="custom-control-label" for="KrediKartiRadio"> <i class="fal fa-credit-card width-1 fs-xl ml-2"></i> Kredi Kartı</label>
+                                </div>
+                            </div>
+                            <div id="KrediKarti" class="collapse show" data-parent="#OdemeYontemiSec">
+                                <div class="card-body text-center">
+                                    <img height="300" src="~/Areas/Otomasyon/Dosyalar/iyzico_ile_guvenli_ode.png" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <div class="card-title custom-control custom-radio ml-4">
+                                    <input type="radio" class="custom-control-input collapsed" data-toggle="collapse" data-target="#Banka" aria-expanded="false" id="BankaRadio" name="OdemeYontemi">
+                                    <label class="custom-control-label" for="BankaRadio"><i class="fal fa-lira-sign width-1 fs-xl ml-2"></i>Banka Havalesi/EFT</label>
+                                </div>
+                            </div>
+                            <div id="Banka" class="collapse" data-parent="#OdemeYontemiSec">
+                                <div class="card-body">
+                                    <p> <span class="h3"><b> Yapı Kredi Bankası:</b> <span class="h5"> Kamil ŞEN - TR31 0006 7010 0000 0048 9601 93  </span> </span> </p>
+                                    <p> <span class="h3"><b>Ziraat Bankası:</b><span class="h5"> Kamil ŞEN - TR59 0001 0004 0335 2558 6350 03 </span> </span></p>
+                                    <div class="panel-tag">
+                                        Yapacağınız havale/EFT işleminde "Açıklama" bölümüne "Sipariş Numarasını" yazmayı unutmayınız. Ödemeniz tarafımıza ulaştığında lisansınız hesabınıza tanımlanacaktır.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="panel-3" class="panel">
+            <div class="panel-hdr">
+                <h2>Ön bilgilendirme Formu ve Mesafeli Satış Sözleşmesi</h2>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <div class="accordion accordion-outline" id="SozlesmeFormlar">
+                        <div class="card">
+                            <div class="card-header">
+                                @*<div class="card-title custom-control custom-radio ml-4">
+                                        <label class="custom-control-label" for=""> <i class="fal fa-credit-card width-1 fs-xl ml-2"></i> Ön Bilgilendirme Formu</label>
+                                    </div>*@
+                                <a href="javascript:void(0);" class="card-title" data-toggle="collapse" data-target="#OnBilgilendirmeFormu" aria-expanded="false">
+                                    <i class="fal fa-file-alt width-2 fs-xl"></i>
+                                    Ön Bilgilendirme Formu
+                                    <span class="ml-auto">
+                                        <span class="collapsed-reveal">
+                                            <i class="fal fa-minus fs-xl"></i>
+                                        </span>
+                                        <span class="collapsed-hidden">
+                                            <i class="fal fa-plus fs-xl"></i>
+                                        </span>
+                                    </span>
+                                </a>
+                            </div>
+                            <div id="OnBilgilendirmeFormu" class="collapse" data-parent="#SozlesmeFormlar">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <h2 class="fw-700 ml-2"> ÖN BİLGİLENDİRME FORMU </h2>
+                                        <ol class="list-spaced fs-md">
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    KONU
+                                                </strong>
+                                                <p>İşbu Satış Sözleşmesi Ön Bilgi Formu’nun konusu, SATICI' nın, SİPARİŞ VEREN/ALICI' ya satışını yaptığı, aşağıda nitelikleri ve satış fiyatı belirtilen ürün/ürünlerin satışı ve teslimi ile ilgili olarak 6502 sayılı Tüketicilerin Korunması Hakkındaki Kanun - Mesafeli Sözleşmeler Yönetmeliği (RG:27.11.2014/29188) hükümleri gereğince tarafların hak ve yükümlülüklerini kapsamaktadır. İş bu ön bilgilendirme formunu kabul etmekle ALICI, sözleşme konusu siparişi onayladığı takdirde sipariş konusu bedeli ve varsa kargo ücreti, vergi gibi belirtilen ek ücretleri ödeme yükümlülüğü altına gireceğini ve bu konuda bilgilendirildiğini peşinen kabul eder.</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    SATICI BİLGİLERİ
+                                                </strong>
+                                                <p class="m-0"><b>Unvan / Ad Soyad:</b> Tetra Bilişim - Kamil ŞEN</p>
+                                                <p class="m-0"><b>Adres:</b> Cumhuriyet Mahallesi Akçiçek Sokak No:8 Üsküdar/İstanbul</p>
+                                                <p class="m-0"><b>Telefon:</b> 0533 262 55 60</p>
+                                                <p><b>Eposta:</b> destek@tetrabilisim.com</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    ALICI BİLGİLERİ (Bundan sonra ALICI olarak anılacaktır.)
+                                                </strong>
+                                                @{tel = frm.SabitTel == null ? frm.SabitTel + " - " + frm.CepTel : frm.CepTel; }
+                                                <p class="m-0"><b>Unvan / Ad Soyad:</b> @frm.FirmaAdi - @frm.Yetkili</p>
+                                                <p class="m-0"><b>Adres:</b> @frm.Adres</p>
+                                                <p class="m-0"><b>Telefon:</b> @tel </p>
+                                                <p><b>Eposta:</b> @frm.Email</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    SÖZLEŞME KONUSU ÜRÜN/ÜRÜNLER BİLGİLERİ
+                                                </strong>
+                                                <p class="mb-1">4.1 Malın / Ürün / Ürünlerin / Hizmetin temel özellikleri (türü, miktarı, marka/modeli, rengi, adedi) SATICI’ya ait internet sitesinde yer almaktadır. Ürünün temel özelliklerini kampanya süresince inceleyebilirsiniz. Kampanya tarihine kadar geçerlidir.</p>
+                                                <p class="mb-1">4.2 Listelenen ve sitede ilan edilen fiyatlar satış fiyatıdır. İlan edilen fiyatlar ve vaatler güncelleme yapılana ve değiştirilene kadar geçerlidir. Süreli olarak ilan edilen fiyatlar ise belirtilen süre sonuna kadar geçerlidir.</p>
+                                                <p class="mb-1">4.3 Sözleşme konusu mal ya da hizmetin tüm vergiler dâhil satış fiyatı sözleşme sonundaki tabloda gösterilmiştir.</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    GENEL HÜKÜMLER
+                                                </strong>
+                                                <p class="mb-1">5.1. ALICI, SATICI’ya ait internet sitesinde sözleşme konusu ürünün temel nitelikleri, satış fiyatı ve ödeme şekli ile teslimata ilişkin ön bilgileri okuyup, bilgi sahibi olduğunu, elektronik ortamda gerekli teyidi verdiğini kabul, beyan ve taahhüt eder. ALICININ; Ön Bilgilendirmeyi elektronik ortamda teyit etmesi, mesafeli satış sözleşmesinin kurulmasından evvel, SATICI tarafından ALICI' ya verilmesi gereken adresi, siparişi verilen ürünlere ait temel özellikleri, ürünlerin vergiler dâhil fiyatını, ödeme ve teslimat bilgilerini de doğru ve eksiksiz olarak edindiğini kabul, beyan ve taahhüt eder. </p>
+                                                <p class="mb-1">5.2. Sözleşme konusu ürün(lisans), Dijital ortamda otomatik olarak aktif edilecek olup, aktivasyonun gerçekleşmemesi durumunda, ALICI’nın sözleşmeyi feshetme hakkı saklıdır. </p>
+                                                <p class="mb-1">5.3. SATICI, sözleşme konusu ürünü eksiksiz, siparişte belirtilen niteliklere uygun ve varsa garanti belgeleri, kullanım kılavuzları ile teslim etmeyi, her türlü ayıptan arî olarak yasal mevzuat gereklerine sağlam, standartlara uygun bir şekilde işin gereği olan bilgi ve belgeler ile işi doğruluk ve dürüstlük esasları dâhilinde ifa etmeyi, hizmet kalitesini koruyup yükseltmeyi, işin ifası sırasında gerekli dikkat ve özeni göstermeyi, ihtiyat ve öngörü ile hareket etmeyi kabul, beyan ve taahhüt eder. </p>
+                                                <p class="mb-1">5.4. SATICI, sipariş konusu ürün veya hizmetin yerine getirilmesinin imkânsızlaşması halinde sözleşme konusu yükümlülüklerini yerine getiremezse, bu durumu, öğrendiği tarihten itibaren 3 gün içinde yazılı olarak tüketiciye bildireceğini, 14 günlük süre içinde toplam bedeli ALICI’ya iade edeceğini kabul, beyan ve taahhüt eder. </p>
+                                                <p class="mb-1">5.5. ALICI, sözleşme konusu ürünün teslimatı için işbu Ön Bilgilendirme Formunu elektronik ortamda teyit edeceğini, herhangi bir nedenle sözleşme konusu ürün bedelinin ödenmemesi ve/veya banka kayıtlarında iptal edilmesi halinde, SATICI’ nın sözleşme konusu ürünü teslim yükümlülüğünün sona ereceğini kabul, beyan ve taahhüt eder. </p>
+                                                <p class="mb-1">5.6. ALICI, Sözleşme konusu ürünün(lisansın) aktif edilmesinden sonra ALICI'ya ait kredi kartının yetkisiz kişilerce haksız kullanılması sonucunda sözleşme konusu ürün bedelinin ilgili banka veya finans kuruluşu tarafından SATICI'ya ödenmemesi halinde, ALICI Sözleşme konusu ürünü(lisansı) 3 gün içerisinde SATICI tarafından iptal edileceğini kabul, beyan ve taahhüt eder. </p>
+                                                <p class="mb-1">5.7. SATICI, tarafların iradesi dışında gelişen, önceden öngörülemeyen ve tarafların borçlarını yerine getirmesini engelleyici ve/veya geciktirici hallerin oluşması gibi mücbir sebepler halleri nedeni ile sözleşme konusu ürünü süresi içinde teslim edemez ise, durumu ALICI' ya bildireceğini kabul, beyan ve taahhüt eder. ALICI da siparişin iptal edilmesini, sözleşme konusu ürünün varsa emsali ile değiştirilmesini ve/veya teslimat süresinin engelleyici durumun ortadan kalkmasına kadar ertelenmesini SATICI’ dan talep etme hakkına haizdir. ALICI tarafından siparişin iptal edilmesi halinde ALICI’ nın nakit ile yaptığı ödemelerde, ürün tutarı 14 gün içinde kendisine nakden ve defaten ödenir. ALICI’ nın kredi kartı ile yaptığı ödemelerde ise, ürün tutarı, siparişin ALICI tarafından iptal edilmesinden sonra 14 gün içerisinde ilgili bankaya iade edilir. ALICI, SATICI tarafından kredi kartına iade edilen tutarın banka tarafından ALICI hesabına yansıtılmasına ilişkin ortalama sürecin 2 ile 3 haftayı bulabileceğini, bu tutarın bankaya iadesinden sonra ALICI’ nın hesaplarına yansıması halinin tamamen banka işlem süreci ile ilgili olduğundan, ALICI, olası gecikmeler için SATICI’yı sorumlu tutamayacağını kabul, beyan ve taahhüt eder. </p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    FATURA BİLGİLERİ
+                                                </strong>
+                                                @{tel = frm.SabitTel == null ? frm.SabitTel + " - " + frm.CepTel : frm.CepTel; }
+                                                <p class="m-0"><b>Unvan / Ad Soyad:</b> @frm.FirmaAdi - @frm.Yetkili</p>
+                                                <p class="m-0"><b>Adres:</b> @frm.Adres</p>
+                                                <p class="m-0"><b>Telefon:</b> @tel </p>
+                                                <p class="m-0"><b>Eposta:</b> @frm.Email</p>
+                                                <p><b>Fatura Teslimatı:</b> Fatura dijital olarak e-posta ile gönderilecektir. </p>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                    <div class="row">
+                                        <strong class="mb-1 ml-4 d-block fs-lg">
+                                            ÜRÜN BİLGİLERİ
+                                        </strong>
+                                        <table class="table table-bordered m-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sipariş No</th>
+                                                    <th>Sipariş Tarihi</th>
+                                                    <th>Paket Adı</th>
+                                                    <th>Paket Detay</th>
+                                                    <th>Paket Tutarı</th>
+                                                    <th>Süre</th>
+                                                    <th>Ödeme Şekli</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>@ViewBag.SiparisNo</td>
+                                                    <td>@DateTime.Now.ToShortDateString()</td>
+                                                    <td>@ViewBag.PaketAdi</td>
+                                                    <td>@Html.Raw(ViewBag.PaketDetayi)</td>
+                                                    <td id="OnBilgilendirmeTutar"></td>
+                                                    <td id="OnBilgilendirmeSure"></td>
+                                                    <td id="OnBilgilendirmeOdemeSekli"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <p class="mt-2 ml-4">Teslimat Şekli: Dijital Lisans (Online olarak otomatik aktivasyon)</p>
+                                    </div>
+                                    <div class="row">
+                                        <table class="table table-striped m-0">
+                                            <tbody>
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td class="text-right">@DateTime.Now.ToShortDateString()</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-center">SATICI</td>
+                                                    <td></td>
+                                                    <td class="text-center">ALICI</td>
+                                                </tr>
+                                                <tr>
+                                                    @{firmaunvan = frm.Yetkili != null ? frm.FirmaAdi + " - " + frm.Yetkili : frm.FirmaAdi; }
+                                                    <td class="text-center">Tetra Bilişim - Kamil ŞEN</td>
+                                                    <td></td>
+                                                    <td class="text-center">@firmaunvan</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                @*<div class="card-title custom-control custom-radio ml-4">
+                                        <label class="custom-control-label" for=""><i class="fal fa-lira-sign width-1 fs-xl ml-2"></i>Mesafeli Satış Sözleşmesi</label>
+                                    </div>*@
+                                <a href="javascript:void(0);" class="card-title" data-toggle="collapse" data-target="#MesafeliSatisSozlesmesi" aria-expanded="false">
+                                    <i class="fal fa-file-alt width-2 fs-xl"></i>
+                                    Mesafeli Satış Sözleşmesi
+                                    <span class="ml-auto">
+                                        <span class="collapsed-reveal">
+                                            <i class="fal fa-minus fs-xl"></i>
+                                        </span>
+                                        <span class="collapsed-hidden">
+                                            <i class="fal fa-plus fs-xl"></i>
+                                        </span>
+                                    </span>
+                                </a>
+                            </div>
+                            <div id="MesafeliSatisSozlesmesi" class="collapse" data-parent="#SozlesmeFormlar">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <h2 class="fw-700 ml-2"> MESAFELİ SATIŞ SÖZLEŞMESİ </h2>
+                                        <ol class="list-spaced fs-md">
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    TARAFLAR
+                                                </strong>
+                                                <p>İşbu Sözleşme aşağıdaki taraflar arasında aşağıda belirtilen hüküm ve şartlar çerçevesinde dijital ortamda onaylanarak kabul edilmiş sayılır.</p>
+                                                <p>İş bu sözleşmeyi kabul etmekle ALICI, sözleşme konusu siparişi onayladığı takdirde sipariş konusu bedeli ve varsa kargo ücreti, vergi gibi belirtilen ek ücretleri ödeme yükümlülüğü altına gireceğini ve bu konuda bilgilendirildiğini peşinen kabul eder.</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    SATICI BİLGİLERİ
+                                                </strong>
+                                                <p class="m-0"><b>Unvan / Ad Soyad:</b> Tetra Bilişim - Kamil ŞEN</p>
+                                                <p class="m-0"><b>Adres:</b> Cumhuriyet Mahallesi Akçiçek Sokak No:8 Üsküdar/İstanbul</p>
+                                                <p class="m-0"><b>Telefon:</b> 0533 262 55 60</p>
+                                                <p><b>Eposta:</b> destek@tetrabilisim.com</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    ALICI BİLGİLERİ (Bundan sonra ALICI olarak anılacaktır.)
+                                                </strong>
+                                                @{tel = frm.SabitTel == null ? frm.SabitTel + " - " + frm.CepTel : frm.CepTel; }
+                                                <p class="m-0"><b>Unvan / Ad Soyad:</b> @frm.FirmaAdi - @frm.Yetkili</p>
+                                                <p class="m-0"><b>Adres:</b> @frm.Adres</p>
+                                                <p class="m-0"><b>Telefon:</b> @tel </p>
+                                                <p><b>Eposta:</b> @frm.Email</p>
+                                            </li>
+
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    TANIMLAR
+                                                </strong>
+                                                <p class="mb-1">İşbu sözleşmenin uygulanmasında ve yorumlanmasında aşağıda yazılı terimler karşılarındaki yazılı açıklamaları ifade edeceklerdir.</p>
+                                                <p class="mb-1"><b>BAKAN:</b> Türkiye Cumhuriyeti Ticaret Bakanı’nı,</p>
+                                                <p class="mb-1"><b>BAKANLIK:</b>  Türkiye Cumhuriyeti Ticaret Bakanlığı’nı,</p>
+                                                <p class="mb-1"><b>KANUN:</b>  6502 sayılı Tüketicinin Korunması Hakkında Kanun’u,</p>
+                                                <p class="mb-1"><b>YÖNETMELİK:</b>  Mesafeli Sözleşmeler Yönetmeliği’ni (RG:27.11.2014/29188)</p>
+                                                <p class="mb-1"><b>HİZMET:</b>  Bir ücret veya menfaat karşılığında yapılan ya da yapılması taahhüt edilen mal sağlama dışındaki her türlü tüketici işleminin konusunu,</p>
+                                                <p class="mb-1"><b>SATICI:</b>  Ticari veya mesleki faaliyetleri kapsamında tüketiciye mal veya hizmet sunan veya mal veya hizmet sunan adına veya hesabına hareket eden şirketi,</p>
+                                                <p class="mb-1"><b>ALICI:</b>  Bir mal veya hizmeti ticari veya mesleki olmayan amaçlarla edinen, kullanan veya yararlanan gerçek ya da tüzel kişiyi,</p>
+                                                <p class="mb-1"><b>SİTE:</b>  SATICI’ya ait internet sitesini (www.fotografcitakip.com),</p>
+                                                <p class="mb-1"><b>SİPARİŞ VEREN:</b>  Bir mal veya hizmeti SATICI’ya ait internet sitesi üzerinden talep eden gerçek ya da tüzel kişiyi,</p>
+                                                <p class="mb-1"><b>TARAFLAR:</b>  SATICI ve ALICI’yı,</p>
+                                                <p class="mb-1"><b>SÖZLEŞME:</b>  SATICI ve ALICI arasında akdedilen işbu sözleşmeyi,</p>
+                                                <p class="mb-1"><b>MAL:</b>  Alışverişe konu olan taşınır eşyayı ve elektronik ortamda kullanılmak üzere hazırlanan yazılım, ses, görüntü ve benzeri gayri maddi malları ifade eder.</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    KONU
+                                                </strong>
+                                                <p class="mb-1">İşbu Sözleşme, ALICI’nın, SATICI’ya ait internet sitesi üzerinden elektronik ortamda siparişini verdiği aşağıda nitelikleri ve satış fiyatı belirtilen ürünün satışı ve teslimi ile ilgili olarak 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmelere Dair Yönetmelik hükümleri gereğince tarafların hak ve yükümlülüklerini düzenler.</p>
+                                                <p class="mb-1">Listelenen ve sitede ilan edilen fiyatlar satış fiyatıdır. İlan edilen fiyatlar ve vaatler güncelleme yapılana ve değiştirilene kadar geçerlidir. Süreli olarak ilan edilen fiyatlar ise belirtilen süre sonuna kadar geçerlidir.</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    SATICI BİLGİLERİ
+                                                </strong>
+                                                <p class="m-0"><b>Unvan / Ad Soyad:</b> Tetra Bilişim - Kamil ŞEN</p>
+                                                <p class="m-0"><b>Adres:</b> Cumhuriyet Mahallesi Akçiçek Sokak No:8 Üsküdar/İstanbul</p>
+                                                <p class="m-0"><b>Telefon:</b> 0533 262 55 60</p>
+                                                <p><b>Eposta:</b> destek@tetrabilisim.com</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    ALICI BİLGİLERİ
+                                                </strong>
+                                                @{tel = frm.SabitTel == null ? frm.SabitTel + " - " + frm.CepTel : frm.CepTel; }
+                                                <p class="m-0"><b>Unvan / Ad Soyad:</b> @frm.FirmaAdi - @frm.Yetkili</p>
+                                                <p class="m-0"><b>Adres:</b> @frm.Adres</p>
+                                                <p class="m-0"><b>Telefon:</b> @tel </p>
+                                                <p class="m-0"><b>Eposta:</b> @frm.Email</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    SİPARİŞ VEREN KİŞİ BİLGİLERİ (Kullanıcı)
+                                                </strong>
+                                                <p class="m-0"><b>Ad Soyad:</b> @kl.AdSoyad</p>
+                                                <p class="m-0"><b>Adres:</b> @frm.Adres</p>
+                                                <p class="m-0"><b>Telefon:</b> @kl.CepTel </p>
+                                                <p class="m-0"><b>Eposta:</b> @kl.Email</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    SÖZLEŞME KONUSU ÜRÜN/ÜRÜNLER BİLGİLERİ
+                                                </strong>
+                                                <p class="mb-1">7.1. Malın /Ürün/Ürünlerin/ Hizmetin temel özelliklerini (türü, miktarı, marka/modeli, rengi, adedi) SATICI’ya ait internet sitesinde yayınlanmaktadır. Satıcı tarafından kampanya düzenlenmiş ise ilgili ürünün temel özelliklerini kampanya süresince inceleyebilirsiniz. Kampanya tarihine kadar geçerlidir.</p>
+                                                <p class="mb-1">7.2. Listelenen ve sitede ilan edilen fiyatlar satış fiyatıdır. İlan edilen fiyatlar ve vaatler güncelleme yapılana ve değiştirilene kadar geçerlidir. Süreli olarak ilan edilen fiyatlar ise belirtilen süre sonuna kadar geçerlidir.</p>
+                                                <p class="mb-1">7.3. Sözleşme konusu mal ya da hizmetin tüm vergiler dâhil satış fiyatı sözleşme sonunda gösterilmiştir.</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    FATURA BİLGİLERİ
+                                                </strong>
+                                                @{tel = frm.SabitTel == null ? frm.SabitTel + " - " + frm.CepTel : frm.CepTel; }
+                                                <p class="m-0"><b>Unvan / Ad Soyad:</b> @frm.FirmaAdi - @frm.Yetkili</p>
+                                                <p class="m-0"><b>Adres:</b> @frm.Adres</p>
+                                                <p class="m-0"><b>Telefon:</b> @tel </p>
+                                                <p class="m-0"><b>Eposta:</b> @frm.Email</p>
+                                                <p class="m-0"><b>Fatura teslim:</b> Fatura dijital olarak e-posta ile gönderilecektir.</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    GENEL HÜKÜMLER
+                                                </strong>
+                                                <p class="mb-1">9.1. ALICI, SATICI’ya ait internet sitesinde sözleşme konusu ürünün temel nitelikleri, satış fiyatı ve ödeme şekli ile teslimata ilişkin ön bilgileri okuyup, bilgi sahibi olduğunu, elektronik ortamda gerekli teyidi verdiğini kabul, beyan ve taahhüt eder. ALICI’nın; Ön Bilgilendirmeyi elektronik ortamda teyit etmesi, mesafeli satış sözleşmesinin kurulmasından evvel, SATICI tarafından ALICI' ya verilmesi gereken adresi, siparişi verilen ürünlere ait temel özellikleri, ürünlerin vergiler dâhil fiyatını, ödeme ve teslimat bilgilerini de doğru ve eksiksiz olarak edindiğini kabul, beyan ve taahhüt eder.</p>
+                                                <p class="mb-1">9.2. Sözleşme konusu her bir ürün, 30 günlük yasal süreyi aşmamak kaydı ile ALICI' nın yerleşim yeri uzaklığına bağlı olarak internet sitesindeki ön bilgiler kısmında belirtilen süre zarfında ALICI veya ALICI’nın gösterdiği adresteki kişi ve/veya kuruluşa teslim edilir. Bu süre içinde ürünün ALICI’ya teslim edilememesi durumunda, ALICI’nın sözleşmeyi feshetme hakkı saklıdır.</p>
+                                                <p class="mb-1">9.3. SATICI, Sözleşme konusu ürünü eksiksiz, siparişte belirtilen niteliklere uygun ve varsa garanti belgeleri, kullanım kılavuzları işin gereği olan bilgi ve belgeler ile teslim etmeyi, her türlü ayıptan arî olarak yasal mevzuat gereklerine göre sağlam, standartlara uygun bir şekilde işi doğruluk ve dürüstlük esasları dâhilinde ifa etmeyi, hizmet kalitesini koruyup yükseltmeyi, işin ifası sırasında gerekli dikkat ve özeni göstermeyi, ihtiyat ve öngörü ile hareket etmeyi kabul, beyan ve taahhüt eder.</p>
+                                                <p class="mb-1">9.4. SATICI, sipariş konusu ürün veya hizmetin yerine getirilmesinin imkânsızlaşması halinde sözleşme konusu yükümlülüklerini yerine getiremezse, bu durumu, öğrendiği tarihten itibaren 3 gün içinde yazılı olarak tüketiciye bildireceğini, 14 günlük süre içinde toplam bedeli ALICI’ya iade edeceğini kabul, beyan ve taahhüt eder. </p>
+                                                <p class="mb-1">9.5. ALICI, Sözleşme konusu ürünün teslimatı için işbu Sözleşme’yi elektronik ortamda teyit edeceğini, herhangi bir nedenle sözleşme konusu ürün bedelinin ödenmemesi ve/veya banka kayıtlarında iptal edilmesi halinde, SATICI’nın sözleşme konusu ürünü teslim yükümlülüğünün sona ereceğini kabul, beyan ve taahhüt eder.</p>
+                                                <p class="mb-1">9.6. ALICI, Sözleşme konusu ürünün dijital ortamda online olarak aktif edildikten sonra ALICI'ya ait kredi kartının yetkisiz kişilerce haksız kullanılması sonucunda sözleşme konusu ürün bedelinin ilgili banka veya finans kuruluşu tarafından SATICI'ya ödenmemesi halinde, SATICI, ALICI’yı bilgilendirmek koşuluyla Sözleşme konusu ürünün aktivasyonunu 3 gün içerisinde iptal ederek kullanım hakkını kapatabilir. ALICI, böyle bir durum söz konusu olduğunda hizmetin iptali edilebileceğini, kabul eder.</p>
+                                                <p class="mb-1">9.7. SATICI, tarafların iradesi dışında gelişen, önceden öngörülemeyen ve tarafların borçlarını yerine getirmesini engelleyici ve/veya geciktirici hallerin oluşması gibi mücbir sebepler halleri nedeni ile sözleşme konusu ürünün aktivasyonunu gerçekleştiremez ise, durumu ALICI'ya bildireceğini kabul, beyan ve taahhüt eder. ALICI da siparişin iptal edilmesini, aktivasyon süresinin engelleyici durumun ortadan kalkmasına kadar ertelenmesini SATICI’dan talep etme hakkını haizdir. ALICI tarafından siparişin iptal edilmesi halinde ALICI’nın nakit ile yaptığı ödemelerde, ürün tutarı 14 gün içinde kendisine nakden ve defaten ödenir. ALICI’nın kredi kartı ile yaptığı ödemelerde ise, ürün tutarı, siparişin ALICI tarafından iptal edilmesinden sonra 14 gün içerisinde ilgili bankaya iade edilir. ALICI, SATICI tarafından kredi kartına iade edilen tutarın banka tarafından ALICI hesabına yansıtılmasına ilişkin ortalama sürecin 2 ile 3 haftayı bulabileceğini, bu tutarın bankaya iadesinden sonra ALICI’nın hesaplarına yansıması halinin tamamen banka işlem süreci ile ilgili olduğundan, ALICI, olası gecikmeler için SATICI’yı sorumlu tutamayacağını kabul, beyan ve taahhüt eder.</p>
+                                                <p class="mb-1">9.8. SATICININ, ALICI tarafından siteye kayıt formunda belirtilen veya daha sonra kendisi tarafından güncellenen adresi, e-posta adresi, sabit ve mobil telefon hatları ve diğer iletişim bilgileri üzerinden mektup, e-posta, SMS, telefon görüşmesi ve diğer yollarla iletişim, pazarlama, bildirim ve diğer amaçlarla ALICI’ya ulaşma hakkı bulunmaktadır. ALICI, işbu sözleşmeyi kabul etmekle SATICI’nın kendisine yönelik yukarıda belirtilen iletişim faaliyetlerinde bulunabileceğini kabul ve beyan etmektedir.</p>
+                                                <p class="mb-1">9.9. ALICI, sözleşme konusu mal/hizmeti teslim almadan önce muayene edecek; ezik, kırık, ambalajı yırtılmış vb. hasarlı ve ayıplı mal/hizmeti kargo şirketinden teslim almayacaktır. Teslim alınan mal/hizmetin hasarsız ve sağlam olduğu kabul edilecektir. Teslimden sonra mal/hizmetin özenle korunması borcu, ALICI’ya aittir. Cayma hakkı kullanılacaksa mal/hizmet kullanılmamalıdır. Fatura iade edilmelidir.</p>
+                                                <p class="mb-1">9.10. ALICI ile sipariş esnasında kullanılan kredi kartı hamilinin aynı kişi olmaması veya ürünün ALICI’ya tesliminden evvel, siparişte kullanılan kredi kartına ilişkin güvenlik açığı tespit edilmesi halinde, SATICI, kredi kartı hamiline ilişkin kimlik ve iletişim bilgilerini, siparişte kullanılan kredi kartının bir önceki aya ait ekstresini yahut kart hamilinin bankasından kredi kartının kendisine ait olduğuna ilişkin yazıyı ibraz etmesini ALICI’dan talep edebilir. ALICI’nın talebe konu bilgi/belgeleri temin etmesine kadar geçecek sürede sipariş dondurulacak olup, mezkur taleplerin 24 saat içerisinde karşılanmaması halinde ise SATICI, siparişi iptal etme hakkını haizdir.</p>
+                                                <p class="mb-1">9.11. ALICI, SATICI’ya ait internet sitesine üye olurken verdiği kişisel ve diğer sair bilgilerin gerçeğe uygun olduğunu, SATICI’nın bu bilgilerin gerçeğe aykırılığı nedeniyle uğrayacağı tüm zararları, SATICI’nın ilk bildirimi üzerine derhal, nakden ve defaten tazmin edeceğini beyan ve taahhüt eder.</p>
+                                                <p class="mb-1">9.12. ALICI, SATICI’ya ait internet sitesini kullanırken yasal mevzuat hükümlerine riayet etmeyi ve bunları ihlal etmemeyi baştan kabul ve taahhüt eder. Aksi takdirde, doğacak tüm hukuki ve cezai yükümlülükler tamamen ve münhasıran ALICI’yı bağlayacaktır.</p>
+                                                <p class="mb-1">9.13. ALICI, SATICI’ya ait internet sitesini hiçbir şekilde kamu düzenini bozucu, genel ahlaka aykırı, başkalarını rahatsız ve taciz edici şekilde, yasalara aykırı bir amaç için, başkalarının maddi ve manevi haklarına tecavüz edecek şekilde kullanamaz. Ayrıca, üye başkalarının hizmetleri kullanmasını önleyici veya zorlaştırıcı faaliyet (spam, virus, truva atı, vb.) işlemlerde bulunamaz.</p>
+                                                <p class="mb-1">9.14. SATICI’ya ait internet sitesinin üzerinden, SATICI’nın kendi kontrolünde olmayan ve/veya başkaca üçüncü kişilerin sahip olduğu ve/veya işlettiği başka web sitelerine ve/veya başka içeriklere link verilebilir. Bu linkler ALICI’ya yönlenme kolaylığı sağlamak amacıyla konmuş olup herhangi bir web sitesini veya o siteyi işleten kişiyi desteklememekte ve Link verilen web sitesinin içerdiği bilgilere yönelik herhangi bir garanti niteliği taşımamaktadır.</p>
+                                                <p class="mb-1">9.15. İşbu sözleşme içerisinde sayılan maddelerden bir ya da birkaçını ihlal eden üye işbu ihlal nedeniyle cezai ve hukuki olarak şahsen sorumlu olup, SATICI’yı bu ihlallerin hukuki ve cezai sonuçlarından ari tutacaktır. Ayrıca; işbu ihlal nedeniyle, olayın hukuk alanına intikal ettirilmesi halinde, SATICI’nın üyeye karşı üyelik sözleşmesine uyulmamasından dolayı tazminat talebinde bulunma hakkı saklıdır.</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    CAYMA HAKKI
+                                                </strong>
+                                                <p class="mb-1">10.1. ALICI; mesafeli sözleşmenin mal satışına ilişkin olması durumunda, ürünün kendisine veya gösterdiği adresteki kişi/kuruluşa teslim tarihinden itibaren 14 (on dört) gün içerisinde, SATICI’ya bildirmek şartıyla hiçbir hukuki ve cezai sorumluluk üstlenmeksizin ve hiçbir gerekçe göstermeksizin malı reddederek sözleşmeden cayma hakkını kullanabilir. Hizmet sunumuna ilişkin mesafeli sözleşmelerde ise, bu süre sözleşmenin imzalandığı tarihten itibaren başlar. Cayma hakkı süresi sona ermeden önce, tüketicinin onayı ile hizmetin ifasına başlanan hizmet sözleşmelerinde cayma hakkı kullanılamaz. Cayma hakkının kullanımından kaynaklanan masraflar SATICI’ ya aittir. ALICI, iş bu sözleşmeyi kabul etmekle, cayma hakkı konusunda bilgilendirildiğini peşinen kabul eder.</p>
+                                                <p class="mb-1">10.2. Cayma hakkının kullanılması için 14 (ondört) günlük süre içinde SATICI' ya iadeli taahhütlü posta, faks veya eposta ile yazılı bildirimde bulunulması şarttır. Bu hakkın kullanılması halinde, </p>
+                                                <p class="mb-1 ml-3">a) 3. kişiye veya ALICI’ ya teslim edilen ürünün faturası, kurumsal ise, iade ederken kurumun düzenlemiş olduğu iade faturası ile birlikte gönderilmesi gerekmektedir. Faturası kurumlar adına düzenlenen sipariş iadeleri İADE FATURASI kesilmediği takdirde tamamlanamayacaktır.</p>
+                                                <p class="mb-1 ml-3">b) Hizmet sayfasında bulunan İade formu doldurularak ürün(lisans) iptal süreci başlatılır.</p>
+                                                <p class="mb-1 ml-3">c) SATICI, cayma bildiriminin kendisine ulaşmasından itibaren en geç 10 günlük süre içerisinde toplam bedeli ve ALICI’yı borç altına sokan belgeleri ALICI’ ya iade etmek ve Ürünün aktivasyon iptalini 10 gün içerisinde yapmakla yükümlüdür.</p>
+                                                <p class="mb-1 ml-3">e) ALICI’nın satın aldığı malın iptali için başvurduğu süre sipariş tarihinden itibaren geçen her 30 günlük süre için SATICI ücret kesintisinde bulunabilir.</p>
+                                                <p class="mb-1 ml-3">f) Cayma hakkının kullanılması nedeniyle SATICI tarafından düzenlenen kampanya limit tutarının altına düşülmesi halinde kampanya kapsamında faydalanılan indirim miktarı iptal edilir.</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    TEMERRÜT HALİ VE HUKUKİ SONUÇLARI
+                                                </strong>
+                                                <p class="mb-1">ALICI, ödeme işlemlerini kredi kartı ile yaptığı durumda temerrüde düştüğü takdirde, kart sahibi banka ile arasındaki kredi kartı sözleşmesi çerçevesinde faiz ödeyeceğini ve bankaya karşı sorumlu olacağını kabul, beyan ve taahhüt eder. Bu durumda ilgili banka hukuki yollara başvurabilir; doğacak masrafları ve vekâlet ücretini ALICI’dan talep edebilir ve her koşulda ALICI’nın borcundan dolayı temerrüde düşmesi halinde, ALICI, borcun gecikmeli ifasından dolayı SATICI’nın uğradığı zarar ve ziyanını ödeyeceğini kabul, beyan ve taahhüt eder.</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    YETKİLİ MAHKEME
+                                                </strong>
+                                                <p class="mb-1">İşbu sözleşmeden doğan uyuşmazlıklarda şikayet ve itirazlar, aşağıdaki kanunda belirtilen parasal sınırlar dâhilinde tüketicinin yerleşim yerinin bulunduğu veya tüketici işleminin yapıldığı yerdeki tüketici sorunları hakem heyetine veya tüketici mahkemesine yapılacaktır. Parasal sınıra ilişkin bilgiler aşağıdadır: </p>
+                                                <p class="mb-1">28/05/2014 tarihinden itibaren geçerli olmak üzere:</p>
+                                                <p class="mb-1 ml-3">a) 6502 sayılı Tüketicinin Korunması Hakkında Kanun’un 68. Maddesi gereği değeri 2.000,00 (ikibin) TL’nin altında olan uyuşmazlıklarda ilçe tüketici hakem heyetlerine,</p>
+                                                <p class="mb-1 ml-3">b) Değeri 3.000,00(üçbin)TL’ nin altında bulunan uyuşmazlıklarda il tüketici hakem heyetlerine,</p>
+                                                <p class="mb-1 ml-3">c) Büyükşehir statüsünde bulunan illerde ise değeri 2.000,00 (ikibin) TL ile 3.000,00(üçbin)TL’ arasındaki uyuşmazlıklarda il tüketici hakem heyetlerine başvuru yapılmaktadır.</p>
+                                                <p class="mb-1">İşbu Sözleşme ticari amaçlarla yapılmaktadır.</p>
+                                            </li>
+                                            <li>
+                                                <strong class="mb-1 d-block fs-lg">
+                                                    YÜRÜRLÜK
+                                                </strong>
+                                                <p class="mb-1">ALICI, Site üzerinden verdiği siparişe ait ödemeyi gerçekleştirdiğinde işbu sözleşmenin tüm şartlarını kabul etmiş sayılır. SATICI, siparişin gerçekleşmesi öncesinde işbu sözleşmenin sitede ALICI tarafından okunup kabul edildiğine dair onay alacak şekilde gerekli yazılımsal düzenlemeleri yapmakla yükümlüdür.</p>
+                                            </li>
+                                        </ol>
+                                    </div>
+                                    <div class="row">
+                                        <strong class="mb-1 ml-4 d-block fs-lg">
+                                            ÜRÜN BİLGİLERİ
+                                        </strong>
+                                        <table class="table table-bordered m-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Sipariş No</th>
+                                                    <th>Sipariş Tarihi</th>
+                                                    <th>Paket Adı</th>
+                                                    <th>Paket Detay</th>
+                                                    <th>Paket Tutarı</th>
+                                                    <th>Süre</th>
+                                                    <th>Ödeme Şekli</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td>@ViewBag.SiparisNo</td>
+                                                    <td>@DateTime.Now.ToShortDateString()</td>
+                                                    <td>@ViewBag.PaketAdi</td>
+                                                    <td>@Html.Raw(ViewBag.PaketDetayi)</td>
+                                                    <td id="OnBilgilendirmeTutar"></td>
+                                                    <td id="OnBilgilendirmeSure"></td>
+                                                    <td id="OnBilgilendirmeOdemeSekli"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <p class="mt-2 ml-4">Teslimat Şekli: Dijital Lisans (Online olarak otomatik aktivasyon)</p>
+                                    </div>
+                                    <div class="row">
+                                        <table class="table table-striped m-0">
+                                            <tbody>
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td class="text-right">@DateTime.Now.ToShortDateString()</td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="text-center">SATICI</td>
+                                                    <td></td>
+                                                    <td class="text-center">ALICI</td>
+                                                </tr>
+                                                <tr>
+                                                    @{firmaunvan = frm.Yetkili != null ? frm.FirmaAdi + " - " + frm.Yetkili : frm.FirmaAdi; }
+                                                    <td class="text-center">Tetra Bilişim - Kamil ŞEN</td>
+                                                    <td></td>
+                                                    <td class="text-center">@firmaunvan</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <input type="text" id="PaketTutar" class="form-control" name="Id" style="display:none" value="@ViewBag.PaketTutar.ToString("C").Replace("₺", "").TrimEnd()">
+    <input type="text" id="PaketTip" class="form-control" name="Id" style="display:none" value="@ViewBag.PaketTip">
+    <input type="text" id="PaketAdi" class="form-control" name="Id" style="display:none" value="@ViewBag.PaketAdi">
+    <input type="text" id="SiparisNo" class="form-control" name="Id" style="display:none" value="@ViewBag.SiparisNo">
+    <input type="text" id="PaketSatisFiyatId" class="form-control" name="Id" style="display:none" value="@ViewBag.PaketSatisFiyatId">
+    @*<div id="iyzipay-checkout-form" class="popup"></div>*@
+    <div class="col-lg-4">
+        <div id="panel-2" class="panel">
+            <div class="panel-hdr">
+                <h2>Sipariş Özeti </h2>
+                <span class="text-right fw-700">Sipariş No: @ViewBag.SiparisNo</span>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <p class="text-primary text-center h2 mb-4">@ViewBag.PaketAdi</p>
+                    @if (ViewBag.PaketTip == "Lisans")
+                    {
+                        <div class="form-group" id="LisansSuresi">
+                            <label class="form-label">Lisans Süresi</label>
+                            <select class="custom-select form-control">
+                                <option value="1">1 Ay</option>
+                                <option value="2">3 Ay</option>
+                                <option value="3">6 Ay</option>
+                                <option value="4" selected="">12 Ay (1 Yıl)</option>
+                                <option value="5">24 Ay (2 Yıl)</option>
+                                <option value="6">36 Ay (3 Yıl)</option>
+                            </select>
+                        </div>
+                    }
+                    <p class="fw-300 h6 text-right mb-0">Sipariş Tutarı</p>
+                    <p id="SiparisTutari" class="fw-700 h4 text-right"></p>
+                    <div class="border-bottom mb-2"></div>
+                    <p class="fw-300 h6 text-right mb-0">KDV (%20)</p>
+                    <p id="Vegiler" class="fw-700 h4 text-right"></p>
+                    <div class="border-bottom mb-2"></div>
+                    <p class="fw-500 fs-lg text-right mb-0">Ödenecek Tutar</p>
+                    <p id="OdenecekTutar" class="fw-700 fs-xxl text-right"></p>
+                    <div class="modal-footer" style="padding-top:0px">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="SozlesmelerOnay">
+                            <label class="custom-control-label" for="SozlesmelerOnay"><b>Ön Bilgilendirme Koşulları</b>'nı ve <b>Mesafeli Satış Sözleşmesi</b>'ni okudum, onaylıyorum.</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="padding-top:0px">
+                        <button type="button" class="btn btn-primary btn-block" id="SiparisOnay" disabled>Siparişi Onayla</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Script
+{
+    <script src="~/Areas/Otomasyon/Content/js/requer.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            function ParaFormat(fiyat) {
+                var para_sembol = "TL"
+                var format = new Intl.NumberFormat('de-DE', {
+                    style: 'currency',
+                    currency: 'TRY',
+                    minumumFractionDigits: 2
+                })
+                //return format.format(fiyat)
+                return format.format(fiyat).replace('TRY', para_sembol)
+            }
+            var secim = 4;
+            var OdemeTutar = $("#PaketTutar").val().replace(",", ".");
+            console.log(OdemeTutar);
+            $("#OnBilgilendirmeOdemeSekli").html("Kredi Kartı");
+            $("#OnBilgilendirmeSure").html("12 Ay (1 Yıl)");
+            var PaketTip = $("#PaketTip").val();
+            if (PaketTip == "Lisans") {
+                OdemeTutar = OdemeTutar * 12;
+            }
+            var SiparisTutar = OdemeTutar / 1.20;
+            var Vergiler = SiparisTutar * 0.20;
+            $("#SozlesmelerOnay").on('click', function () {
+                if ($(this).is(':checked')) {
+                    $("#SiparisOnay").removeAttr("disabled");
+                }
+                else {
+                    $("#SiparisOnay").attr("disabled", "disabled");
+                }
+            });
+            $("#SiparisTutari").html(accounting.formatMoney(SiparisTutar, "TL", 2, ".", ",", "%v %s"));
+            $("#Vegiler").html(accounting.formatMoney(Vergiler, "TL", 2, ".", ",", "%v %s"));
+            $("#OdenecekTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+            $("#OnBilgilendirmeTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+            $("#LisansSuresi").change(function () {
+                secim = $(this).find("option:selected").val();
+                PaketTutar = 0;
+                if (secim == 1) {
+                    OdemeTutar = $("#PaketTutar").val().replace(",", ".");
+                    var SiparisTutar = OdemeTutar / 1.18;
+                    var Vergiler = SiparisTutar * 0.18;
+                    $("#SiparisTutari").html(accounting.formatMoney(SiparisTutar, "TL", 2, ".", ",", "%v %s"));
+                    $("#Vegiler").html(accounting.formatMoney(Vergiler, "TL", 2, ".", ",", "%v %s"));
+                    $("#OdenecekTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+                    $("#OnBilgilendirmeTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+                }
+                if (secim == 2) {
+                    OdemeTutar = $("#PaketTutar").val().replace(",", ".");
+                    OdemeTutar = OdemeTutar * 3;
+                    var SiparisTutar = OdemeTutar / 1.18;
+                    var Vergiler = SiparisTutar * 0.18;
+                    $("#SiparisTutari").html(accounting.formatMoney(SiparisTutar, "TL", 2, ".", ",", "%v %s"));
+                    $("#Vegiler").html(accounting.formatMoney(Vergiler, "TL", 2, ".", ",", "%v %s"));
+                    $("#OdenecekTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+                    $("#OnBilgilendirmeTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+                }
+                if (secim == 3) {
+                    OdemeTutar = $("#PaketTutar").val().replace(",", ".");
+                    OdemeTutar = OdemeTutar * 6;
+                    var SiparisTutar = OdemeTutar / 1.18;
+                    var Vergiler = SiparisTutar * 0.18;
+                    $("#SiparisTutari").html(accounting.formatMoney(SiparisTutar, "TL", 2, ".", ",", "%v %s"));
+                    $("#Vegiler").html(accounting.formatMoney(Vergiler, "TL", 2, ".", ",", "%v %s"));
+                    $("#OdenecekTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+                    $("#OnBilgilendirmeTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+                }
+                if (secim == 4) {
+                    OdemeTutar = $("#PaketTutar").val().replace(",", ".");
+                    OdemeTutar = OdemeTutar * 12;
+                    var SiparisTutar = OdemeTutar / 1.18;
+                    var Vergiler = SiparisTutar * 0.18;
+                    $("#SiparisTutari").html(accounting.formatMoney(SiparisTutar, "TL", 2, ".", ",", "%v %s"));
+                    $("#Vegiler").html(accounting.formatMoney(Vergiler, "TL", 2, ".", ",", "%v %s"));
+                    $("#OdenecekTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+                    $("#OnBilgilendirmeTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+                }
+                if (secim == 5) {
+                    OdemeTutar = $("#PaketTutar").val().replace(",", ".");
+                    OdemeTutar = OdemeTutar * 24;
+                    var SiparisTutar = OdemeTutar / 1.18;
+                    var Vergiler = SiparisTutar * 0.18;
+                    $("#SiparisTutari").html(accounting.formatMoney(SiparisTutar, "TL", 2, ".", ",", "%v %s"));
+                    $("#Vegiler").html(accounting.formatMoney(Vergiler, "TL", 2, ".", ",", "%v %s"));
+                    $("#OdenecekTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+                    $("#OnBilgilendirmeTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+                }
+                if (secim == 6) {
+                    OdemeTutar = $("#PaketTutar").val().replace(",", ".");
+                    OdemeTutar = OdemeTutar * 36;
+                    var SiparisTutar = OdemeTutar / 1.18;
+                    var Vergiler = SiparisTutar * 0.18;
+                    $("#SiparisTutari").html(accounting.formatMoney(SiparisTutar, "TL", 2, ".", ",", "%v %s"));
+                    $("#Vegiler").html(accounting.formatMoney(Vergiler, "TL", 2, ".", ",", "%v %s"));
+                    $("#OdenecekTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+                    $("#OnBilgilendirmeTutar").html(accounting.formatMoney(OdemeTutar, "TL", 2, ".", ",", "%v %s"));
+                }
+                $("#OnBilgilendirmeSure").html($(this).find("option:selected").text());
+            });
+            $("#SiparisOnay").click(function () {
+                var LisansSuresi = secim; // 1: 1AY, 2: 3AY, 3: 6AY, 4: 12AY(1YIL), 5: 24AY(2YIL), 6: 36AY(3YIL)
+                var PaketAdi = $("#PaketAdi").val(); // Basit Lisans (60 TL/Ay), Standart Lisans (75 TL/Ay), Profesyonel Lisans (90 TL/Ay), 1.000 SMS, 5.000 SMS, 10.000 SMS, 25.000 SMS
+                var PaketTip = $("#PaketTip").val();
+                var SiparisNo = $("#SiparisNo").val();
+                var PaketSatisFiyatId = $("#PaketSatisFiyatId").val();
+                if (document.getElementById('KrediKartiRadio').checked) {
+                    var KrediKartiData = new FormData();
+                    KrediKartiData.append("LisansSuresi", LisansSuresi);
+                    KrediKartiData.append("PaketAdi", PaketAdi);
+                    KrediKartiData.append("PaketTip", PaketTip);
+                    KrediKartiData.append("SiparisNo", SiparisNo);
+                    KrediKartiData.append("PaketSatisFiyatId", PaketSatisFiyatId);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: KrediKartiData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/SatinAl/FKrediKartSiparisFormOlustur/",
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                $("#iyzipay-checkout-form").html(data.forum);
+                                $("#KrediKartiModal").modal("show");
+                            }
+
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                    //alert("Kredi Kartı");
+                }
+                else if (document.getElementById('BankaRadio').checked) {
+                    var BankaHavaleData = new FormData();
+                    BankaHavaleData.append("LisansSuresi", LisansSuresi);
+                    BankaHavaleData.append("PaketAdi", PaketAdi);
+                    BankaHavaleData.append("PaketTip", PaketTip);
+                    BankaHavaleData.append("SiparisNo", SiparisNo);
+                    BankaHavaleData.append("PaketSatisFiyatId", PaketSatisFiyatId);
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: BankaHavaleData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/SatinAl/FBankaSiparisOnay/",
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                Swal.fire(
+                                    {
+                                        title: "Hata",
+                                        html: "<p><h2 style='font-size:16px; color:red'><strong>Sipariş No : </strong>" + SiparisNo + "</h2></p><h2>" + data.Mesaj + "</h2>",
+                                        type: "error",
+                                        showCancelButton: false,
+                                        confirmButtonText: "Tamam",
+                                    }).then(function (result) {
+                                        window.location.replace("/Otomasyon/Giris/GirisYap");
+                                    });
+                            }
+                            else if (data.Sonuc == true) {
+                                Swal.fire(
+                                    {
+                                        title: "Teşekkür Ederiz",
+                                        html: "<p><h2 style='font-size:16px; color:red'><strong>Sipariş No : </strong>" + SiparisNo + "</h2></p><h2>" + data.Mesaj + "</h2>",
+                                        type: "success",
+                                        showCancelButton: false,
+                                        confirmButtonText: "Tamam",
+                                    }).then(function (result) {
+                                        window.location.replace("/Otomasyon/Giris/GirisYap");
+                                    });
+                            }
+
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+
+
+
+            });
+
+            $('input:radio[name="OdemeYontemi"]').change(function () {
+                if ($(this).val() == 'Kredi Kartı') {
+                    $("#OnBilgilendirmeOdemeSekli").html("Kredi Kartı");
+                }
+                else if ($(this).val() == 'Banka') {
+                    $("#OnBilgilendirmeOdemeSekli").html("Banka Havalesi/EFT");
+                }
+            });
+        });
+    </script>
+}

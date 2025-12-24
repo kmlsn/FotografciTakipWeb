@@ -1,0 +1,1262 @@
+﻿
+@{
+    Layout = null;
+}
+@using FotografciTakipWeb.Models
+@model List<Il>
+@{
+    List<SatisFiyatlari> SatisFiyatlari = ViewBag.SatisFiyatlari;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <!-- Basic -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <title>Fotoğrafçı Takip- Fotoğraf Stüdyolarının Yeni Uygulaması</title>
+
+    <meta name="keywords" content="Fotoğrafçı Takip,fotoğrafçı takip programı,fotoğrafçıtakip,fotoğrafçı,fotografci,takip,stüdyotakip,stüdyo takip,stüdyo takip programı,iş takip,takip,randevu,randevutakip,randevu takip,iştakip,randevu takip,randevu takip programı,fotoğrafçılar için program,fotoğrafçı muhasebe,fotoğrafçı randevu,muahsebe,muahsebe takip" />
+    <meta name="description" content="Fotoğrafçı Takip- Fotoğraf Stüdyolarının ve Fotoğrafçıların Yeni Uygulaması">
+    <meta name="author" content="tetrabilisim.com">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="~/Content/img/Tetra_Logo_Favico.ico" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="~/Content/img/Tetra_Logo_apple-touch-icon.png">
+
+    <!-- Mobile Metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, shrink-to-fit=no">
+
+
+
+    <!-- Web Fonts  -->
+    <link id="googleFonts" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800%7CShadows+Into+Light&display=swap" rel="stylesheet" type="text/css">
+
+    <!-- Vendor CSS -->
+    <link href="~/Content/vendor/font-awesome/css/font-awesome.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Content/vendor/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="~/Content/vendor/fontawesome-free/css/all.min.css">
+    <link rel="stylesheet" href="~/Content/vendor/animate/animate.compat.css">
+    <link rel="stylesheet" href="~/Content/vendor/simple-line-icons/css/simple-line-icons.min.css">
+    <link rel="stylesheet" href="~/Content/vendor/owl.carousel/assets/owl.carousel.min.css">
+    <link rel="stylesheet" href="~/Content/vendor/owl.carousel/assets/owl.theme.default.min.css">
+    <link rel="stylesheet" href="~/Content/vendor/magnific-popup/magnific-popup.min.css">
+    <link href="~/Content/css/sweetalert2/sweetalert2.bundle.css" rel="stylesheet" />
+    <!-- Theme CSS -->
+
+    <link href="~/Content/css/theme.css" rel="stylesheet" />
+    <link href="~/Content/css/theme-shop.css" rel="stylesheet" />
+    <link href="~/Content/css/theme-elements.css" rel="stylesheet" />
+    <link href="~/Content/css/theme-blog.css" rel="stylesheet" />
+
+    <!-- Demo CSS -->
+    <link rel="stylesheet" href="~/Content/css/demos/demo-seo.css">
+    <!-- Skin CSS -->
+    <link id="skinCSS" rel="stylesheet" href="~/Content/css/skins/skin-seo.css">
+
+    <!-- Theme Custom CSS -->
+    <link rel="stylesheet" href="~/Content/css/custom.css">
+
+    <!-- Head Libs -->
+    <script src="~/Content/vendor/modernizr/modernizr.min.js"></script>
+    <style>
+        .modal {
+            overflow: auto !important; /*Açılan ikinci modal ekranda kaymadığı için eklendi*/
+        }
+    </style>
+</head>
+<body data-target="#header" data-spy="scroll" data-offset="100">
+
+    <div class="body">
+
+        <div class="modal fade" id="UyelikSozlesmesiModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index:10000">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="padding-bottom:5px">
+                        <h4 class="modal-title">
+                            Üyelik Sözleşmesi
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true"><i class="fa fa-times"></i></span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel-content p-0">
+                            <div class="panel-content">
+                                <div class="modal-body" id="slimtest1">
+                                    <div class="row">
+                                        <p class="h5 text-color-dark mb-3">1. Temel Bilgiler ve Tanımlar </p>
+                                        <p class="mx-2 ">https:\\www.fotografcitakip.com web sitesini kullanarak aşağıdaki kuralları kabul etmiş sayılmaktasınız. </p>
+                                        <p class="mx-2">Sitemizdeki web sayfaları ve ona bağlı tüm sayfalar (‘Site’) https:\\www.fotografcitakip.com, Tetra Bilişim firmasının (‘Firma’) malıdır ve onun tarafından işletilir. Sizler -Bireysel Fotoğrafçılar, Fotoğrafçı Firmalar, …- (‘Kullanıcı’) ve sitede sunulan hizmetleri sizlerin belirlediği ve yetkilendirdiği alt kullanıcılar (‘AltKullanıcı’)  sitede sunulan tüm hizmetleri kullanırken aşağıdaki şartlara tabi olduğunuzu, sitedeki hizmetten yararlanmakla ve kullanmaya devam etmekle; Bağlı olduğunuz yasalara göre sözleşme imzalama hakkına, yetkisine ve hukuki ehliyetine sahip ve 18 yaşın üzerinde olduğunuzu, bu sözleşmeyi okuduğunuzu, anladığınızı ve sözleşmede yazan şartlarla bağlı olduğunuzu kabul etmiş sayılırsınız. </p>
+                                        <p class="mx-2">Kullanıcı, ‘Site’de sunulan hizmetleri kullanabilmek için kendi Müşterilerine (‘Müşteri’) ait bilgileri de kaydetmektedir.</p>
+                                        <p class="mx-2">İşbu sözleşme taraflara sözleşme konusu site ile ilgili hak ve yükümlülükler yükler ve taraflar işbu sözleşmeyi kabul ettiklerinde bahsi geçen hak ve yükümlülükleri eksiksiz, doğru, zamanında, işbu sözleşmede talep edilen şartlar dâhilinde yerine getireceklerini beyan ederler.</p>
+                                        <p class="h5 text-color-dark mb-3">2. Sorumluluklar </p>
+                                        <p class="mx-2">2.1. Firma, fiyatlar ve sunulan ürün ve hizmetler üzerinde değişiklik yapma hakkını her zaman saklı tutar. </p>
+                                        <p class="mx-2">2.2. Firma, üyenin sözleşme konusu hizmetlerden, teknik arızalar dışında yararlandırılacağını kabul ve taahhüt eder.</p>
+                                        <p class="mx-2">2.3. Kullanıcı/AltKullanıcı, sitenin kullanımında tersine mühendislik yapmayacağını ya da bunların kaynak kodunu bulmak veya elde etmek amacına yönelik herhangi bir başka işlemde bulunmayacağını aksi halde ve 3. Kişiler nezdinde doğacak zararlardan sorumlu olacağını, hakkında hukuki ve cezai işlem yapılacağını peşinen kabul eder. </p>
+                                        <p class="mx-2">2.4. Kullanıcı/AltKullanıcı, site içindeki faaliyetlerinde, sitenin herhangi bir bölümünde veya iletişimlerinde genel ahlaka ve adaba aykırı, kanuna aykırı, 3. Kişilerin haklarını zedeleyen, yanıltıcı, saldırgan, müstehcen, pornografik, kişilik haklarını zedeleyen, telif haklarına aykırı, yasa dışı faaliyetleri teşvik eden içerikler üretmeyeceğini, paylaşmayacağını kabul eder. Aksi halde oluşacak zarardan tamamen kendisi sorumludur ve bu durumda ‘Site’ yetkilileri, bu tür hesapları askıya alabilir, sona erdirebilir, yasal süreç başlatma hakkını saklı tutar. Bu sebeple yargı mercilerinden etkinlik veya kullanıcı hesapları ile ilgili bilgi talepleri gelirse paylaşma hakkını saklı tutar.</p>
+                                        <p class="mx-2">2.5. Kullanıcıya ait bilgiler, görseller, iletişim ve detay bilgileri tamamen kendi sorumluluğundadır. Her "Kullanıcı" verdiği bilgilerin doğruluğunu ve orijinalliğini baştan kabul eder. ‘Firma’ bu bilgilerin diğer kullanıcılar tarafından görüntülenmesi ve paylaşılması hakkını saklı tutar.</p>
+                                        <p class="mx-2">2.6 ‘Site’de sadece üye olan ‘Kullanıcı’ ve ‘Kullanıcı’ tarafından yetkilendirilen ‘AltKullanıcı’lar planlama, rezervasyon tutma, ‘Müşteri’ kaydetme gibi araçlarından yararlanabilir. İstenen ve gönderilen teklifler, verilen taahhütler, yapılan sözleşmelerde ‘Firma’nın ve ‘Site’nin hiçbir hükmü yoktur. Bu konuda sorumluluk beklenemez doğacak her sorundan ‘Kullanıcı’ ve ‘AltKullanıcı’lar sorumludur.</p>
+                                        <p class="mx-2">2.7. Kullanıcı tarafından ‘Site’de kullanılan bazı hizmetler sonucunda ‘Kullanıcı/AltKullanıcı’ya ve ‘Müşteri’ye bilgilendirme amaçlı SMS ve e-posta gönderilebilir.</p>
+                                        <p class="mx-2">2.8. Sitenin üyelerinin birbirleri veya üçüncü şahıslarla olan ilişkileri kendi sorumluluğundadır.</p>
+                                        <p class="h5 text-color-dark mb-3">3. Fikri Mülkiyet Hakları </p>
+                                        <p class="mx-2">3.1 İşbu Site’de yer alan ünvan, işletme adı, marka, patent, logo, tasarım, bilgi ve yöntem gibi tescilli veya tescilsiz tüm fikri mülkiyet hakları site işleteni ve sahibi firmaya veya belirtilen ilgilisine ait olup, ulusal ve uluslararası hukukun koruması altındadır. İşbu Site’nin ziyaret edilmesi veya bu Site’deki hizmetlerden yararlanılması söz konusu fikri mülkiyet hakları konusunda hiçbir hak vermez.</p>
+                                        <p class="mx-2">3.2. Site’de yer alan bilgiler hiçbir şekilde çoğaltılamaz, yayınlanamaz, kopyalanamaz, sunulamaz ve/veya aktarılamaz. Site’nin bütünü veya bir kısmı diğer bir internet sitesinde izinsiz olarak kullanılamaz. </p>
+                                        <p class="h5 text-color-dark mb-3">4. Gizli Bilgiler</p>
+                                        <p class="mx-2">4.1. Firma, site üzerinden ‘Kullanıcı/AltKullanıcı/Müşteri’nin ilettiği kişisel bilgileri 3. Kişilere açıklamayacaktır. Bu kişisel bilgiler; kişi adı-soyadı, adresi, sabit telefon numarası, cep telefonu numarası, e-posta adresi gibi Kullanıcı/AltKullanıcı/Müşteri’yi tanımlamaya yönelik her türlü diğer bilgiyi içermekte olup, kısaca ‘Gizli Bilgiler’ olarak anılacaktır.</p>
+                                        <p class="mx-2">4.2. Kullanıcı, sadece tanıtım, reklam, kampanya, promosyon, duyuru vb. pazarlama faaliyetleri kapsamında kullanılması ile sınırlı olmak üzere, Site’nin sahibi olan firmanın kendisine ait iletişim, portföy durumu ve demografik bilgilerini iştirakleri ya da bağlı bulunduğu grup şirketleri ile paylaşmasına muvafakat ettiğini kabul ve beyan eder. Bu kişisel bilgiler firma bünyesinde müşteri profili belirlemek, müşteri profiline uygun promosyon ve kampanyalar sunmak ve istatistiksel çalışmalar yapmak amacıyla kullanılabilecektir.</p>
+                                        <p class="mx-2">4.3. Gizli Bilgiler, ancak resmi makamlarca usulü dairesinde bu bilgilerin talep edilmesi halinde ve yürürlükteki emredici mevzuat hükümleri gereğince resmi makamlara açıklama yapılmasının zorunlu olduğu durumlarda resmi makamlara açıklanabilecektir.</p>
+                                        <p class="h5 text-color-dark mb-3">5. Garanti Vermeme</p>
+                                        <p class="mx-2">İŞBU SÖZLEŞME MADDESİ UYGULANABİLİR KANUNUN İZİN VERDİĞİ AZAMİ ÖLÇÜDE GEÇERLİ OLACAKTIR. FİRMA TARAFINDAN SUNULAN HİZMETLER "OLDUĞU GİBİ” VE "MÜMKÜN OLDUĞU” TEMELDE SUNULMAKTA VE PAZARLANABİLİRLİK, BELİRLİ BİR AMACA UYGUNLUK VEYA İHLAL ETMEME KONUSUNDA TÜM ZIMNİ GARANTİLER DE DÂHİL OLMAK ÜZERE HİZMETLER VEYA UYGULAMA İLE İLGİLİ OLARAK (BUNLARDA YER ALAN TÜM BİLGİLER DÂHİL) SARİH VEYA ZIMNİ, KANUNİ VEYA BAŞKA BİR NİTELİKTE HİÇBİR GARANTİDE BULUNMAMAKTADIR. </p>
+                                        <p class="h5 text-color-dark mb-3">6. Kayıt ve Güvenlik </p>
+                                        <p class="mx-2">Kullanıcı/AltKullanıcı, doğru, eksiksiz ve güncel kayıt bilgilerini vermek zorundadır. Aksi halde bu Sözleşme ihlal edilmiş sayılacak ve ‘Site’ yetkilileri ‘Kullanıcı’yı bilgilendirilmeksizin hesabı askıya alabilir, sona erdirebilir veya kapatılabilecektir.</p>
+                                        <p class="mx-2">Firma, ‘Kullanıcı/AltKullanıcı‘ya ait bilgilerin güvenliği konusunda yazılım ve sunucu kaynaklı gerekli güvenlik önlemlerini alır, ‘Kullanıcı/AltKullanıcı’ da ‘Site’ deki şifre ve hesap güvenliğinden kendisi sorumludur. Aksi halde oluşacak veri kayıplarından ve güvenlik ihlallerinden veya donanım ve cihazların zarar görmesinden ‘Firma’ sorumlu tutulamaz.</p>
+                                        <p class="h5 text-color-dark mb-3">7. Mücbir Sebep </p>
+                                        <p class="mx-2">Tarafların kontrolünde olmayan; tabii afetler, yangın, patlamalar, iç savaşlar, savaşlar, ayaklanmalar, halk hareketleri, seferberlik ilanı, grev, lokavt ve salgın hastalıklar, altyapı ve internet arızaları, elektrik kesintisi gibi sebeplerden (aşağıda birlikte "Mücbir Sebep” olarak anılacaktır.) dolayı sözleşmeden doğan yükümlülükler taraflarca ifa edilemez hale gelirse, taraflar bundan sorumlu değildir. Bu sürede Tarafların işbu Sözleşme ’den doğan hak ve yükümlülükleri askıya alınır.</p>
+                                        <p class="h5 text-color-dark mb-3">8. Sözleşmenin Bütünlüğü ve Uygulanabilirlik </p>
+                                        <p class="mx-2">İşbu sözleşme şartlarından biri, kısmen veya tamamen geçersiz hale gelirse, sözleşmenin geri kalanı geçerliliğini korumaya devam eder.</p>
+                                        <p class="h5 text-color-dark mb-3">9. Sözleşmede Yapılacak Değişiklikler </p>
+                                        <p class="mx-2">Firma, dilediği zaman sitede sunulan hizmetleri ve işbu sözleşme şartlarını kısmen veya tamamen değiştirebilir. Değişiklikler sitede yayınlandığı tarihten itibaren geçerli olacaktır. Değişiklikleri takip etmek ‘Kullanıcı’nın sorumluluğundadır. Kullanıcı, sunulan hizmetlerden yararlanmaya devam etmekle bu değişiklikleri de kabul etmiş sayılır.</p>
+                                        <p class="h5 text-color-dark mb-3">10. Tebligat</p>
+                                        <p class="mx-2">İşbu Sözleşme ile ilgili taraflara gönderilecek olan tüm bildirimler, Firma’nın bilinen e-posta adresi ve kullanıcının üyelik formunda belirttiği e-posta adresi vasıtasıyla yapılacaktır. Kullanıcı, üye olurken belirttiği adresin geçerli tebligat adresi olduğunu, değişmesi durumunda 5 gün içinde yazılı olarak diğer tarafa bildireceğini, aksi halde bu adrese yapılacak tebligatların geçerli sayılacağını kabul eder.</p>
+                                        <p class="h5 text-color-dark mb-3">11. Delil Sözleşmesi</p>
+                                        <p class="mx-2">Taraflar arasında işbu sözleşme ile ilgili işlemler için çıkabilecek her türlü uyuşmazlıklarda Tarafların defter, kayıt ve belgeleri ile ve bilgisayar kayıtları ve faks kayıtları 6100 sayılı Hukuk Muhakemeleri Kanunu uyarınca delil olarak kabul edilecek olup, ‘Kullanıcı’ bu kayıtlara itiraz etmeyeceğini kabul eder.</p>
+                                        <p class="h5 text-color-dark mb-3">12. Uyuşmazlıkların Çözümü</p>
+                                        <p class="mx-2">İşbu Sözleşme’nin uygulanmasından veya yorumlanmasından doğacak her türlü uyuşmazlığın çözümünde İstanbul (Merkez) Adliyesi Mahkemeleri ve İcra Daireleri yetkilidir.</p>
+                                        <span class="text-right"><small>Yayın Tarihi: 01.03.2022 - Revizyon:01 - Revizyon Tarihi: 01.03.2022</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="GizlilikPolitikasiModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index:20000">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="padding-bottom:5px">
+                        <h4 class="modal-title">
+                            Gizlilik Politikası
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true"><i class="fa fa-times"></i></span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel-content p-0">
+                            <div class="panel-content">
+                                <div class="modal-body" id="slimtest2">
+                                    <div class="row">
+                                        <p class="mx-2">Güvenliğiniz bizim için önemli. Bu sebeple bizimle paylaşacağınız kişisel verileriz hassasiyetle korunmaktadır.</p>
+                                        <p class="mx-2">Bu gizlilik politikası Tetra Bilişim tarafından yayınlanan www.fotografcitakip.com la başlayan tüm sitelerde geçerlidir.</p>
+                                        <p class="mx-2">Sitemizi ziyaret için herhangi bir kişisel bilginizi bize vermek zorunda değilsiniz. Ancak, hizmetlerimizden faydalanmak için üye olmanız ve bazı kişisel bilgilerinizi vermeniz gerekmektedir.</p>
+                                        <p class="mx-2">Size ait üyelik bilgileri (isim, adres, telefon, e-posta adresi, şifre vb.) hiçbir şekilde üçüncü şahıslarla paylaşılmaz. Bu bilgilerin güvenliği için gerekli önlemler tarafımızca alınmış olup, kullanıcı kaynaklı olarak, bu bilgilerin üçüncü şahıslarla paylaşılması, şifrelerin başkasının eline geçmesi ya da çalınmasından Tetra Bilişim (www.fotografcitakip.com) sorumlu değildir. </p>
+                                        <p class="mx-2">Talebiniz doğrultusunda sistemimizden kayıtlarınızı tamamen sildirebilirsiniz.</p>
+                                        <p class="mx-2">IP adresiniz ve yaklaşık konum bilginiz uygulamamızdaki sorunların giderilmesi ve kullanıcı giriş kayıtlarının güvenliği için saklanmaktadır. IP adresiniz, sizi tanımak ve açık demografik bilgilerinizin toplanması için kullanılacaktır.</p>
+                                        <p class="mx-2">Tetra Bilişim, www.fotografcitakip.com ve alt sayfalarında kullanıcılarının uygulama içerisinde kaydettikleri ve yayınladıkları bilgileri kontrol ve sansür etmemektedir. Kullanıcılar, www.fotografcitakip.com uygulamasını kullanımı esnasında gerçekleştirecekleri aktivitelerin yasal sonuçlarından dolayı kendileri sorumludurlar.</p>
+                                        <p class="mx-2">Üye ve ziyaretçilerin site ile ilgili tarafımıza ulaştırdıkları her türlü öneri, istek soru ve şikâyetleri içeren bilgiler site performansını ölçmek açısından saklanmaktadır. Bu bilgiler kişilerin kendilerine yanıt vermek dışında herhangi bir amaç için kullanılamaz. </p>
+                                        <p class="mx-2">Sitemizde yayınlanan hiçbir yazı veya grafik üçüncü kişiler tarafından izinsiz kullanılamaz.</p>
+                                        <p class="mx-2">KİŞİSEL VERİ SAHİBİNİN İLGİLİ KİŞİ OLARAK 6698 SAYILI KVKK KAPSAMINDA HAKLARI 6698 sayılı KVKK’nın 11. maddesi uyarınca herkes, veri sorumlusuna başvurarak aşağıdaki haklarını kullanabilir:</p>
+                                        <p class="ml-4 mr-2">a. Kişisel veri işlenip işlenmediğini öğrenme,</p>
+                                        <p class="ml-4 mr-2">b. Kişisel verileri işlenmişse buna ilişkin bilgi talep etme,</p>
+                                        <p class="ml-4 mr-2">c. Kişisel verilerin işlenme amacını ve bunların amacına uygun kullanılıp kullanılmadığını öğrenme,</p>
+                                        <p class="ml-4 mr-2">d. Yurt içinde veya yurt dışında kişisel verilerin aktarıldığı üçüncü kişileri bilme,</p>
+                                        <p class="ml-4 mr-2">e. Kişisel verilerin eksik veya yanlış işlenmiş olması hâlinde bunların düzeltilmesini isteme,</p>
+                                        <p class="ml-4 mr-2">f. Kişisel verilerin silinmesini veya yok edilmesini isteme,</p>
+                                        <p class="ml-4 mr-2">g. (e) ve (f) bentleri uyarınca yapılan işlemlerin, kişisel verilerin aktarıldığı üçüncü kişilere bildirilmesini isteme,</p>
+                                        <p class="ml-4 mr-2">h. İşlenen verilerin münhasıran otomatik sistemler vasıtasıyla analiz edilmesi suretiyle kişinin kendisi aleyhine bir sonucun ortaya çıkmasına itiraz etme,</p>
+                                        <p class="ml-4 mr-2">i. Kişisel verilerin kanuna aykırı olarak işlenmesi sebebiyle zarara uğraması hâlinde zararın giderilmesini talep etme, haklarına sahiptir.</p>
+                                        <p class="mx-2">Yukarıda sayılan haklarınızı kullanmak üzere destek@tetrabilisim.com üzerinden bizimle iletişime geçebilirsiniz.</p>
+                                        <p class="mx-2">Aşağıda belirtilen sınırlı hallerde Firmamız, işbu "Gizlilik Politikası" hükümleri dışında kullanıcılara ait bilgileri üçüncü kişilere açıklayabilir. Bu durumlar sınırlı sayıda olmak üzere;</p>
+                                        <p class="ml-4 mr-2">1. Kanun, Kanun Hükmünde Kararname, Yönetmelik vb. yetkili hukuki otorite tarafından çıkarılan ve yürürlükte olan hukuk kurallarının getirdiği zorunluluklara uymak;</p>
+                                        <p class="ml-4 mr-2">2. Mağazamızın kullanıcılarla akdettiği "Üyelik Sözleşmesi"nin ve diğer sözleşmelerin gereklerini yerine getirmek ve bunları uygulamaya koymak amacıyla;</p>
+                                        <p class="ml-4 mr-2">3. Yetkili idari ve adli otorite tarafından usulüne göre yürütülen bir araştırma veya soruşturmanın yürütümü amacıyla kullanıcılarla ilgili bilgi talep edilmesi;</p>
+                                        <p class="ml-4 mr-2">4. Kullanıcıların hakları veya güvenliklerini korumak için bilgi vermenin gerekli olduğu hallerdir.</p>
+                                        <p class="mx-2">Firmamız, www.fotografcitakip.com sayfası üzerinden uygulamayı kullanan kullanıcılar ve kullanıcıların web sitesini kullanımı hakkındaki bilgileri teknik bir iletişim dosyası (Çerez-Cookie) kullanarak elde edebilir. Bahsi geçen teknik iletişim dosyaları, ana bellekte saklanmak üzere bir internet sitesinin kullanıcının tarayıcısına (browser) gönderdiği küçük metin dosyalarıdır. Teknik iletişim dosyası site hakkında durum ve tercihleri saklayarak İnternet'in kullanımını kolaylaştırır.</p>
+                                        <p class="mx-2">Teknik iletişim dosyası, siteyi kaç kişinin ziyaret ettiğini, bir kişinin siteyi hangi amaçla, kaç kez ziyaret ettiğini ve ne kadar sitede kaldıkları hakkında istatistiksel bilgileri elde etmeye ve kullanıcılar için özel tasarlanmış kullanıcı sayfalarından dinamik olarak reklam ve içerik üretilmesine yardımcı olur. Teknik iletişim dosyası, ana bellekte veya e-postanızdan veri veya başkaca herhangi bir kişisel bilgi almak için tasarlanmamıştır. Tarayıcıların pek çoğu başta teknik iletişim dosyasını kabul eder biçimde tasarlanmıştır ancak kullanıcılar dilerse teknik iletişim dosyasının gelmemesi veya teknik iletişim dosyasının gönderildiğinde uyarı verilmesini sağlayacak biçimde ayarları değiştirebilirler.</p>
+                                        <p class="mx-2">Firmamız, işbu "Gizlilik Politikası" hükümlerini dilediği zaman sitede yayınlamak veya kullanıcılara elektronik posta göndermek veya sitesinde yayınlamak suretiyle değiştirebilir. Gizlilik Politikası hükümleri değiştiği takdirde, yayınlandığı tarihte yürürlük kazanır.</p>
+                                        <span class="text-right"><small>Yayın Tarihi: 01.03.2022 - Revizyon: 01 - Revizyon Tarihi: 01.03.2022</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="IptalIadeModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index:20000">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header" style="padding-bottom:5px">
+                        <h4 class="modal-title">
+                            İptal ve İade Koşulları
+                        </h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true"><i class="fa fa-times"></i></span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="panel-content p-0">
+                            <div class="panel-content">
+                                <div class="modal-body" id="slimtest3">
+                                    <div class="row">
+                                        <p class="h5 text-color-dark mb-3">GENEL: </p>
+                                        <p class="ml-4 mr-2">1.	Kullanmakta olduğunuz web sitesi üzerinden elektronik ortamda sipariş verdiğiniz takdirde, size sunulan ön bilgilendirme formunu ve mesafeli satış sözleşmesini kabul etmiş sayılırsınız.</p>
+                                        <p class="ml-4 mr-2">2.	Alıcılar, satın aldıkları ürünün satış ve teslimi ile ilgili olarak 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği (RG:27.11.2014/29188) hükümleri ile yürürlükteki diğer yasalara tabidir. </p>
+                                        <p class="ml-4 mr-2">3.	Ürün, dijital olması nedeniyle herhangi teslimat veya kargo süreci olmayacak, aktivasyon işlemi otomatik olarak gerçekleşecektir. </p>
+                                        <p class="h5 text-color-dark mb-3">SATIN ALINAN ÜRÜN BEDELİ ÖDENMEZ İSE: </p>
+                                        <p class="ml-4 mr-2">4.	Alıcı, satın aldığı ürün bedelini ödemez veya banka kayıtlarında iptal ederse, Satıcı ürünü(lisansı) iptal eder.</p>
+                                        <p class="h5 text-color-dark mb-3">KREDİ KARTININ YETKİSİZ KULLANIMI İLE YAPILAN ALIŞVERİŞLER: </p>
+                                        <p class="ml-4 mr-2">5.	Lisans aktif edildikten sonra, alıcının ödeme yaptığı kredi kartının yetkisiz kişiler tarafından haksız olarak kullanıldığı tespit edilirse ve satılan ürün bedeli ilgili banka veya finans kuruluşu tarafından Satıcı'ya ödenmez ise, Satıcı, sözleşme konusu ürünü(lisansı) iptal eder. </p>
+                                        <p class="h5 text-color-dark mb-3">ÖNGÖRÜLEMEYEN SEBEPLERLE ÜRÜN(LİSANS) AKTİVASYONU GERÇEKLEŞMEZ İSE: </p>
+                                        <p class="ml-4 mr-2">6. Satıcı’nın öngöremeyeceği mücbir sebepler oluşursa ve ürün(lisans) aktif edilemez ise, durum Alıcı’ya bildirilir. Alıcı, siparişin iptalini veya engel ortadan kalkana dek aktivasyon işleminin ertelenmesini talep edebilir. Alıcı siparişi iptal ederse; ödemeyi nakit ile yapmış ise iptalinden itibaren 14 gün içinde kendisine nakden bu ücret ödenir. Alıcı, ödemeyi kredi kartı ile yapmış ise ve iptal ederse, bu iptalden itibaren yine 14 gün içinde ürün bedeli bankaya iade edilir, ancak bankanın alıcının hesabına 2-3 hafta içerisinde aktarması olasıdır. </p>
+                                        <p class="h5 text-color-dark mb-3">CAYMA HAKKI: </p>
+                                        <p class="ml-4 mr-2">7.	ALICI; satın aldığı ürünün(lisansın) aktivasyon tarihinden itibaren 14 (on dört) gün içerisinde, SATICI ’ya aşağıdaki iletişim bilgileri üzerinden bildirmek şartıyla hiçbir hukuki ve cezai sorumluluk üstlenmeksizin ve hiçbir gerekçe göstermeksizin hizmeti kullanmayı reddederek sözleşmeden cayma hakkını kullanabilir. </p>
+                                        <p class="h5 text-color-dark mb-3">SATICININ CAYMA HAKKI BİLDİRİMİ YAPILACAK İLETİŞİM BİLGİLERİ: </p>
+                                        <p class="ml-4 mr-2"><b>ADI/UNVANI:</b> TeTRa Bilişim – Kamil ŞEN </p>
+                                        <p class="ml-4 mr-2"><b>ADRES:</b> Cumhuriyet Mahallesi Akçiçek Sokak Kardelen Apt. No:8 Üsküdar/İstanbul </p>
+                                        <p class="ml-4 mr-2"><b>EPOSTA:</b> destek@tetrabilisim.com </p>
+                                        <p class="ml-4 mr-2"><b>TELEFON:</b> 0850 308 83 30 </p>
+                                        <p class="ml-4 mr-4"></p>
+                                        <p class="h5 text-color-dark mb-3">CAYMA HAKKININ SÜRESİ: </p>
+                                        <p class="ml-4 mr-2">8.	Alıcı, satın aldığı eğer bir hizmet ise, bu 14 günlük süre sözleşmenin imzalandığı tarihten itibaren başlar. Cayma hakkı süresi sona ermeden önce, tüketicinin onayı ile hizmetin ifasına başlanan hizmet sözleşmelerinde cayma hakkı kullanılamaz. </p>
+                                        <p class="ml-4 mr-2">9.	Alıcı, 14 günü geçen sürede cayma hakkını kullanmak isterse ücret iadesinde kullandığı süre karşılığı ücret kesintisi uygulanır. </p>
+                                        <p class="ml-4 mr-2">10. Cayma hakkının kullanılması için 14 (ondört) günlük süre içinde SATICI' ya iadeli taahhütlü posta, faks veya eposta ile yazılı bildirimde bulunulması şarttır. </p>
+                                        <p class="h5 text-color-dark mb-3">CAYMA HAKKININ KULLANIMI: </p>
+                                        <p class="ml-4 mr-2">11. İade edilmek istenen ürünün faturası kurumsal ise, iade ederken kurumun düzenlemiş olduğu iade faturası ile birlikte gönderilmesi gerekmektedir. Faturası kurumlar adına düzenlenen sipariş iadeleri İADE FATURASI kesilmediği takdirde tamamlanamayacaktır. </p>
+                                        <p class="ml-4 mr-2">12. Hizmet sayfasında bulunan İade formu doldurularak ürün(lisans) iptal süreci başlatılır. </p>
+                                        <p class="h5 text-color-dark mb-3">İADE KOŞULLARI: </p>
+                                        <p class="ml-4 mr-2">13. SATICI, cayma bildiriminin kendisine ulaşmasından itibaren en geç 10 günlük süre içerisinde toplam bedeli ve ALICI’yı borç altına sokan belgeleri ALICI’ ya iade etmekle yükümlüdür. </p>
+                                        <p class="ml-4 mr-2">14. ALICI’nın cayma hakkını 14 günü geçen sürede yapması durumunda hizmetin kullanıldığı süre göz önüne alınarak kullanım ücreti ALICI’ya bildirilir. Kalan ücreti için iade işlemi gerçekleştirilir. </p>
+                                        <p class="ml-4 mr-2">15. Cayma hakkının kullanılması nedeniyle SATICI tarafından düzenlenen kampanya limit tutarının altına düşülmesi halinde kampanya kapsamında faydalanılan indirim miktarı iptal edilir. </p>
+                                        <p class="h5 text-color-dark mb-3">TEMERRÜT HALİ VE HUKUKİ SONUÇLARI: </p>
+                                        <p class="ml-4 mr-2">16. ALICI, ödeme işlemlerini kredi kartı ile yaptığı durumda temerrüde düştüğü takdirde, kart sahibi banka ile arasındaki kredi kartı sözleşmesi çerçevesinde faiz ödeyeceğini ve bankaya karşı sorumlu olacağını kabul, beyan ve taahhüt eder. Bu durumda ilgili banka hukuki yollara başvurabilir; doğacak masrafları ve vekâlet ücretini ALICI’dan talep edebilir ve her koşulda ALICI’nın borcundan dolayı temerrüde düşmesi halinde, ALICI, borcun gecikmeli ifasından dolayı SATICI’nın uğradığı zarar ve ziyanını ödeyeceğini kabul eder. </p>
+                                        <p class="h5 text-color-dark mb-3">ŞİKAYET VE İTİRAZ: </p>
+                                        <p class="ml-4 mr-2">17. SATICI veya ALICI şikâyet ve itirazları konusunda başvurularını, aşağıdaki kanunda belirtilen parasal sınırlar dâhilinde tüketici sorunları hakem heyetine veya tüketici mahkemesine yapabilir. Parasal sınıra ilişkin bilgiler aşağıdadır: </p>
+                                        <p class="ml-4 mr-2">28/05/2014 tarihinden itibaren geçerli olmak üzere:  </p>
+                                        <p class="ml-4 mr-2">a) 6502 sayılı Tüketicinin Korunması Hakkında Kanun’un 68. Maddesi gereği değeri 2.000,00 (ikibin) TL’nin altında olan uyuşmazlıklarda ilçe tüketici hakem heyetlerine, </p>
+                                        <p class="ml-4 mr-2">b) Değeri 3.000,00(üçbin) TL’nin altında bulunan uyuşmazlıklarda il tüketici hakem heyetlerine, </p>
+                                        <p class="ml-4 mr-2">c) Büyükşehir statüsünde bulunan illerde ise değeri 2.000,00 (ikibin) TL ile 3.000,00(üçbin) TL arasındaki uyuşmazlıklarda il tüketici hakem heyetlerine başvuru yapılmaktadır. </p>
+                                        <p class="h5 text-color-dark mb-3">ÖDEME VE TESLİMAT: </p>
+                                        <p class="ml-4 mr-2">18. Banka Havalesi veya EFT (Elektronik Fon Transferi) yaparak, Yapı Kredi Bankası IBAN : TR31 0006 7010 0000 0048 9601 93, Kamil ŞEN, Ziraat Bankası IBAN: TR59 0001 0004 0335 2558 6350 03, Kamil ŞEN, hesaplarımızdan (TL) herhangi birine yapabilirsiniz. </p>
+                                        <p class="ml-4 mr-2">19. Sitemiz üzerinden kredi kartlarınız ile, Her türlü kredi kartınıza online tek ödeme ya da online taksit imkânlarından yararlanabilirsiniz. Online ödemelerinizde siparişiniz sonunda kredi kartınızdan tutar çekim işlemi gerçekleşecektir.</p>
+                                        <span class="text-right"><small>Yayın Tarihi: 01.03.2022 - Revizyon: 01 - Revizyon Tarihi: 01.03.2022</small></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="UyeOlModal" tabindex="-1" role="dialog" aria-hidden="true" style="z-index:30000">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body mx-2">
+                        <div class="panel-content p-0">
+                            <div class="panel-content">
+                                <form id="uyelikform" class="contact-form">
+                                    <div class="form-row mt-2">
+                                        <div class="col-sm-12">
+                                            <h2 class="font-weight-bold text-center text-7 mb-4">Ücretsiz Deneyin</h2>
+                                        </div>
+                                    </div>
+
+                                    <div class="contact-form-success alert alert-success d-none mt-4">
+                                        <strong>Tebrikler!</strong> Üyeliğiniz gerçekleşti. Giriş yaparak uygulamamızı deneyebilirsiniz.
+                                    </div>
+
+                                    <div class="contact-form-error alert alert-danger d-none mt-4">
+                                        <strong>Üzgünüz!</strong> Üye kaydınız alınırken bir hata oluştu. Lütfen bizimle iletişime geçiniz.
+                                        <span class="mail-error-message text-1 d-block"></span>
+                                    </div>
+
+                                    <div class="custom-form-style-1 custom-form-style-1-rounded">
+                                        <div class="form-row">
+                                            <div class="form-group col mb-2" id="FirmaAdiHata">
+                                                <input type="text" name="FirmaAdi" id="FirmaAdi" class="form-control" value="" placeholder="Firma Adı*" data-msg-required="Lütden Firmanızın adını giriniz.">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col mb-2" id="FirmaYetkiliHata">
+                                                <input type="text" name="Yetkili" id="Yetkili" class="form-control" value="" placeholder="Firma Yetkilisi*" data-msg-required="Lütden Firmanızın yetkilisini giriniz.">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col mb-2" id="EmailHata">
+                                                <input type="email" name="Email" id="Email" data-inputmask="'alias': 'email'" class="form-control" value="" placeholder="Email*" data-msg-required="Lütfen Email adresinizi giriniz." data-msg-email="Lütfen geçerli bir email adresi giriniz." maxlength="100">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col mb-2" id="CepTelHata">
+                                                <input type="tel" name="CepTel" id="CepTel" data-inputmask="'mask': '(0999) 999-9999'" class="form-control" value="" placeholder="Cep Telefonu*" data-msg-required="Lütfen Cep Telefonu numaranızı giriniz.">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col mb-2" id="IlIdHata">
+                                                <select class="form-control" id="iller" name="IlId" style="padding:5px 20px 5px 20px; font-weight:500; color:#495057" data-msg-required="Lütfen Firmanızın bulunduğu İli seçiniz.">
+                                                    <option selected="" disabled value="0">İl Seçiniz</option>
+                                                    @foreach (var item in Model)
+                                                    {
+                                                        <option value="@item.Id">@item.Il1</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col mb-2" id="IlceIdHata">
+                                                <select class="form-control" id="ilceler" name="IlceId" style="padding:5px 20px 5px 20px; font-weight:500; color:#495057" data-msg-required="Lütfen Firmanızın bulunduğu İli seçiniz.">
+                                                    <option selected="" value="0">İlçe Seçiniz</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        @*<div class="form-row">
+                                                <div class="form-group" id="IlIdHata">
+                                                    <select class="form-control" id="iller"  name="IlId" style="padding:0px 0px 5px 5px">
+                                                        <option selected="" disabled value="0">İl Seçiniz</option>
+                                                        @foreach (var item in Model)
+                                                        {
+                                                            <option value="@item.Id">@item.Il1</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>*@
+                                        @*<div class="form-row">
+                                                <div class="form-group col mb-2" id="IlceIdHata">
+                                                    <select class="custom-select form-control" id="ilceler" name="IlceId" data-msg-required="Lütfen Firmanızın bulunduğu İlçeyi seçiniz.">
+                                                        <option selected="" value="0">İlçe Seçiniz</option>
+                                                    </select>
+                                                </div>
+                                            </div>*@
+                                        <div class="form-row">
+                                            <div class="form-group col mb-2" id="SifreHata">
+                                                <input type="password" name="Sifre" id="Sifre" class="form-control" value="" placeholder="Şifreniz* (en az 6 karakter)" data-msg-required="Lütfen Şifrenizi giriniz.">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col mb-2" id="SifreTekrarHata">
+                                                <input type="password" name="SifreTekrar" id="SifreTekrar" class="form-control" value="" placeholder="Şifreniz (Tekrar)*" data-msg-required="Lütfen Şifrenizi giriniz.">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group col mb-0">
+                                                <input type="button" id="KayitOl" class="btn btn-primary btn-outline btn-rounded font-weight-semibold text-center text-4 btn-py-2 w-100 mb-3" value="KAYIT OL" data-loading-text="Loading...">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="custom-control custom-checkbox" id="UyelikSozlesmesiHata">
+                                                <input type="checkbox" class="custom-control-input" id="UyelikSozlesmesi" data-msg-required="Üyelik Sözleşmesini kabul etmeden uygulamamıza kayıt yaptıramazsınız.">
+                                                <label class="custom-control-label" for="UyelikSozlesmesi"><a href="#" data-toggle="modal" data-target="#UyelikSozlesmesiModal">Üyelik Sözleşmesini</a> Okudum ve Kabul Ediyorum.</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="custom-control custom-checkbox" id="GizlilikHata">
+                                                <input type="checkbox" class="custom-control-input" id="GizlilikPolitikasi" data-msg-required="Gizlilik Politikasını kabul etmeden uygulamamıza kayıt yaptıramazsınız.">
+                                                <label class="custom-control-label" for="GizlilikPolitikasi"><a href="#" data-toggle="modal" data-target="#GizlilikPolitikasiModal">Gizlilik Politikasını</a> Okudum ve Kabul Ediyorum.</label>
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="custom-control custom-checkbox">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <header id="header" class="header-transparent header-effect-shrink appear-animation" data-plugin-options="{'stickyEnabled': true, 'stickyEffect': 'shrink', 'stickyEnableOnBoxed': true, 'stickyEnableOnMobile': true, 'stickyChangeLogo': true, 'stickyStartAt': 30, 'stickyHeaderContainerHeight': 70}" data-appear-animation="fadeIn" data-appear-animation-delay="200">
+            <div class="header-body border-top-0 header-body-bottom-border">
+                <div class="header-container container">
+                    <div class="header-row">
+                        <div class="header-column">
+                            <div class="header-row">
+                                <div class="header-logo">
+                                    <a href="/Home/Index">
+                                        <img alt="Fotoğrafçı Takip" width="250" height="75" data-sticky-width="200" data-sticky-height="60" src="~/Content/img/Fotografci_Takip_Logo_Alt_Yazi_Mavi.png">
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="header-column justify-content-end">
+                            <div class="header-row">
+                                <div class="header-nav header-nav-links justify-content-start order-2 order-lg-1">
+                                    <div class="header-nav-main header-nav-main-square header-nav-main-dropdown-no-borders header-nav-main-effect-2 header-nav-main-sub-effect-1">
+                                        <nav class="collapse">
+                                            <ul class="nav nav-pills" id="mainNav">
+                                                <li class="dropdown">
+                                                    <a class="dropdown-item active" data-hash data-hash-offset="95" href="/Home/Index">ANA SAYFA</a>
+                                                </li>
+                                                <li class="dropdown">
+                                                    <a class="dropdown-item" data-hash data-hash-offset="95" href="#hakkinda">HAKKINDA</a>
+                                                </li>
+                                                <li class="dropdown">
+                                                    <a class="dropdown-item" data-hash data-hash-offset="95" href="#ozellikler">ÖZELLİKLER</a>
+                                                </li>
+                                                <li class="dropdown">
+                                                    <a class="dropdown-item" data-hash data-hash-offset="95" href="#fiyatlarimiz">FİYATLARIMIZ</a>
+                                                </li>
+                                                @*<li class="dropdown">
+                                                        <a class="dropdown-item" data-hash data-hash-offset="95" href="#yorumlar">MÜŞTERİ YORUMLARI</a>
+                                                    </li>*@
+                                                <li class="dropdown">
+                                                    <a class="dropdown-item" data-hash data-hash-offset="95" href="#iletisim">İLETİŞİM</a>
+                                                </li>
+                                                <li class="dropdown">
+                                                    <a class="dropdown-item" data-hash data-hash-offset="95" href="~/Otomasyon/Giris/GirisYap/">FİRMA GİRİŞİ</a>
+                                                </li>
+                                                <li class="dropdown">
+                                                    <a class="dropdown-item" data-hash data-hash-offset="95" href="~/Musteri/Giris/GirisYap/">MÜŞTERİ GİRİŞİ</a>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </div>
+                                    <button class="btn header-btn-collapse-nav" data-toggle="collapse" data-target=".header-nav-main nav">
+                                        <i class="fas fa-bars"></i>
+                                    </button>
+                                </div>
+                                @*<a class="btn btn-primary popup-with-form order-1 order-lg-2 d-none d-md-block mr-3" href="~/Otomasyon/Giris/GirisYap/" data-hash data-hash-offset="65">Firma Girişi</a>*@
+
+                                @*<a class="btn btn-primary popup-with-form order-1 order-lg-2 d-none d-md-block mr-3" href="#" data-toggle="modal" data-target="#UyeOlModal" data-hash data-hash-offset="65">Kayıt Ol</a>*@
+                                @*<div class="order-1 order-lg-2 d-none d-md-block mr-3">
+                                        <div class="header-nav-main header-nav-main-square header-nav-main-text-capitalize header-nav-main-effect-1 header-nav-main-sub-effect-1">
+                                            <nav class="collapse">
+                                                <ul class="nav nav-pills" id="mainNav">
+                                                    <li class="dropdown">
+                                                        <a class="nav-link btn btn-outline-primary btn-rounded popup-with-form" href="#">
+                                                            Giriş Yap
+                                                        </a>
+                                                        <ul class="dropdown-menu">
+                                                            <li>
+                                                                <a href="~/Otomasyon/Giris/GirisYap/" class="dropdown-item">Firma Girişi</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="~/Musteri/Giris/GirisYap/" class="dropdown-item">Müşteri Girişi</a>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </nav>
+                                        </div>
+                                    </div>*@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div role="main" class="main">
+            <div class="container position-relative py-5" style="min-height: 643px;" id="anasayfa">
+                <svg class="custom-svg-style-1" viewBox="0 0 180 470" x="0px" y="0px" width="100%" height="100%">
+                    <g>
+                        <path id="shape_one_start" opacity="0.098" fill="#00a3d5" d="M 847.5703 23.7939 C 847.5703 23.7939 581.8154 -245.1675 394.2842 33.9375 C 305.4043 166.2183 345.0537 358.8125 253.5615 364.6631 C 162.0684 370.5146 129.5303 342.542 70.9883 383.9072 C 3.0254 431.9297 17.8926 499.2158 17.8926 499.2158 L 847.5703 499.2158 L 847.5703 23.7939 Z" />
+                        <path id="shape_one_end" opacity="0.098" fill="#00a3d5" d="m847.5703,24.7939c0,0 -85.7549,-346.9614 -273.2861,-67.8564c149.1201,176.2808 52.7695,313.875 -46.7227,312.7256c-99.4922,-1.1494 -59.0312,107.8789 -117.5732,149.2441c-67.9629,48.0225 -186.0957,167.3086 -207.0957,167.3086l644.6777,-86l0,-475.4219z" style="visibility:hidden" />
+
+                        <path id="shape_two_start" opacity="0.149" fill="#00a3d5" d="M 847.5703 239.9771 C 847.5703 239.9771 806.873 141.5913 733.1348 164.937 C 622.249 200.0459 648.416 318.083 566.6426 342.042 C 484.8682 365.999 247.9814 345.0283 168.6406 371.8037 C 89.3008 398.5781 85.5703 499.3408 85.5703 499.3408 L 847.5693 499.3408 L 847.5703 239.9771 Z" />
+                        <path id="shape_two_end" opacity="0.149" fill="#00a3d5" d="m907.5703,89.9771c0,0 29.3027,-9.3858 -95.4355,112.9599c-124.7382,122.3457 -254.7188,64.146 -300.4922,167.105c-45.7734,102.959 -79.6612,61.9863 -209.002,106.7617c-129.3408,44.7754 -218.0703,21.5371 -218.0703,21.5371l761.999,0l0.001,-265.3637z" style="visibility:hidden" />
+                    </g>
+                </svg>
+                <div class="row align-items-center py-5">
+                    <div class="col-lg-6 pt-4 pt-lg-0 mt-5 mt-lg-0 mb-5 mb-lg-0">
+                        <div class="appear-animation" data-appear-animation="fadeInUpShorter" data-appear-animation-delay="400">
+                            <h1 class="mb-4 mb-md-0 mb-xl-3" data-plugin-float-element data-plugin-options="{'startPos': 'none', 'speed': 1, 'transition': true, 'horizontal': false}"><strong>Fotoğrafçı Takip Uygulaması</strong><br> ile işlerinizi takip etmek artık daha kolay</h1>
+                        </div>
+                        <div class="appear-animation" data-appear-animation="fadeInUpShorter" data-appear-animation-delay="600">
+                            <p class="text-4 mb-5 mb-md-2" data-plugin-float-element data-plugin-options="{'startPos': 'none', 'speed': 0.5, 'transition': true, 'horizontal': false}">Detaylı randevu takip sistemi ile tüm randevularınızı, rezervasyonlarınızı ve ödemelerinizi kolay bir şekilde kayıt altına alarak profesyonelliğinizi arttırabilirsiniz. Uygulamayı <b>1 ay ücretsiz</b> olarak deneyebilirsiniz.</p>
+                        </div>
+                        <div class="appear-animation" data-appear-animation="fadeInUpShorter" data-appear-animation-delay="800">
+                            <a href="#" data-toggle="modal" data-target="#UyeOlModal" class="btn btn-primary btn-outline btn-rounded popup-with-form font-weight-semibold text-4 btn-px-5 btn-py-2" data-plugin-float-element data-plugin-options="{'startPos': 'none', 'speed': 0.3, 'transition': true, 'horizontal': false}">Kayıt Ol - Ücretsiz Dene</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 text-center mt-5 appear-animation" data-appear-animation="fadeInRightShorter" data-appear-animation-delay="550">
+                        <img src="~/Content/img/Takvim-3.png" class="img-fluid" alt="" data-plugin-float-element data-plugin-options="{'startPos': 'none', 'speed': 8, 'transition': true, 'horizontal': true}" />
+                    </div>
+                </div>
+            </div>
+
+            <section class="section section-height-3 section-parallax border-0 m-0 appear-animation" data-appear-animation="fadeIn" data-plugin-parallax data-plugin-options="{'speed': 1.5, 'parallaxHeight': '130%'}" data-image-src="/Content/img/anasayfa_background-2.fw.png" id="hakkinda">
+                <div class="container">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6 col-xl-7 mb-5 mb-lg-0">
+                        </div>
+                        <div class="col-lg-6 col-xl-5 mb-5 mb-lg-0">
+                            <div class="appear-animation" data-appear-animation="fadeInUpShorter" data-appear-animation-delay="600">
+                                <h2 class="font-weight-bold line-height-2 text-7 mb-1">Hakkında</h2>
+                                <span class="d-block text-color-dark text-5 pb-2 mb-4 opacity-7">Kısaca Fotoğrafçı Takip Uygulaması</span>
+                            </div>
+                            <p class="pb-3 mb-4 appear-animation" data-appear-animation="fadeInUpShorter" data-appear-animation-delay="800">Uygulamamız sayesinde Fotoğraf Stüdyolarının işlerini daha kolay takip etmelerini ve daha profesyonel hale gelmelerini hedefledik. Bu doğrultuda geliştirilen uygulama sayesinde müşterileriniz ile yapacağınız tüm işleri bir sözleşme ile resmiyete dökecek, kolay bir şekilde işlerinizi(randevularınızı) takip edebileceksiniz. Şube odaklı, kapsamlı ve opsiyonel olarak tasarlanmış uygulamamızı kolay bir şekilde işletmenize adapte edebileceksiniz.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <div class="my-3"></div>
+            <hr>
+            <section class="section section-height-3 section-parallax border-0 m-0 appear-animation" data-appear-animation="fadeIn" data-plugin-parallax data-plugin-options="{'speed': 1.5, 'parallaxHeight': '130%'}" data-image-src="/Content/img/Musteri_Panel-2.png" id="hakkinda-2">
+                <div class="container">
+                    <div class="row align-items-center">
+
+                        <div class="col-lg-6 col-xl-5 mb-5 mb-lg-0">
+                            <div class="appear-animation" data-appear-animation="fadeInUpShorter" data-appear-animation-delay="600">
+                                @*<h2 class="font-weight-bold line-height-2 text-7 mb-1">Hakkında</h2>
+                                    <span class="d-block text-color-dark text-5 pb-2 mb-4 opacity-7">Kısaca Fotoğrafçı Takip Uygulaması</span>*@
+                            </div>
+                            <p class="pb-3 mb-4 appear-animation" data-appear-animation="fadeInUpShorter" data-appear-animation-delay="800">Bir çok aşamada hem müşterilerinize  hem de çalışanlarınıza bilgilendirme amaçlı SMS ve Email gönderebilirsiniz. Müşteri Paneli sayesinde, müşterileriniz de yapmış olduğunuz iş aşamalarını görebilir, düğün, nişan vb. organizasyonlarda çekimleri yapılmış fotğrafları düzenledikten sonra sisteme yüklereyerek online olarak seçim yapabilirler.</p>
+                        </div>
+                        <div class="col-lg-6 col-xl-7 mb-5 mb-lg-0">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <hr>
+
+            <div class="container py-5 mb-5" id="ozellikler">
+                <div class="row">
+                    <div class="col text-center">
+                        <h2 class="font-weight-bold line-height-2 text-7 mb-1">Özellikler</h2>
+                        @*<span class="d-block text-color-dark text-5 pb-2 mb-4 opacity-7">Services</span>*@
+                    </div>
+                </div>
+                <div class="content-grid">
+                    <div class="row content-grid-row text-center">
+                        <div class="col-md-6 col-lg-3 content-grid-item flex-column p-5">
+                            <img src="~/Content/img/sube.png" class="img-fluid mb-4" alt="" />
+                            <h3 class="font-weight-semibold text-transform-none text-5 mb-3">Sube Odaklı</h3>
+                            <p class="mb-0">Birden fazla şube tanımlayın ve şubelerinizin tüm çalışmalarını görün.</p>
+                        </div>
+                        <div class="col-md-6 col-lg-3 content-grid-item flex-column p-5">
+                            <img src="~/Content/img/Sozlesme.png" class="img-fluid mb-4" alt="" />
+                            <h3 class="font-weight-semibold text-transform-none text-5 mb-3">Sözleşme</h3>
+                            <p class="mb-0">Randevularınız resmi sözleşmelere dönüştürün.</p>
+                        </div>
+                        <div class="col-md-6 col-lg-3 content-grid-item flex-column p-5">
+                            <img src="~/Content/img/takvim-liste.png" class="img-fluid mb-4" alt="" />
+                            <h3 class="font-weight-semibold text-transform-none text-5 mb-3">Takvim ve Rezervasyon Listesi</h3>
+                            <p class="mb-0">Rezervasyonlarınızı ister takvim üzerinden isterseniz listeler üzerinden kolay bir şekilde takip edin.</p>
+                        </div>
+                        <div class="col-md-6 col-lg-3 content-grid-item flex-column p-5">
+                            <img src="~/Content/img/gunluk-satis.png" class="img-fluid mb-4" alt="" />
+                            <h3 class="font-weight-semibold text-transform-none text-5 mb-3">Günlük İşler</h3>
+                            <p class="mb-0">Günlük satışlarınızı takip edin.</p>
+                        </div>
+                        <div class="col-md-6 col-lg-3 content-grid-item flex-column p-5">
+                            <img src="~/Content/img/muteri-cari.png" class="img-fluid mb-4" alt="" />
+                            <h3 class="font-weight-semibold text-transform-none text-5 mb-3">Cariler ve Müşteriler</h3>
+                            <p class="mb-0">Carilerinizin ve Müşterilerinizin tüm işlemlerini kolaylıkla takip edin.</p>
+                        </div>
+                        <div class="col-md-6 col-lg-3 content-grid-item flex-column p-5">
+                            <img src="~/Content/img/personel.png" class="img-fluid mb-4" alt="" />
+                            <h3 class="font-weight-semibold text-transform-none text-5 mb-3">Personeller</h3>
+                            <p class="mb-0">Farklı görevlerde bulunan çalışanlarınızı takip edin ve görevlendirin.</p>
+                        </div>
+                        <div class="col-md-6 col-lg-3 content-grid-item flex-column p-5">
+                            <img src="~/Content/img/rehber.png" class="img-fluid mb-4" alt="" />
+                            <h3 class="font-weight-semibold text-transform-none text-5 mb-3">Telefon Rehberi ve Email Rehberi</h3>
+                            <p class="mb-0">İstediğiniz grup başlıkları altında Telefon Renberi ve Email Rehberi oluşturun. Oluşturduğunuz gruplara toplu Email ve Toplu SMS'ler gönderin.</p>
+                        </div>
+                        <div class="col-md-6 col-lg-3 content-grid-item flex-column p-5">
+                            <img src="~/Content/img/yetkilendirme.png" class="img-fluid mb-4" alt="" />
+                            <h3 class="font-weight-semibold text-transform-none text-5 mb-3">Yetkilendirme</h3>
+                            <p class="mb-0">Kullanıcılarınıza detaylı yetkilendirme özelliği sayesinde istediğiniz erişimleri verin, istediğiniz erişimleri engelleyin.</p>
+                        </div>
+                        <div class="col-md-6 col-lg-3 content-grid-item flex-column p-5">
+                            <img src="~/Content/img/SMS-Email.png" class="img-fluid mb-4" alt="" />
+                            <h3 class="font-weight-semibold text-transform-none text-5 mb-3">SMS ve Email</h3>
+                            <p class="mb-0">Detaylandırılmış SMS ve Email ayarları ile opsiyonel olarak belirlediğiniz içerikleri müşterilerinize gönderin.</p>
+                        </div>
+                        <div class="col-md-6 col-lg-3 content-grid-item flex-column p-5">
+                            <img src="~/Content/img/fotograf-sec.png" class="img-fluid mb-4" alt="" />
+                            <h3 class="font-weight-semibold text-transform-none text-5 mb-3">Online Fotoğraf Seçimi</h3>
+                            <p class="mb-0">Müşterilerinize çekimleri yapılmış fotoğrafların online olarak seçmelerini sağlayın.</p>
+                        </div>
+                        <div class="col-md-6 col-lg-3 content-grid-item flex-column p-5">
+                            <img src="~/Content/img/ayarlar.png" class="img-fluid mb-4" alt="" />
+                            <h3 class="font-weight-semibold text-transform-none text-5 mb-3">Tanımlar - Ayarlar</h3>
+                            <p class="mb-0">Detaylandırılmış tanımlama ve ayarlama sistemi ile uygulamayı opsiyonel olarak kullanın.</p>
+                        </div>
+                        <div class="col-md-6 col-lg-3 content-grid-item flex-column p-5">
+                            <img src="~/Content/img/raporlar.png" class="img-fluid mb-4" alt="" />
+                            <h3 class="font-weight-semibold text-transform-none text-5 mb-3">Raporlar</h3>
+                            <p class="mb-0">Randevularınızı, Gelir-Giderlerinizi, işlerinizi raporlar halinde inceleyin.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-5">
+                    <div class="col text-center appear-animation" data-appear-animation="fadeInDownShorter" data-appear-animation-delay="500">
+                        <a href="#" data-toggle="modal" data-target="#UyeOlModal" class="btn btn-primary btn-outline btn-rounded popup-with-form font-weight-semibold text-4 btn-px-5 btn-py-2">Kayıt Ol - Ücretsiz Dene</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container py-4 my-5" id="fiyatlarimiz">
+                <div class="row mb-4">
+                    <div class="col text-center">
+                        <h2 class="font-weight-bold line-height-2 text-7 mb-1">Fiyatlarımız</h2>
+                        <span class="d-block text-color-dark text-5 pb-2 mb-4 opacity-7">Paketler</span>
+                    </div>
+                </div>
+
+                <div class="pricing-table mb-4">
+                    @foreach (var paket in SatisFiyatlari)
+                    {
+                        if (paket.PaketTip == "Lisans")
+                        {
+                            if (SatisFiyatlari.Count(x => x.PaketTip == "Lisans" && x.Aktif == true) == 1)
+                            {
+                                <div class="col-md-6 col-lg-4 appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="1050"></div>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="plan appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="650">
+                                        <div class="plan-header bg-primary rounded-top">
+                                            <h3>@paket.PaketAdi</h3>
+                                        </div>
+                                        <div class="plan-price">
+                                            <span class="price">@paket.SatisFiyati.ToString("C").Replace("₺", "") <span class="price-unit">TL/AY</span></span>
+                                        </div>
+                                        <div class="plan-features">
+                                            @Html.Raw(paket.PaketDetayi)
+                                            @*<ul>
+                                                    <li>1 Şube Tanımlama</li>
+                                                    <li>5 Kullanıcı Tanımlama</li>
+                                                    <li>5 Personel Tanımlama</li>
+                                                    <li>Sınırsız Randevu Oluşturma</li>
+                                                    <li>Sınırsız Müşteri Kaydı</li>
+                                                    <li>100 SMS Bakiyesi</li>
+                                                </ul>*@
+                                        </div>
+                                        <div class="plan-footer rounded-bottom">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-4 appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="1050"></div>
+                                @*<div class="row mt-5">*@
+                                <div class="col text-center appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="600">
+                                    <a href="#" data-toggle="modal" data-target="#UyeOlModal" class="btn btn-primary btn-outline btn-rounded popup-with-form font-weight-semibold text-4 btn-px-5 btn-py-2">Kayıt Ol - Ücretsiz Dene</a>
+                                </div>
+                                @*</div>*@
+                            }
+                            else if (SatisFiyatlari.Count(x => x.PaketTip == "Lisans" && x.Aktif == true) == 2)
+                            {
+                                <div class="col-md-6 col-lg-6">
+                                    <div class="plan appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="650">
+                                        <div class="plan-header bg-primary rounded-top">
+                                            <h3>@paket.PaketAdi</h3>
+                                        </div>
+                                        <div class="plan-price">
+                                            <span class="price">@paket.SatisFiyati.ToString("C").Replace("₺", "") <span class="price-unit">TL/AY</span></span>
+                                        </div>
+                                        <div class="plan-features">
+                                            @Html.Raw(paket.PaketDetayi)
+                                            @*<ul>
+                                                    <li>1 Şube Tanımlama</li>
+                                                    <li>5 Kullanıcı Tanımlama</li>
+                                                    <li>5 Personel Tanımlama</li>
+                                                    <li>Sınırsız Randevu Oluşturma</li>
+                                                    <li>Sınırsız Müşteri Kaydı</li>
+                                                    <li>100 SMS Bakiyesi</li>
+                                                </ul>*@
+                                        </div>
+                                        <div class="plan-footer rounded-bottom">
+                                        </div>
+                                    </div>
+                                </div>
+                                @*<div class="row mt-5">*@
+                                <div class="col text-center appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="600">
+                                    <a href="#" data-toggle="modal" data-target="#UyeOlModal" class="btn btn-primary btn-outline btn-rounded popup-with-form font-weight-semibold text-4 btn-px-5 btn-py-2">Kayıt Ol - Ücretsiz Dene</a>
+                                </div>
+                                @*</div>*@
+                            }
+                            else if (SatisFiyatlari.Count(x => x.PaketTip == "Lisans" && x.Aktif == true) == 3)
+                            {
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="plan appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="650">
+                                        <div class="plan-header bg-primary rounded-top">
+                                            <h3>@paket.PaketAdi</h3>
+                                        </div>
+                                        <div class="plan-price">
+                                            <span class="price">@paket.SatisFiyati.ToString("C").Replace("₺", "") <span class="price-unit">TL/AY</span></span>
+                                        </div>
+                                        <div class="plan-features">
+                                            @Html.Raw(paket.PaketDetayi)
+                                            @*<ul>
+                                                    <li>1 Şube Tanımlama</li>
+                                                    <li>5 Kullanıcı Tanımlama</li>
+                                                    <li>5 Personel Tanımlama</li>
+                                                    <li>Sınırsız Randevu Oluşturma</li>
+                                                    <li>Sınırsız Müşteri Kaydı</li>
+                                                    <li>100 SMS Bakiyesi</li>
+                                                </ul>*@
+                                        </div>
+                                        <div class="plan-footer rounded-bottom">
+                                        </div>
+                                    </div>
+                                </div>
+                                @*<div class="row mt-5">*@
+                                <div class="col text-center appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="600">
+                                    <a href="#" data-toggle="modal" data-target="#UyeOlModal" class="btn btn-primary btn-outline btn-rounded popup-with-form font-weight-semibold text-4 btn-px-5 btn-py-2">Kayıt Ol - Ücretsiz Dene</a>
+                                </div>
+                                @*</div>*@
+                            }
+                        }
+                    }
+
+                    @*<div class="col-md-6 col-lg-4">
+                            <div class="plan appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="650">
+                                <div class="plan-header bg-primary rounded-top">
+                                    <h3>Basit</h3>
+                                </div>
+                                <div class="plan-price">
+                                    <span class="price">60<span class="price-unit">TL/AY</span></span>
+                                </div>
+                                <div class="plan-features">
+                                    <ul>
+                                        <li>1 Şube Tanımlama</li>
+                                        <li>5 Kullanıcı Tanımlama</li>
+                                        <li>5 Personel Tanımlama</li>
+                                        <li>Sınırsız Randevu Oluşturma</li>
+                                        <li>Sınırsız Müşteri Kaydı</li>
+                                        <li>100 SMS Bakiyesi</li>
+                                    </ul>
+                                </div>
+                                <div class="plan-footer rounded-bottom">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4 appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="1050">
+                            <div class="plan plan-featured custom-plan-featured-style-1">
+                                <div class="plan-header bg-primary rounded-top">
+                                    <h3>Standart</h3>
+                                </div>
+                                <div class="plan-price bg-primary border-0">
+                                    <span class="price text-color-light">75<span class="price-unit">TL/AY</span></span>
+                                </div>
+                                <div class="plan-features">
+                                    <ul>
+                                        <li>5 Şube Tanımlama</li>
+                                        <li>25 Kullanıcı Tanımlama</li>
+                                        <li>25 Personel Tanımlama</li>
+                                        <li>Sınırsız Randevu Oluşturma</li>
+                                        <li>Sınırsız Müşteri Kaydı</li>
+                                        <li>250 SMS Bakiyesi</li>
+                                    </ul>
+                                </div>
+                                <div class="plan-footer rounded-bottom">
+                                </div>
+                            </div>
+                        </div>*@
+                    @*<div class="col-md-6 col-lg-4 appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="1050"></div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="plan appear-animation" data-appear-animation="fadeInLeftShorter" data-appear-animation-delay="850">
+                                    <div class="plan-header bg-primary rounded-top">
+                                        <h3>profesyonel</h3>
+                                    </div>
+                                    <div class="plan-price">
+                                        <span class="price">@SatisFiyati.SatisFiyati.ToString("C").Replace("₺", "") <span class="price-unit">TL/AY</span></span>
+                                    </div>
+                                    <div class="plan-features">
+                                        <ul>
+                                            <li>10 Şube Tanımlama</li>
+                                            <li>Sınırsız Kullanıcı Tanımlama</li>
+                                            <li>Sınırsız Personel Tanımlama</li>
+                                            <li>Sınırsız Randevu Oluşturma</li>
+                                            <li>Sınırsız Müşteri Kaydı</li>
+                                            <li>200 SMS Bakiyesi</li>
+                                        </ul>
+                                    </div>
+                                    <div class="plan-footer rounded-bottom">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>*@
+
+
+                </div>
+            </div>
+            @*<section class="section section-height-3 border-0 m-0 appear-animation" data-appear-animation="fadeIn" id="yorumlar">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col text-center">
+                                <h2 class="font-weight-bold line-height-2 text-7 mb-1">Müşteri Yorumları</h2>
+                                <span class="d-block text-color-dark text-5 pb-2 mb-4 opacity-7">Düşünceleriniz</span>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="col-md-11 appear-animation" data-appear-animation="fadeInUpShorter" data-appear-animation-delay="600">
+                                <div class="owl-carousel owl-theme nav-bottom rounded-nav mb-0" data-plugin-options="{'items': 1, 'loop': false}">
+                                    <div>
+                                        <div class="testimonial testimonial-style-2 testimonial-with-quotes mb-0">
+                                            <div class="testimonial-author mb-0">
+                                                <img src="~/Content/img/clients/client-1.jpg" class="img-fluid rounded-circle mb-1" alt="">
+                                            </div>
+                                            <blockquote>
+                                                <p class="text-color-dark opacity-7 mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget risus porta, tincidunt turpis at, interdum tortor. Suspendisse potenti. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce ante tellus, convallis non consectetur sed, pharetra nec ex.</p>
+                                            </blockquote>
+                                            <div class="testimonial-author mb-3">
+                                                <p><strong class="font-weight-bold">John Smith</strong><span class="font-weight-normal">CEO & Founder - Okler</span></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="testimonial testimonial-style-2 testimonial-with-quotes mb-0">
+                                            <div class="testimonial-author mb-0">
+                                                <img src="~/Content/img/clients/client-2.jpg" class="img-fluid rounded-circle mb-1" alt="">
+                                            </div>
+                                            <blockquote>
+                                                <p class="text-color-dark opacity-7 mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eget risus porta, tincidunt turpis at, interdum tortor. Suspendisse potenti. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                                            </blockquote>
+                                            <div class="testimonial-author">
+                                                <p><strong class="font-weight-bold">Jessica Smith</strong><span class="font-weight-normal">Marketing - Okler</span></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>*@
+
+            <section class="section bg-primary border-0 m-0" id="iletisim">
+                <div class="container">
+                    <div class="row align-items-center justify-content-between">
+                        <div class="col-lg-12 col-xl-3 mb-3 mb-xl-0">
+                            <h2 class="font-weight-semibold text-color-light text-8 text-lg-7 text-xl-6 line-height-2 mb-0">Profesyonelliğinizi arttırmaya hazır mısınız?</h2>
+                        </div>
+                        <div class="col-auto mb-3 mb-lg-0">
+                            <div class="feature-box feature-box-style-2 align-items-center">
+                                <div class="feature-box-icon">
+                                    <i class="fab fa-whatsapp text-color-light text-9 mr-3 p-relative text-color-dark"></i>
+                                </div>
+                                <div class="feature-box-info pl-1">
+                                    <label class="d-block text-color-light line-height-2 opacity-8 mb-1">BİZİ ARAYIN</label>
+                                    <strong class="font-weight-normal text-6"><a href="tel:08503088330" class="text-color-light">(0850) 308 83 30</a></strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto mb-4 mb-lg-0">
+                            <div class="feature-box feature-box-style-2 align-items-center">
+                                <div class="feature-box-icon">
+                                    <i class="far fa-envelope text-color-light text-9 mr-3 p-relative text-color-dark"></i>
+                                </div>
+                                <div class="feature-box-info pl-1">
+                                    <label class="d-block text-color-light line-height-2 opacity-8 mb-1">BİZE MAİL GÖNDERİN</label>
+                                    <strong class="font-weight-normal text-4"><a href="mailto:info@fotografcitakip.com" class="text-color-light">info@fotografcitakip.com</a></strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <a href="#" data-toggle="modal" data-target="#UyeOlModal" class="btn btn-light btn-rounded popup-with-form text-color-primary font-weight-semibold text-4 btn-px-5 py-3">Ücretsiz Dene</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <footer id="footer" class="mt-0">
+            <div class="container my-4">
+                <div class="row pt-5">
+                    <div class="col-lg-4 align-self-center mb-5 mb-lg-0">
+                        <a href="/">
+                            <img src="~/Content/img/Fotografci_Takip_Logo_Alt_Yazi_Mavi.png" class="img-fluid" alt="Fotoğrafçı Takip" width="200" />
+                        </a>
+                    </div>
+                    <div class="col-lg-4 mb-4 mb-lg-0">
+                        <h4 class="font-weight-normal text-color-light text-5 ls-0 mb-4">İletişim</h4>
+                        <ul class="list list-unstyled">
+                            <li class="d-flex align-items-baseline"><i class="far fa-dot-circle text-color-primary mr-3"></i><div><span class="text-color-light">Adres:</span> İstanbul </div></li>
+                            <li class="d-flex align-items-baseline"><i class="fab fa-whatsapp text-color-primary mr-3"></i><div><span class="text-color-light">Telefon:</span> (0850) 308 83 30</div></li>
+                            <li class="d-flex align-items-baseline"><i class="far fa-envelope text-color-primary mr-3"></i><div><span class="text-color-light">Email:</span> <a href="mailto:info@fotografcitakip.com">info@fotografcitakip.com</a></div></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 mb-4 mb-lg-0">
+                        <h4 class="font-weight-normal text-color-light text-5 ls-0 mb-4">Menü</h4>
+                        <ul class="list list-unstyled">
+                            <li class="mb-1">
+                                <a class="link-hover-style-1 active" data-hash data-hash-offset="95" href="/Home/Index">Ana Sayfa</a>
+                            </li>
+                            <li class="mb-1">
+                                <a class="link-hover-style-1" data-hash data-hash-offset="95" href="#hakkimizda">Hakkımızda</a>
+                            </li>
+                            <li class="mb-1">
+                                <a class="link-hover-style-1" data-hash data-hash-offset="95" href="#ozellikler">Özellikler</a>
+                            </li>
+                            <li class="mb-1">
+                                <a class="link-hover-style-1" data-hash data-hash-offset="95" href="#fiyatlarimiz">Fiyatlarımız</a>
+                            </li>
+                            <li class="mb-1">
+                                <a class="link-hover-style-1" data-hash data-hash-offset="95" href="~/Otomasyon/Giris/GirisYap/">Firma Girişi</a>
+                            </li>
+                            <li class="mb-1">
+                                <a class="link-hover-style-1" data-hash data-hash-offset="95" href="~/Musteri/Giris/GirisYap/">Müşteri Girişi</a>
+                            </li>
+                            @*<li class="mb-1">
+                                    <a class="link-hover-style-1" data-hash data-hash-offset="95" href="#yorumlar">Müşteri Yorumları</a>
+                                </li>
+                                <li class="mb-1">
+                                    <a class="link-hover-style-1" data-hash data-hash-offset="95" href="#news">News</a>
+                                </li>*@
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 mb-4 mb-lg-0">
+                        <h4 class="font-weight-normal text-color-light text-5 ls-0 mb-4">Sözleşme ve Bilgiler</h4>
+                        <ul class="list list-unstyled">
+                            <li class="mb-1">
+                                <a class="link-hover-style-1" data-hash data-hash-offset="95" href="#" data-toggle="modal" data-target="#UyelikSozlesmesiModal">Üyelik Sözleşmesi</a>
+                            </li>
+                            <li class="mb-1">
+                                <a class="link-hover-style-1" data-hash data-hash-offset="95" href="#" data-toggle="modal" data-target="#GizlilikPolitikasiModal">Gizlilik Politikası</a>
+                            </li>
+                            <li class="mb-1">
+                                <a class="link-hover-style-1" data-hash data-hash-offset="95" href="#" data-toggle="modal" data-target="#IptalIadeModal">İptal ve İade Koşulları</a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+                @*<div class="row pb-2">
+                        <div class="col-lg-4 align-self-center mb-5 mb-lg-0">
+                            <img src="~/Areas/Otomasyon/Dosyalar/logo_band_white_1X.png" />
+                        </div>
+                    </div>*@
+            </div>
+            <div class="footer-copyright footer-copyright-style-2">
+                <div class="container py-2">
+                    <div class="row justify-content-between py-4">
+                        <div class="col-auto">
+                            <p>2022 © TeTRa Bilişim. Tüm Hakları Saklıdır.</p>
+                        </div>
+                        @*<div class="col-auto">
+                                <ul class="footer-social-icons social-icons social-icons-clean social-icons-icon-light ml-3">
+                                    <li class="social-icons-facebook"><a href="http://www.facebook.com/" target="_blank" title="Facebook"><i class="fab fa-facebook-f text-2"></i></a></li>
+                                    <li class="social-icons-twitter"><a href="http://www.twitter.com/" target="_blank" title="Twitter"><i class="fab fa-twitter text-2"></i></a></li>
+                                    <li class="social-icons-linkedin"><a href="http://www.linkedin.com/" target="_blank" title="Linkedin"><i class="fab fa-linkedin-in text-2"></i></a></li>
+                                </ul>
+                            </div>*@
+                    </div>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Vendor -->
+    <script src="~/Content/vendor/jquery/jquery.min.js"></script>
+    <script src="~/Content/vendor/jquery.appear/jquery.appear.min.js"></script>
+    <script src="~/Content/vendor/jquery.easing/jquery.easing.min.js"></script>
+    <script src="~/Content/vendor/jquery.cookie/jquery.cookie.min.js"></script>
+    <script src="~/Content/vendor/popper/umd/popper.min.js"></script>
+    <script src="~/Content/vendor/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/Content/vendor/jquery.validation/jquery.validate.min.js"></script>
+    <script src="~/Content/vendor/jquery.easy-pie-chart/jquery.easypiechart.min.js"></script>
+    <script src="~/Content/vendor/jquery.gmap/jquery.gmap.min.js"></script>
+    <script src="~/Content/vendor/lazysizes/lazysizes.min.js"></script>
+    <script src="~/Content/vendor/isotope/jquery.isotope.min.js"></script>
+    <script src="~/Content/vendor/owl.carousel/owl.carousel.min.js"></script>
+    <script src="~/Content/vendor/magnific-popup/jquery.magnific-popup.min.js"></script>
+    <script src="~/Content/vendor/vide/jquery.vide.min.js"></script>
+    <script src="~/Content/vendor/vivus/vivus.min.js"></script>
+    <script src="~/Content/vendor/kute/kute.min.js"></script>
+
+    <!-- Theme Base, Components and Settings -->
+    <script src="~/Content/js/theme.js"></script>
+
+    <!-- Current Page Vendor and Views -->
+    <!-- Current Page Vendor and Views -->
+    <script src="~/Content/js/views/view.contact.js"></script>
+
+    <!-- Demo -->
+    @*<script src="~/Content/js/demos/demo-seo.js"></script>*@
+    <!-- Theme Custom -->
+    <script src="~/Content/js/custom.js"></script>
+
+    <!-- Theme Initialization Files -->
+    <script src="~/Content/js/theme.init.js"></script>
+    <script src="~/Content/js/inputmask/inputmask.bundle.js"></script>
+    <script src="~/Content/js/sweetalert2/sweetalert2.bundle.js"></script>
+    <script src="~/Content/js/slimscroll.js"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-144337234-4"></script>
+
+
+    <script>
+
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'UA-144337234-4');
+
+        $(document).ready(function () {
+            $("#iller").change(function () { //Firma Düzenleme Tab'ındaki Seçilen İl'in İlçeleri listeleniyor.
+                ilId = $(this).find("option:selected").val();
+                var id = ilId;
+                $("#ilceler").empty();
+                $("#ilceler").append("<option value='0'> İlçe Seçiniz </option>");
+                if (id > 0) {
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        url: "/Home/IlceGetir/" + id,
+                        success: function (durum) {
+                            $.each(durum, function () {
+                                $("#ilceler").append("<option value=" + this.Id + "> " + this.IlceAd + " </option>");
+                            });
+                        }
+                    });
+                }
+            });
+            var UyelikSozlesmesi = "off";
+            var GizlilikPolitikasi = "off";
+            $(":input").inputmask();
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#IlIdHata').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $("#ilhata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $('#IlIdHata').on('change', function (e) {
+                if ($(this).val != "0") {
+                    $("#ilhata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $('#IlceIdHata').on('focusout', function (e) {
+                if ($(this).val != "0") {
+                    $("#ilcehata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $('#IlceIdHata').on('change', function (e) {
+                if ($(this).val != "0") {
+                    $("#ilcehata").remove();
+                }
+            }); // zorunlu alan kontrolü
+            $("#UyelikSozlesmesi").on('click', function () {
+                if ($(this).is(':checked')) {
+                    UyelikSozlesmesi = "on"
+                    $("#sozlesmehata").remove();
+                }
+                else {
+                    UyelikSozlesmesi = "off";
+                }
+            }); // zorunlu alan kontrolü
+            $("#GizlilikPolitikasi").on('click', function () {
+                if ($(this).is(':checked')) {
+                    GizlilikPolitikasi = "on";
+                    $("#gizlilikhata").remove();
+                }
+                else {
+                    GizlilikPolitikasi = "off";
+                }
+            }); // zorunlu alan kontrolü
+
+            $("#KayitOl").click(function () {
+                console.log(UyelikSozlesmesi + " " + GizlilikPolitikasi);
+                $("#sozlesmehata").remove();
+                $("#gizlilikhata").remove();
+                if ($("#FirmaAdi").val() == "") {
+                    $("#FirmaAdi").focus();
+                    $("#FirmaAdiHata").append("<div class='hata ml-4' style='color:red'>Lütden Firmanızın adını giriniz.</div>");
+                }
+                else if ($("#Yetkili").val() == "") {
+                    $("#Yetkili").focus();
+                    $("#FirmaYetkiliHata").append("<div class='hata ml-4' style='color:red'>Lütden Firmanızın yetkilisini giriniz.</div>");
+                }
+                else if ($("#Email").val() == "") {
+                    $("#Email").focus();
+                    $("#EmailHata").append("<div class='hata ml-4' style='color:red'>Lütfen Email adresinizi giriniz.</div>");
+                }
+                else if ($("#CepTel").val() == "") {
+                    $("#CepTel").focus();
+                    $("#CepTelHata").append("<div class='hata ml-4' style='color:red'>Lütfen Cep Telefonu numaranızı giriniz.</div>");
+                }
+                else if ($("#iller").val() == "0" || $("#iller").val() == null) {
+                    $("#iller").focus();
+                    $("#IlIdHata").append("<div id='ilhata' class='ml-4' style='color:red'>Lütfen Firmanızın bulunduğu İli seçiniz.</div>");
+                }
+                else if ($("#ilceler").val() == "0") {
+                    $("#ilceler").focus();
+                    $("#IlceIdHata").append("<div id='ilcehata' class='ml-4' style='color:red'>Lütfen Firmanızın bulunduğu İlçeyi seçiniz.</div>");
+                }
+                else if ($("#Sifre").val() == "") {
+                    $("#Sifre").focus();
+                    $("#SifreHata").append("<div class='hata ml-4' style='color:red'>Lütfen bir şifre belirleyiniz.</div>");
+                }
+                else if ($("#Sifre").val().length < 6) {
+                    $("#Sifre").focus();
+                    $("#SifreHata").append("<div class='hata ml-4' style='color:red'>Şifreniz en ez 6 karakter olmalıdır.</div>");
+                }
+                else if ($("#SifreTekrar").val() == "") {
+                    $("#SifreTekrar").focus();
+                    $("#SifreTekrarHata").append("<div class='hata ml-4' style='color:red'>Lütfen şifrenizi tekrar giriniz.</div>");
+                }
+                else if ($("#SifreTekrar").val() != "") {
+                    var sifre = $("#Sifre").val();
+                    var sifretekrar = $("#SifreTekrar").val();
+                    if (sifre != sifretekrar) {
+                        $("#SifreTekrar").focus();
+                        $("#SifreTekrarHata").append("<div class='hata ml-4' style='color:red'>Şifreler uyuşmuyor.</div>");
+                    }
+                    else {
+                        if (UyelikSozlesmesi == "off") {
+                            $("#UyelikSozlesmesiHata").append("<div id='sozlesmehata' class='ml-4 text-sm-left' style='color:red'>Lütfen Üyelik Sözleşmesini onaylayınız.</div>");
+                        }
+                        else if (GizlilikPolitikasi == "off") {
+                            $("#GizlilikHata").append("<div id='gizlilikhata' class='ml-4 text-sm-left' style='color:red'>Lütfen Gizlilik Politikasını onaylayınız.</div>");
+                        }
+                        else {
+                            var email = $("#Email").val();
+                            var UyelikData = new FormData();
+                            UyelikData.append("Email", $("#Email").val());
+                            $.ajax({
+                                type: "POST",
+                                datatype: 'json',
+                                data: UyelikData,
+                                contentType: false,
+                                processData: false,
+                                url: "/Home/EmailKontrol/",
+                                success: function (data) {
+                                    if (data.Mesaj == "Email Kullanılıyor" && data.Sonuc == false) {
+                                        Swal.fire(
+                                            {
+                                                title: "Varolan Kayıt",
+                                                html: "<p><h2 style='font-size:16px; color:red'><strong>Email : </strong>" + email + "</h2></p><h4> Bu Email adresine kayıtlı bir Firma zaten var! Şifrenizi unuttuysanız 'Şifremi Unuttum' linkinden sıfırlayabilirsiniz.</h4>",
+                                                type: "warning",
+                                                //showCancelButton: true,
+                                                confirmButtonText: "Tamam"
+                                            }).then(function (result) { window.location.replace("/Otomasyon/Giris/GirisYap"); });
+                                    }
+                                    else if (data.Mesaj == "Firma Pasif" && data.Sonuc == false) {
+                                        Swal.fire(
+                                            {
+                                                title: "Varolan Kayıt",
+                                                html: "<p><h2 style='font-size:16px; color:red'><strong>Email : </strong>" + email + "</h2></p><h4> Bu Email adresine kayıtlı bir Firma zaten var ancak Firma pasif durumda. Aktif duruma geçirmek istermisiniz?</h4>",
+                                                type: "warning",
+                                                showCancelButton: true,
+                                                confirmButtonText: "Aktif Yap"
+                                            }).then(function (result) {
+                                                if (result.value) {
+                                                    $.ajax({
+                                                        type: "POST",
+                                                        datatype: 'json',
+                                                        data: MusteriData,
+                                                        contentType: false,
+                                                        processData: false,
+                                                        url: "/Home/FirmaAktifYap/" + data.FirmaId, // data: controller dan dönen varolan kaydın ID si
+                                                        success: function (data) {
+                                                            if (data.Sonuc == true) {
+                                                                window.location.replace("/Otomasyon/Giris/GirisYap"); // aynı sekme
+                                                            }
+                                                        },
+                                                        error: function (err) {
+                                                            alert("HATA");
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                    }
+                                    else {
+                                        $('#UyeOlModal').modal('hide');
+                                        var UyelikData = new FormData();
+                                        UyelikData.append("FirmaAdi", $("#FirmaAdi").val());
+                                        UyelikData.append("Yetkili", $("#Yetkili").val());
+                                        UyelikData.append("Email", $("#Email").val());
+                                        UyelikData.append("CepTel", $("#CepTel").val());
+                                        UyelikData.append("iller", $("#iller").val());
+                                        UyelikData.append("ilceler", $("#ilceler").val());
+                                        UyelikData.append("Sifre", $("#Sifre").val());
+                                        $.ajax({
+                                            type: "POST",
+                                            datatype: 'json',
+                                            data: UyelikData,
+                                            contentType: false,
+                                            processData: false,
+                                            beforeSend: function () {
+                                                Swal.fire(
+                                                    {
+                                                        title: "Üyeliğiniz Oluşturuluyor!",
+                                                        html: "<strong>Lütfen Bekleyin. Giriş sayfasına yönlendirileceksiniz.</strong>",
+                                                        onBeforeOpen: function onBeforeOpen() {
+                                                            Swal.showLoading();
+                                                        }
+                                                    });
+                                            },
+                                            url: "/Home/UyeOl/",
+                                            success: function (data) {
+                                                if (data.Sonuc == true) {
+                                                    window.location.replace("/Otomasyon/Giris/GirisYap");
+                                                    swal.close();
+                                                }
+                                            },
+                                            error: function (err) {
+                                                alert("HATA");
+                                            }
+                                        });
+                                    }
+                                },
+                                error: function (err) {
+                                    alert("HATA");
+                                }
+                            });
+                        }
+                    }
+                }
+            });
+
+            $(document).on('show.bs.modal', '.modal', function (event) {
+                var zIndex = 1040 + (10 * $('.modal:visible').length);
+                $(this).css('z-index', zIndex);
+                setTimeout(function () {
+                    $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+                }, 0);
+            });
+            $('#slimtest1').slimScroll(
+                {
+                    //position: 'right',
+                    height: '600px',
+                    railVisible: true,
+                    alwaysVisible: true
+                });
+            $('#slimtest2').slimScroll(
+                {
+                    //position: 'right',
+                    height: '600px',
+                    railVisible: true,
+                    alwaysVisible: true
+                });
+            $('#slimtest3').slimScroll(
+                {
+                    //position: 'right',
+                    height: '600px',
+                    railVisible: true,
+                    alwaysVisible: true
+                });
+        });
+    </script>
+    <!-- Google Analytics: Change UA-XXXXX-X to be your site's ID. Go to http://www.google.com/analytics/ for more information.
+    <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-12345678-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+     -->
+
+
+</body>
+</html>

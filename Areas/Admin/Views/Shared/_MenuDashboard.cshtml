@@ -1,0 +1,9 @@
+﻿@using FotografciTakipWeb.Models
+
+@{ string ustmenuclass = ViewBag.UstMenu == "Dashboard" ? "active open" : "";}
+<li class=@ustmenuclass>
+    <a href="~/Admin/Dashboard/Index" title="Dashboard" data-filter-tags="dashboard">
+        <i class="fal fa-home"></i>
+        <span class="nav-link-text" data-i18n="nav.dashboard">Dashboard</span>
+    </a>
+</li>

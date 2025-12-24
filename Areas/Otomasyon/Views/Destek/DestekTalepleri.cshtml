@@ -1,0 +1,457 @@
+﻿
+@{
+    ViewBag.Title = "Destek Talepleri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model List<DestekTalepleri>
+@{
+    List<Sube> SubeListesi = ViewBag.SubeListesi;
+    List<SubeToKullanici> SubeKullanici = ViewBag.SubeKullanici;
+    string clss = "";
+    string durum = "";
+    string cevaptarihi = "";
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+    string DetayYetki = KullaniciYetki.KayitDetayi.ToString();
+
+}
+
+@section Head
+{
+    <style>
+        .modal {
+            overflow: auto !important; /*Açılan ikinci modal ekranda kaymadığı için eklendi*/
+        }
+    </style>
+}
+@*   Destek Talebi Oluştur Modal   *@
+<div class="modal fade" id="DestekTalebiOlusturModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header" style="padding-bottom:5px">
+                <h4 class="modal-title">
+                    Destek Talebi Oluştur
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fal fa-times"></i></span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="panel-content p-0">
+                    <div class="panel-content">
+                        <div class="frame-wrap mb-0">
+                            <div class="row">
+                                <div class="form-group col-sm-6 mb-2" id="TalepTuruHata">
+                                    <label class="form-label" for="TalepTuru">Talep Türü</label>
+                                    <select class="custom-select form-control custom-select-sm" id="TalepTuru" name="TalepTuru" title="Talep türünü seçiniz.">
+                                        <option selected="" disabled value="0">Seçiniz</option>
+                                        <option value="1">Hata Bildirimi</option>
+                                        <option value="2">Bilgi Talebi</option>
+                                        <option value="3">Öneri</option>
+                                        <option value="4">Ödeme İşlemleri</option>
+                                        <option value="5">Şikayet</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-12 mb-2" id="TalepBasligiHata">
+                                    <label class="form-label" for="TalepBasligi">Talep Başlığı</label>
+                                    <input type="text" id="TalepBasligi" class="form-control form-control-sm" name="TalepBasligi" maxlength="100" required>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-12 mb-3" id="TalepMesajHata">
+                                    <label class="form-label" for="TalepMesaj">Mesaj</label>
+                                    <textarea class="form-control form-control-sm" id="TalepMesaj" rows="5" name="TalepMesaj" style="overflow:auto;resize:none"></textarea>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-6 mb-0">
+                                    <label class="form-label" for="TalepEkranGorunutusu">Ekran Görüntüsü Yükle (Sadece resim dosyaları seçebilirsiniz.)</label>
+                                    <input type="file" id="TalepEkranGorunutusu" class="form-control-file" accept=".jpg, .jpeg, .png, .bmp, .tiff, .tif,|images/*">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer" style="padding-top:0px">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">İptal</button>
+                <button type="button" class="btn btn-primary" id="TalebiGonder">Talebi Gönder</button>
+            </div>
+        </div>
+    </div>
+</div>
+@*   Destek Talebi Oluştur Modal  *@
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h2> Destek Talepleri</h2>
+                @if (KullaniciYetki.KayitEkle)
+                {
+                    <div class="panel-hdr">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#DestekTalebiOlusturModal" style="margin:10px 10px 10px 17px " id="YeniDestekTalebiEkle"> Destek Talebi Oluştur </button>
+                    </div>
+                }
+            </div>
+            <div class="border-bottom"></div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    @if (Model.Count == 0)
+                    {
+                        <table class="table table-bordered table-hover table-sm w-100">
+                            <thead class="bg-primary-500">
+                                <tr>
+                                    <th class="w-10">Kullanıcı</th>
+                                    <th>Talep Türü</th>
+                                    <th>Talep Başlığı</th>
+                                    <th class="w-15">Talep Tarihi</th>
+                                    <th class="w-15">Cevap Tarihi</th>
+                                    <th class="w-15">Durum</th>
+                                    <th class="w-15">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="alert border border-primary bg-transparent text-primary m-0 text-sm-center" id="GelecekOdemelerMesaj" role="alert">
+                                            <h2> Henüz Talep Yok</h2>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <table id="dttalepler" class="table table-bordered table-hover table-sm w-100">
+                            <thead class="bg-primary-500">
+                                <tr>
+                                    <th class="w-10">Kullanıcı</th>
+                                    <th>Talep Türü</th>
+                                    <th>Talep Başlığı</th>
+                                    <th class="w-15">Talep Tarihi</th>
+                                    <th class="w-15">Cevap Tarihi</th>
+                                    <th class="w-15">Durum</th>
+                                    <th class="w-15">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @*1: Cevap Bekleniyor 2: Okundu 3: Cevaplandı 4: Değerlendiriliyor 5: Kapandı 6: Talep İletildi 7: İptal*@
+                                @foreach (var item in Model.OrderByDescending(x => x.Durum).OrderBy(x => x.Durum))
+                                {
+                                    clss = "";
+
+                                    if (item.Durum == "1")
+                                    { clss = clss + "bg-warning-100"; }
+
+                                    else if (item.Durum == "3")
+                                    { clss = clss + "bg-info-100"; }
+                                    else if (item.Durum == "4")
+                                    { clss = clss + "bg-warning-100"; }
+                                    else if (item.Durum == "5")
+                                    { clss = clss + "bg-success-100"; }
+                                    else if (item.Durum == "6")
+                                    { clss = clss + "bg-primary-100"; }
+                                    else if (item.Durum == "7")
+                                    { clss = clss + "bg-danger-400"; }
+
+                                    switch (item.Durum)
+                                    {
+                                        case "1":
+                                            durum = "Cevap Bekleniyor";
+                                            break;
+                                        case "2":
+                                            durum = "Okundu";
+                                            break;
+                                        case "3":
+                                            durum = "Cevaplandı";
+                                            break;
+                                        case "4":
+                                            durum = "Değerlendiriliyor";
+                                            break;
+                                        case "5":
+                                            durum = "Talep Kapandı";
+                                            break;
+                                        case "6":
+                                            durum = "Talep İletildi";
+                                            break;
+                                        case "7":
+                                            durum = "İptal";
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    <tr class="@clss">
+                                        <td class="w-10 align-middle">@item.Kullanici.AdSoyad</td>
+                                        <td class="align-middle">@item.TalepTuru</td>
+                                        <td class="align-middle">@item.TalepBaslik</td>
+                                        <td class="w-15 align-middle">@item.TalepTarihi.ToShortDateString() @item.TalepTarihi.ToShortTimeString() </td>
+                                        <td class="w-15 align-middle">
+                                            @if (item.CevapTarihi != null)
+                                            {
+                                                cevaptarihi = Convert.ToDateTime(item.CevapTarihi).ToShortDateString().ToString();
+                                                cevaptarihi = cevaptarihi + " ";
+                                                cevaptarihi = cevaptarihi + Convert.ToDateTime(item.CevapTarihi).ToShortTimeString();
+                                            }
+                                            @cevaptarihi
+                                        </td>
+                                        <td class="w-15 align-middle">@durum</td>
+                                        <td class="w-15 align-middle">
+                                            @if (KullaniciYetki.KayitDetayi)
+                                            {
+                                                <button type='button' class='btn btn-sm btn-primary detay' style='color:white' data-talepid='@item.Id'>Görüntüle</button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="text" id="YetkilerDetay" class="form-control" name="Id" maxlength="50" style="display:none" value="@DetayYetki">
+
+@section Script
+{
+    <script>
+        function dateFormat(d) {
+            //console.log(d);
+            //console.log((d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear());
+            return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+        }
+        function timeFormat(t) {
+            var saat = t.getHours();
+            var dakika = t.getMinutes();
+            if (saat < 10) {
+                saat = "0" + saat;
+            }
+            if (dakika < 10) {
+                dakika = "0" + dakika;
+            }
+            var zaman = saat + ":" + dakika
+            return zaman;
+        }
+        $(document).ready(function () {
+            $(":input").inputmask();
+            var DetayYetki = $("#YetkilerDetay").val();
+            var dt;
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+
+            $("#YeniDestekTalebiEkle").click(function () {
+                $("#TalepTuru").val("0");
+                $("#TalepBasligi").val("");
+                $("#TalepMesaj").val("");
+                $("#TalepMesaj").html("");
+            });
+
+            $("#TalebiGonder").click(function () {
+                if (($("#TalepTuru").val() == "0") || ($("#TalepTuru").val() == null)) {
+                    $("#TalepTuru").focus();
+                    $("#TalepTuruHata").append("<div id='talepturuhata' style='color:red'>Talep türünüzü seçiniz.</div>");
+                }
+                else if (($("#TalepBasligi").val() == "")) {
+                    $("#TalepBasligi").focus();
+                    $("#TalepBasligiHata").append("<div class='hata' style='color:red'>Talep başlığını giriniz.</div>");
+                }
+                else if (($("#TalepMesaj").val() == "")) {
+                    $("#TalepMesaj").focus();
+                    $("#TalepMesajHata").append("<div id='hata' style='color:red'>Lütfen mesajınızı yazınız.</div>");
+                }
+                else {
+                    $('#DestekTalebiOlusturModal').modal('hide');
+                    var destekresim = document.getElementById('TalepEkranGorunutusu');
+                    var talepturu = $("#TalepTuru option:selected").text();
+                    var DestekData = new FormData();
+                    DestekData.append("TalepTuru", talepturu);
+                    DestekData.append("TalepBasligi", $("#TalepBasligi").val());
+                    DestekData.append("TalepMesaj", $("#TalepMesaj").val());
+                    // Resim verisini formdata ya eklemek için
+                    for (i = 0; i < destekresim.files.length; i++) {
+                        //Appending each file to FormData object
+                        DestekData.append(destekresim.files[i].name, destekresim.files[i]);
+                    }
+                    // Resim verisini formdata ya eklemek için
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: DestekData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/Destek/DestekKaydet/",
+                        success: function (data) {
+                            $('#DestekTalebiOlusturModal').modal('hide');
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 8);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                                window.location.replace("/Otomasyon/Destek/DestekTalepleri"); // aynı sekme
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                $("#TalepTuru").val("0");
+                                $("#TalepBasligi").val("");
+                                $("#TalepMesaj").val("");
+                                $("#TalepMesaj").html("");
+                                window.location.replace("/Otomasyon/Destek/DestekTalepleri"); // aynı sekme
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+
+            $("#dttalepler").on('click', '.detay', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                var id = $(this).data("talepid");
+                window.location.replace("/Otomasyon/Destek/DestekDetay/" + id);
+            });
+
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+
+            //dt = $('#dttalepler').dataTable(
+            //    {
+            //        responsive: true,
+            //        "destroy": true,
+            //        "order": [[0, "desc"]],
+            //        "searching": false, // arama kaldır
+            //        "lengthChange": false, // sayfa başına göster kaldır
+            //        "ordering": false,
+            //        "createdRow": function (row, data, dataIndex) {
+
+            //        },
+            //        "columns": [
+            //            { "data": "KullaniciAdi", "autowidth": true, "className": "align-middle" },
+            //            { "data": "TalepTuru", "autowidth": true, "className": "align-middle" },
+            //            { "data": "TalepBaslik", "autowidth": true, "className": "align-middle" },
+            //            {
+            //                "data": null,
+            //                "className": "align-middle",
+            //                "render": function (data, type, row) {
+            //                    if (row.TalepTarihi != null) {
+            //                        var t = parseInt(row.TalepTarihi.match(/\d+/)[0]);
+            //                        var tarih = new Date(t);
+            //                        return dateFormat(tarih) + " - " + timeFormat(tarih)
+            //                    }
+            //                    return "";
+            //                }
+            //            },
+            //            {
+            //                "data": null,
+            //                "className": "align-middle",
+            //                "render": function (data, type, row) {
+            //                    if (row.CevapTarihi != null) {
+            //                        var t = parseInt(row.CevapTarihi.match(/\d+/)[0]);
+            //                        var tarih = new Date(t);
+            //                        if (dateFormat(tarih) != '01.01.2000') {
+            //                            return dateFormat(tarih) + " - " + timeFormat(tarih)
+            //                        }
+            //                    }
+            //                    return "";
+            //                }
+            //            },
+            //            {
+            //                "data": null,
+            //                "className": "align-middle",
+            //                "render": function (data, type, row) {
+            //                    if (row.Durum == "1") {
+            //                        return "Cevap Bekleniyor"
+            //                    }
+            //                    else if (row.Durum == "2") {
+            //                        return "Okundu"
+            //                    }
+            //                    else if (row.Durum == "3") {
+            //                        return "Cevaplandı"
+            //                    }
+            //                    else if (row.Durum == "4") {
+            //                        return "Değerlendiriliyor"
+            //                    }
+            //                    else if (row.Durum == "5") {
+            //                        return "Konu Kapandı"
+            //                    }
+            //                    else if (row.Durum == "6") {
+            //                        return "Konu Açık"
+            //                    }
+            //                    else if (row.Durum == "7") {
+            //                        return "İptal"
+            //                    }
+            //                    else {
+            //                        return ""
+            //                    }
+            //                }
+            //            },
+            //            {
+            //                "data": null,
+            //                "className": "align-middle",
+            //                "render": function (data, type, row) {
+            //                    islem = "";
+            //                    if (DetayYetki == "True") {
+            //                        islem = islem + "<a type='button' class='btn btn-sm btn-primary detay' style='color:white' data-talepid='" + row.Id + "'>Görüntüle</a>"
+            //                    }
+            //                    return islem
+            //                }
+            //            }
+            //        ],
+            //        "processing": true,
+            //        "ajax": {
+            //            "url": "/Otomasyon/Destek/DestekTalepleriListesi/",
+            //            "contentType": 'application/json; charset=utf-8',
+            //            'type': 'POST',
+            //            'data': function (data) { return data = JSON.stringify(data); }
+            //        },
+            //        "oLanguage": {
+            //            "sSearchPlaceholder": "Tabloda Ara",
+            //            "sZeroRecords": "Kayıt yok.",
+            //            "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+            //            "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+            //            "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+            //            "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+            //            "processing": "Yükleniyor... Lütfen Bekleyin",
+            //            "oPaginate": {
+            //                "sPrevious": "Önceki",
+            //                "sNext": "Sonraki",
+            //                "sFirst": "İlk",
+            //                "sLast": "Son"
+            //            }
+            //        }
+            //    });
+
+            //dt = $('#dtmesajlar').dataTable(
+            //    {
+            //        responsive: true,
+            //        "ordering": false,
+            //        "oLanguage": {
+            //            "sSearchPlaceholder": "Tabloda Ara",
+            //            "sZeroRecords": "Kayıt yok.",
+            //            "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+            //            "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+            //            "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+            //            "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+            //            "processing": "Yükleniyor... Lütfen Bekleyin",
+            //            "oPaginate": {
+            //                "sPrevious": "Önceki",
+            //                "sNext": "Sonraki",
+            //                "sFirst": "İlk",
+            //                "sLast": "Son"
+            //            }
+            //        }
+            //    });
+        });
+
+    </script>
+}

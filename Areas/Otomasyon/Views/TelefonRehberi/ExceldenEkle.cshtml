@@ -1,0 +1,134 @@
+﻿
+@{
+    ViewBag.Title = "Rehbere Excelden Kayıt Ekle";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+
+@using FotografciTakipWeb.Models
+@model List<TelefonRehberi>
+@{
+    List<RehberGrup> rehbergruplari = ViewBag.gruplar;
+}
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <div class="form-group row col-lg-6" style="margin:5px 5px 0 0">
+                    <h5><label class="col-form-label col-12 col-lg-12 form-label text-lg-right">Rehber Grupları</label></h5>
+                    <div class="col-12 col-lg-6" style="margin-top:5px">
+                        <select class="custom-select form-control" id="GrupId" name="GrupId">
+                            <option selected="" value="0">Grup Seçiniz</option>
+                            @foreach (var gruplar in rehbergruplari)
+                            {
+                                <option value="@gruplar.Id">@gruplar.GrupAdi</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group row col-lg-6" style="margin:5px 5px 0 0">
+                    <div class="input-group">
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" id="exceldenyukle" aria-describedby="DosyaOku" accept=".xls, .xlsx, .csv">
+                            <label class="custom-file-label" for="exceldenyukle">Dosya Şeç</label>
+                        </div>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-default" type="button" id="DosyaOku">Dosyayı Oku</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <table id="dtRehber" class="table table-bordered table-hover table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th>Grup Adı</th>
+                                <th>Firma Adı / Ad Soyad</th>
+                                <th>Sabit Telefon</th>
+                                <th>Cep Telefonu</th>
+                                <th>Email</th>
+                                <th>Notlar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rehbersatir"></tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            var GrupId;
+            $("#GrupId").change(function () {
+                GrupId = $(this).find("option:selected").val();
+            });
+            $("#DosyaOku").click(function () {
+                var fileUpload = $("#exceldenyukle").get(0);
+                var file = fileUpload.files;
+                var FirmaAdi = "";
+                var AdSoyad = "";
+                var RehberData = new FormData();
+                if (file[0] != null && file[0] != "") { // Excel Dosyası Seçilmiş mi?
+                    RehberData.append(file[0].name, file[0]);
+                }
+                RehberData.append("GrupId", GrupId);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: RehberData,
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/TelefonRehberi/ExcelGoruntule/",
+                    success: function (data) {
+                        // json olarak dönene TelefonRehberi Bilgileri tabloya eklenecek ve tablo yenilenecek
+                        $("#rehbersatir").empty();
+                        $.each(data, function (i, item) {
+                            if (item.FirmaAdi != null) { FirmaAdi = item.FirmaAdi }
+                            if (item.AdSoyad != null) { AdSoyad = item.AdSoyad }
+                            $("#rehbersatir").append("<tr>" +
+                                                         "<td>" + item.RehberGrupId + "</td>" +
+                                                         "<td>" + FirmaAdi + " / " + AdSoyad + "</td>" +
+                                                         "<td>" + item.SabitTel1 + "<br />" + item.SabitTel2 + "</td>" +
+                                                         "<td>" + item.CepTel1 + "<br />" + item.CepTel2 + "</td>" +
+                                                         "<td>" + item.Email + "</td>" +
+                                                         "<td>" + item.Notlar + "</td>" +
+                                                     "</tr>");
+                        });
+                        dt.fnDraw();
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+            var dt = $('#dtRehber').dataTable(
+              {
+                  //responsive: true,
+                  "autoWidth": true,
+                  "oLanguage": {
+                      "sProcessing": "Yükleniyor... Lütfen Bekleyin",
+                      "sSearchPlaceholder": "Tabloda Ara",
+                      "sZeroRecords": "Kayıt yok.",
+                      "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                      "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                      "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                      "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                      "oPaginate": {
+                          "sPrevious": "Önceki",
+                          "sNext": "Sonraki",
+                          "sFirst": "İlk",
+                          "sLast": "Son"
+                      },
+                  }
+              });
+        });
+
+    </script>
+}
+

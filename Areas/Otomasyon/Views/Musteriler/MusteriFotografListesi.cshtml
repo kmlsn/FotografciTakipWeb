@@ -1,0 +1,128 @@
+﻿
+@{
+    ViewBag.Title = "Musteri Fotoğraf Listesi";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@section Head
+{
+    <link href="~/Areas/Otomasyon/Content/light-box/jquery.zbox.css" rel="stylesheet" />
+    <style type="text/css">
+        .card-body {
+            display: flex;
+            flex-direction: column;
+            margin-top: auto;
+        }
+    </style>
+}
+@using FotografciTakipWeb.Models
+@{
+    List<Musteri> MusteriListesi = ViewBag.Musteriler;
+    List<MusteriFotograf> MusteriFotolari = ViewBag.MusteriFotolari;
+}
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="row col col-12 mt-3" id="date_filter">
+                <div class="form-group col-sm-4">
+                    <select class="custom-select form-control custom-select-sm" id="Musteri" name="Musteri" title="Müşteri Seçiniz">
+                        <option selected="" value="0" disabled>Müşteri Seçiniz</option>
+                        @foreach (var musteri in MusteriListesi)
+                        {
+                            if (musteri.AdiSoyadi != "-- Müşterisiz İşlem --")
+                            {
+                                if (ViewBag.MusteriId == musteri.Id)
+                                {
+                                    <option selected="" value="@musteri.Id">@musteri.AdiSoyadi</option>
+                                }
+                                else
+                                {
+                                    <option value="@musteri.Id">@musteri.AdiSoyadi</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="border-bottom mt-3"></div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!--  DropZone Resim Yükleme işlemleri   -->
+                    <input type="hidden" id="MusteriId" value="@ViewBag.MusteriId" />
+                    @if (ViewBag.MusteriId == null)
+                    {
+                        <div id="musteriSecUayari">
+                            <div class="alert alert-danger" role="alert">
+                                Lütfen Müşteri Seçiniz.
+                            </div>
+                        </div>
+                        <div id="ResimlerGoster" style="display:none">
+                            <div class="row">
+                               
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="ResimlerGoster">
+                            <div class="row">
+                                @foreach (var foto in MusteriFotolari)
+                                {
+                                    <div class="col-sm-3 mt-3">
+                                        <div class="card" style="height:100%">
+                                            <a href="@foto.FotografYol" data-toggle="lightbox" data-gallery="example-gallery" class="foto-geleri" target="_blank">
+                                                <img class="card-img-top" src="@foto.FotografYol">
+                                            </a>
+                                            @*<img class="card-img-top" src="~/Areas/Otomasyon/Dosyalar/MusteriFoto/8/328.jpg" />*@
+                                            <div class="card-body justify-content-end">
+                                                <h5 class="card-title">@foto.FotografAdi</h5>
+                                                <p class="card-text">@foto.FotografAciklama</p>
+                                                <a href="#" class="btn btn-primary">Fotoğrafı Seç</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Script
+{
+    <script src="~/Areas/Otomasyon/Content/light-box/jquery.zbox.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var MusteriId = $("#MusteriId").val();
+            $(function () {
+                $('#Musteri').select2();
+            });
+            $("#Musteri").change(function () {
+                MusteriId = $(this).val();
+                if (MusteriId == 0) {
+                    $("#ResimlerGoster").attr("style", "display:none");
+                    $("#musteriSecUayari").removeAttr("style");
+                }
+                else if (MusteriId != 0) {
+                    $("#musteriSecUayari").attr("style", "display:none");
+                    $("#ResimlerGoster").removeAttr("style");
+                }
+                window.location.replace("/Otomasyon/Musteriler/MusteriFotografListesi/" + MusteriId); // aynı sekme
+            });
+            //$(document).on('click', '.deneme', function (event) {
+            //    event.preventDefault();
+
+            //    // Only trigger first image  click to avoid multiple triggers
+            //    $('.deneme:first').ekkoLightbox();
+            //});
+            $(".foto-geleri").zbox();
+
+        });
+    </script>
+
+}
+

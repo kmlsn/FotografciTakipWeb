@@ -1,0 +1,64 @@
+﻿
+@{
+    ViewBag.Title = "Tanımlar - Sözleşme Şartları";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model List<SozlesmeSartlari>
+@{ 
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+}
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <form id="SozlesmeSartları" action="/Otomasyon/Tanimlar/SozlesmeSartiGuncelle" method="post">
+                        @foreach (var item in Model)
+                        {
+                            <input type="text" id="SSId" class="form-control" name="Id" maxlength="50" style="display:none" value="@item.Id">
+                            <textarea name="SozlesmeSartlari1" id="sozlesmemetni">
+                                @item.SozlesmeSartlari1
+                            </textarea>
+                        }
+                        <div class="form-group col-sm-12"></div>
+                        <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                            @if (KullaniciYetki.KayitDuzenle)
+                            {
+                                @*<button type="submit" class="btn btn-default ml-auto waves-effect waves-themed"><span class="fal fa-check mr-1"></span>Kaydet</button>*@
+                                <button type="submit" class="btn btn-primary ml-auto" data-dismiss="modal" id="RezervasyonTuruKaydet">Kaydet</button>
+                            }
+                        </div>
+                    </form>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Script
+{
+
+<script src="~/Areas/Otomasyon/Content/ckeditor/ckeditor.js"></script>
+    <script>
+
+        $(document).ready(function () {
+            var editor = CKEDITOR.replace('SozlesmeSartlari1', {
+                height: '400px',
+                resize:'none'
+            });
+            editor.config.removePlugins = 'resize';
+        });
+    </script>
+}
+
+
+
+
+
+
+
+

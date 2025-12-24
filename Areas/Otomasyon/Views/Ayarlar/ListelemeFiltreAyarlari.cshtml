@@ -1,0 +1,1077 @@
+﻿
+@{
+    ViewBag.Title = "Listeleme Filtre Ayarları";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+
+@model AyarlarFiltre
+@section Head
+{
+    <style>
+        .modal {
+            overflow: auto !important; /*Açılan ikinci modal ekranda kaymadığı için eklendi*/
+        }
+    </style>
+}
+
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            @*<div class="panel-hdr">
+                    <h2>
+                        Advanced <span class="fw-300"><i>Example</i></span>
+                    </h2>
+                </div>*@
+            <div class="panel-container show">
+                <div class="panel-content">
+
+                    <div class="alert alert-primary" role="alert">
+                        <strong>Bilgi!</strong> Bu ayarlar listeleme sayfalarındaki tarih aralığının ne kadar olacağını ve listelerdeki durumu PASİF olan satıraların gösterim tercihini seçmeniz içindir.
+                    </div>
+                    @if (Model == null)
+                    {
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Günlük İşler</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="gunlukisler">
+                                    <option value="0" selected>1 Gün</option>
+                                    <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                    <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                    <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                    <option value="4">Ayın Başından Bu güne</option>
+                                    <option value="5">Yılın Başından Bu güne</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Rezervasyon Listesi</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="rezervasyonlistesi">
+                                    <option value="0" selected>1 Gün</option>
+                                    <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                    <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                    <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                    <option value="4">Ayın Başından Bu güne</option>
+                                    <option value="5">Yılın Başından Bu güne</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Rezervasyon Teklifleri</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="rezervasyonteklifleri">
+                                    <option value="0" selected>1 Gün</option>
+                                    <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                    <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                    <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                    <option value="4">Ayın Başından Bu güne</option>
+                                    <option value="5">Yılın Başından Bu güne</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Randevular</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="randevular">
+                                    <option value="0" selected>1 Gün</option>
+                                    <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                    <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                    <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                    <option value="4">Ayın Başından Bu güne</option>
+                                    <option value="5">Yılın Başından Bu güne</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Gelirler - Giderler</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="gelirlergiderler">
+                                    <option value="0" selected>1 Gün</option>
+                                    <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                    <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                    <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                    <option value="4">Ayın Başından Bu güne</option>
+                                    <option value="5">Yılın Başından Bu güne</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Alınan/Gelecek Ödemeler</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="alinangelecekodemeler">
+                                    <option value="0" selected>1 Gün</option>
+                                    <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                    <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                    <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                    <option value="4">Ayın Başından Bu güne</option>
+                                    <option value="5">Yılın Başından Bu güne</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Cari Hesap Takibi</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="carihesaptakibi">
+                                    <option value="0" selected>1 Gün</option>
+                                    <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                    <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                    <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                    <option value="4">Ayın Başından Bu güne</option>
+                                    <option value="5">Yılın Başından Bu güne</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Müşteri Hesap Takibi</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="musterihesaptakibi">
+                                    <option value="0" selected>1 Gün</option>
+                                    <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                    <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                    <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                    <option value="4">Ayın Başından Bu güne</option>
+                                    <option value="5">Yılın Başından Bu güne</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Personel İzinleri</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="personelizinleri">
+                                    <option value="0" selected>1 Gün</option>
+                                    <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                    <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                    <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                    <option value="4">Ayın Başından Bu güne</option>
+                                    <option value="5">Yılın Başından Bu güne</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Personel Ödemeleri</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="personelodemeleri">
+                                    <option value="0" selected>1 Gün</option>
+                                    <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                    <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                    <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                    <option value="4">Ayın Başından Bu güne</option>
+                                    <option value="5">Yılın Başından Bu güne</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Personel İş Takibi</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="personelistakibi">
+                                    <option value="0" selected>1 Gün</option>
+                                    <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                    <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                    <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                    <option value="4">Ayın Başından Bu güne</option>
+                                    <option value="5">Yılın Başından Bu güne</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Kasa</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="kasa">
+                                    <option value="0" selected>1 Gün</option>
+                                    <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                    <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                    <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                    <option value="4">Ayın Başından Bu güne</option>
+                                    <option value="5">Yılın Başından Bu güne</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Cari Listesi PASİF Olanları Gizle</label>
+                            <div class="form-group col-sm-3">
+                                <div class="custom-control custom-checkbox mt-2">
+                                    <input type="checkbox" class="custom-control-input" id="CariListesiPasifGizle" checked>
+                                    <label class="custom-control-label" for="CariListesiPasifGizle"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Müşteri Listesi PASİF Olanları Gizle</label>
+                            <div class="form-group col-sm-3">
+                                <div class="custom-control custom-checkbox mt-2">
+                                    <input type="checkbox" class="custom-control-input" id="MusteriListesiPasifGizle" checked>
+                                    <label class="custom-control-label" for="MusteriListesiPasifGizle"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Kullanıcı Listesi PASİF Olanları Gizle</label>
+                            <div class="form-group col-sm-3">
+                                <div class="custom-control custom-checkbox mt-2">
+                                    <input type="checkbox" class="custom-control-input" id="KullaniciListesiPasifGizle" checked>
+                                    <label class="custom-control-label" for="KullaniciListesiPasifGizle"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Personel Listesi PASİF Olanları Gizle</label>
+                            <div class="form-group col-sm-3">
+                                <div class="custom-control custom-checkbox mt-2">
+                                    <input type="checkbox" class="custom-control-input" id="PersonelListesiPasifGizle" checked>
+                                    <label class="custom-control-label" for="PersonelListesiPasifGizle"></label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Günlük İşler</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="gunlukisler">
+                                    @switch (Model.GunlukIsler)
+                                    {
+                                        case "0":
+                                            <option value="0" selected>1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "1":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1" selected>1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "2":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2" selected>1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "3":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3" selected>1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "4":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4" selected>Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "5":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5" selected>Yılın Başından Bu güne</option>
+                                            break;
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Rezervasyon Listesi</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="rezervasyonlistesi">
+                                    @switch (Model.RezervasyonListesi)
+                                    {
+                                        case "0":
+                                            <option value="0" selected>1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "1":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1" selected>1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "2":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2" selected>1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "3":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3" selected>1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "4":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4" selected>Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "5":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5" selected>Yılın Başından Bu güne</option>
+                                            break;
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Rezervasyon Teklifleri</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="rezervasyonteklifleri">
+                                    @switch (Model.RezervasyonTeklifleri)
+                                    {
+                                        case "0":
+                                            <option value="0" selected>1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "1":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1" selected>1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "2":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2" selected>1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "3":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3" selected>1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "4":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4" selected>Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "5":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5" selected>Yılın Başından Bu güne</option>
+                                            break;
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Randevular</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="randevular">
+                                    @switch (Model.Randevular)
+                                    {
+                                        case "0":
+                                            <option value="0" selected>1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "1":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1" selected>1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "2":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2" selected>1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "3":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3" selected>1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "4":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4" selected>Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "5":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5" selected>Yılın Başından Bu güne</option>
+                                            break;
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Gelirler - Giderler</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="gelirlergiderler">
+                                    @switch (Model.GelirlerGiderler)
+                                    {
+                                        case "0":
+                                            <option value="0" selected>1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "1":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1" selected>1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "2":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2" selected>1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "3":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3" selected>1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "4":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4" selected>Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "5":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5" selected>Yılın Başından Bu güne</option>
+                                            break;
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Alınan/Gelecek Ödemeler</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="alinangelecekodemeler">
+                                    @switch (Model.AlinanGelecekOdemeler)
+                                    {
+                                        case "0":
+                                            <option value="0" selected>1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "1":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1" selected>1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "2":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2" selected>1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "3":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3" selected>1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "4":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4" selected>Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "5":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5" selected>Yılın Başından Bu güne</option>
+                                            break;
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Cari Hesap Takibi</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="carihesaptakibi">
+                                    @switch (Model.CariHesapTakibi)
+                                    {
+                                        case "0":
+                                            <option value="0" selected>1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "1":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1" selected>1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "2":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2" selected>1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "3":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3" selected>1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "4":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4" selected>Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "5":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5" selected>Yılın Başından Bu güne</option>
+                                            break;
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Müşteri Hesap Takibi</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="musterihesaptakibi">
+                                    @switch (Model.MusteriHesapTakibi)
+                                    {
+                                        case "0":
+                                            <option value="0" selected>1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "1":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1" selected>1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "2":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2" selected>1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "3":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3" selected>1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "4":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4" selected>Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "5":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5" selected>Yılın Başından Bu güne</option>
+                                            break;
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Personel İzinleri</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="personelizinleri">
+                                    @switch (Model.PersonelIzinTakibi)
+                                    {
+                                        case "0":
+                                            <option value="0" selected>1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "1":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1" selected>1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "2":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2" selected>1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "3":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3" selected>1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "4":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4" selected>Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "5":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5" selected>Yılın Başından Bu güne</option>
+                                            break;
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Personel Ödemeleri</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="personelodemeleri">
+                                    @switch (Model.PersonelOdemeleri)
+                                    {
+                                        case "0":
+                                            <option value="0" selected>1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "1":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1" selected>1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "2":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2" selected>1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "3":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3" selected>1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "4":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4" selected>Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "5":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5" selected>Yılın Başından Bu güne</option>
+                                            break;
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Personel İş Takibi</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="personelistakibi">
+                                    @switch (Model.PersonelIsTakibi)
+                                    {
+                                        case "0":
+                                            <option value="0" selected>1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "1":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1" selected>1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "2":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2" selected>1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "3":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3" selected>1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "4":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4" selected>Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "5":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5" selected>Yılın Başından Bu güne</option>
+                                            break;
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Kasa</label>
+                            <div class="col-12 col-lg-3">
+                                <select class="form-control custom-select-sm" id="kasa">
+                                    @switch (Model.Kasa)
+                                    {
+                                        case "0":
+                                            <option value="0" selected>1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "1":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1" selected>1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "2":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2" selected>1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "3":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3" selected>1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "4":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4" selected>Ayın Başından Bu güne</option>
+                                            <option value="5">Yılın Başından Bu güne</option>
+                                            break;
+                                        case "5":
+                                            <option value="0">1 Gün</option>
+                                            <option value="1">1 Hafta Öncesi - 1 Hafta Sonrası</option>
+                                            <option value="2">1 Ay Öncesi - 1 Ay Sonrası</option>
+                                            <option value="3">1 Yıl Öncesi - 1 Yıl Sonrası</option>
+                                            <option value="4">Ayın Başından Bu güne</option>
+                                            <option value="5" selected>Yılın Başından Bu güne</option>
+                                            break;
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Cari Listesi PASİF Olanları Gizle</label>
+                            <div class="form-group col-sm-3">
+                                <div class="custom-control custom-checkbox mt-2">
+                                    @if (Model.CariListesiPasifGizle == true)
+                                    {<input type="checkbox" class="custom-control-input" id="CariListesiPasifGizle" checked> }
+                                    else
+                                    {<input type="checkbox" class="custom-control-input" id="CariListesiPasifGizle">}
+                                    <label class="custom-control-label" for="CariListesiPasifGizle"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Müşteri Listesi PASİF Olanları Gizle</label>
+                            <div class="form-group col-sm-3">
+                                <div class="custom-control custom-checkbox mt-2">
+                                    @if (Model.MusteriListesiPasifGizle == true)
+                                    {<input type="checkbox" class="custom-control-input" id="MusteriListesiPasifGizle" checked> }
+                                    else
+                                    {<input type="checkbox" class="custom-control-input" id="MusteriListesiPasifGizle">}
+                                    <label class="custom-control-label" for="MusteriListesiPasifGizle"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Kullanıcı Listesi PASİF Olanları Gizle</label>
+                            <div class="form-group col-sm-3">
+                                <div class="custom-control custom-checkbox mt-2">
+                                    @if (Model.KullaniciListesiPasifGizle == true)
+                                    {<input type="checkbox" class="custom-control-input" id="KullaniciListesiPasifGizle" checked> }
+                                    else
+                                    {<input type="checkbox" class="custom-control-input" id="KullaniciListesiPasifGizle">}
+                                    <label class="custom-control-label" for="KullaniciListesiPasifGizle"></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group row mb-1">
+                            <label class="col-form-label col-12 col-lg-3 form-label text-lg-right">Personel Listesi PASİF Olanları Gizle</label>
+                            <div class="form-group col-sm-3">
+                                <div class="custom-control custom-checkbox mt-2">
+                                    @if (Model.PersonelListesiPasifGizle == true)
+                                    {<input type="checkbox" class="custom-control-input" id="PersonelListesiPasifGizle" checked> }
+                                    else
+                                    {<input type="checkbox" class="custom-control-input" id="PersonelListesiPasifGizle">}
+                                    <label class="custom-control-label" for="PersonelListesiPasifGizle"></label>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    @if (ViewBag.KullaniciYetki)
+                    {
+                        <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                            <button type="submit" class="btn btn-primary ml-auto waves-effect waves-themed" id="Kaydet"><i class="fal fa-save mr-2"></i> Kaydet</button>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Script
+{
+    <script>
+        $(document).ready(function () {
+            var caripasif = "on";
+            var musteripasif = "on";
+            var kullanicipasif = "on";
+            var personelpasif = "on"
+            $("#CariListesiPasifGizle").on('click', function () {
+                if ($(this).is(':checked')) {
+                    caripasif = "on";
+                }
+                else {
+                    caripasif = "off";
+                }
+            });
+            $("#MusteriListesiPasifGizle").on('click', function () {
+                if ($(this).is(':checked')) {
+                    musteripasif = "on";
+                }
+                else {
+                    musteripasif = "off";
+                }
+            });
+            $("#KullaniciListesiPasifGizle").on('click', function () {
+                if ($(this).is(':checked')) {
+                    kullanicipasif = "on";
+                }
+                else {
+                    kullanicipasif = "off";
+                }
+            });
+            $("#PersonelListesiPasifGizle").on('click', function () {
+                if ($(this).is(':checked')) {
+                    personelpasif = "on";
+                }
+                else {
+                    personelpasif = "off";
+                }
+            });
+            $("#Kaydet").click(function () {
+                var FiltreAyarData = new FormData();
+                FiltreAyarData.append("GunlukIsler", $("#gunlukisler").val());
+                FiltreAyarData.append("RezervasyonListesi", $("#rezervasyonlistesi").val());
+                FiltreAyarData.append("RezervasyonTeklifleri", $("#rezervasyonteklifleri").val());
+                FiltreAyarData.append("Randevular", $("#randevular").val());
+                FiltreAyarData.append("GelirlerGiderler", $("#gelirlergiderler").val());
+                FiltreAyarData.append("AlinanGelecekOdemeler", $("#alinangelecekodemeler").val());
+                FiltreAyarData.append("CariHesapTakibi", $("#carihesaptakibi").val());
+                FiltreAyarData.append("PersonelIzinleri", $("#personelizinleri").val());
+                FiltreAyarData.append("PersonelIsTakibi", $("#personelistakibi").val());
+                FiltreAyarData.append("PersonelOdemeleri", $("#personelodemeleri").val());
+                FiltreAyarData.append("Kasa", $("#kasa").val());
+                FiltreAyarData.append("MusteriHesapTakibi", $("#musterihesaptakibi").val());
+                FiltreAyarData.append("CariListesiPasifGizle", caripasif);
+                FiltreAyarData.append("MusteriListesiPasifGizle", musteripasif);
+                FiltreAyarData.append("KullaniciListesiPasifGizle", kullanicipasif);
+                FiltreAyarData.append("PersonelListesiPasifGizle", personelpasif);
+                console.log(caripasif, musteripasif, kullanicipasif, personelpasif);
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: FiltreAyarData,
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Ayarlar/ListelemeFiltreAyarlariKaydet/",
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                            alertify.set('notifier', 'delay', 5);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.error(data.Mesaj);
+                        }
+                        else if (data.Sonuc == true) {
+                            alertify.set('notifier', 'delay', 3);
+                            alertify.set('notifier', 'position', 'top-center');
+                            alertify.success(data.Mesaj);
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+
+

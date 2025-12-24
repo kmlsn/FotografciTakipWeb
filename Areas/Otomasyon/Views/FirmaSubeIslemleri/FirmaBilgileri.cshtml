@@ -1,0 +1,367 @@
+﻿
+@{
+    ViewBag.Title = "FirmaBilgileri";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model List<Il>
+@{
+    Firma frm = ViewBag.frm;
+    Sube sb = ViewBag.sb;
+    List<Ilce> ilceler = ViewBag.ilceler;
+    long FirmaId = Convert.ToInt64(Session["FirmaId"]);
+    bool AcilisBit = ViewBag.AcilisBit;
+    bool DuyuruBit = ViewBag.DuyuruBit;
+}
+@section Head
+{
+    <link href="~/Areas/Otomasyon/Content/css/ResimYukle.css" rel="stylesheet" />
+}
+<input type="text" id="FirmaId" class="form-control" name="Id" maxlength="50" style="display:none" value="@FirmaId">
+@if (AcilisBit)
+{
+    <script src="~/Areas/Otomasyon/Content/js/notifications/sweetalert2/sweetalert2.bundle.js"></script>
+        <script type="text/javascript">
+            var swalWithBootstrapButtons = Swal.mixin(
+            {
+                customClass:
+                {
+                    confirmButton: "btn btn-danger",
+                    cancelButton: "btn btn-secondary mr-2"
+                },
+                buttonsStyling: false
+            });
+            swalWithBootstrapButtons
+                .fire(
+                {
+                    title: "Fotoğrafçı Takip Uygulamasına hoş geldiniz.",
+                    html: "<p><h4>Uygulamamızı tercih ettiğiniz için teşekkür ederiz.</h4></p>" +
+                          "<p><h4>Uygulamamızı verimli kullanabilmek için öncelikle Firma ve Şube Bilgilerinizi güncelleyiniz.</h4></p>" +
+                          "<p><h4>Tanımlamarı yapmanız ve ardından ayarlar bölümüne gözatmanızı öneririz.</h4></p>",
+                    type: "success",
+                    showCancelButton: true,
+                    confirmButtonText: "Tekrar Gösterme!",
+                    cancelButtonText: "Tamam",
+                    reverseButtons: true
+                })
+                .then(function (result) {
+                    if (result.value) {
+                        $.ajax({
+                            type: "POST",
+                            datatype: 'json',
+                            contentType: false,
+                            processData: false,
+                            url: "/Otomasyon/FirmaSubeIslemleri/AcilisBitDegistir/" + $("#FirmaId").val(), // data: controller dan dönen varolan kaydın ID si
+                            success: function (data) {
+                                if (data == "degisti") {
+                                    swal.close();
+                                }
+                            },
+                            error: function (err) {
+                                alert("HATA");
+                            }
+                        });
+                    }
+                });
+        </script>
+}
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h3> Firma Bilgileri</h3>
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    @*<form action="/Otomasyon/FirmaSubeIslemleri/FirmaGuncelle" method="post" enctype="multipart/form-data">*@
+                    <div class="row">
+                        <div class="form-group col-sm-4" id="FirmaAdiHata">
+                            <label class="form-label" for="FirmaAdi">Firma Adı</label>
+                            <input type="text" id="Id" class="form-control" name="Id" maxlength="50" style="display:none" value="@frm.Id">
+                            <input type="text" id="FirmaAdi" class="form-control form-control-sm" name="FirmaAdi" maxlength="50" value="@frm.FirmaAdi" disabled>
+                        </div>
+                        <div class="form-group col-sm-4" id="YetkiliHata">
+                            <label class="form-label" for="Yetkili">Yetkili</label>
+                            <input type="text" id="Yetkili" class="form-control form-control-sm" name="Yetkili" maxlength="50" value="@frm.Yetkili">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-4">
+                            <label class="form-label" for="TCKimlikNo">T.C. Kimlik Numarası</label>
+                            <input type="text" id="TCKimlikNo" class="form-control form-control-sm" name="TCKimlikNo" maxlength="11" data-inputmask="'mask': '99999999999'" value="@frm.TCKimlikNo">
+                        </div>
+                        <div class="form-group col-sm-4">
+                            <label class="form-label" for="VergiDairesi">Vergi Dairesi</label>
+                            <input type="text" id="VergiDairesi" class="form-control form-control-sm" name="VergiDairesi" maxlength="20" value="@frm.VergiDairesi">
+                        </div>
+                        <div class="form-group col-sm-4">
+                            <label class="form-label" for="VergiNo">Vergi No</label>
+                            <input type="text" id="VergiNo" class="form-control form-control-sm" name="VergiNo" maxlength="10" data-inputmask="'mask': '9999999999'" value="@frm.VergiNo">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-4" id="CepTelHata">
+                            <label class="form-label">Cep Telefonu</label>
+                            <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="CepTel" id="CepTel" value="@frm.CepTel">
+                        </div>
+                        <div class="form-group col-sm-4">
+                            <label class="form-label">Sabit Telefon</label>
+                            <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="SabitTel" id="SabitTel" value="@frm.SabitTel">
+                        </div>
+                        <div class="form-group col-sm-4">
+                            <label class="form-label">Fax</label>
+                            <input type="text" data-inputmask="'mask': '(0999) 999-9999'" class="form-control form-control-sm" im-insert="true" name="Fax" id="Fax" value="@frm.Fax">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-4" id="EmailHata">
+                            <label class="form-label">Email Adresi</label>
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text"><i class="fal fa-mouse-pointer width-1 text-align-center"></i></span>
+                                </div>
+                                <input type="text" data-inputmask="'alias': 'email'" class="form-control form-control-sm" im-insert="true" name="Email" id="Email" maxlength="50" value="@frm.Email" disabled>
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-4" id="IlIdHata">
+                            <label class="form-label">İl</label>
+                            <select class="custom-select custom-select-sm form-control" id="illerFirma" name="IlId">
+                                <option selected="">İl Seçiniz</option>
+                                @foreach (var iller in Model)
+                                {
+                                    if (iller.Id == frm.IlId)
+                                    {
+                                        <option selected="" value="@iller.Id">@iller.Il1</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@iller.Id">@iller.Il1</option>
+                                    }
+
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group col-sm-4" id="IlceIdHata">
+                            <label class="form-label">İlçe</label>
+                            <select class="custom-select form-control custom-select-sm" id="ilcelerFirma" name="IlceId">
+                                <option selected="">İlçe Seçiniz</option>
+                                @foreach (Ilce item in ilceler)
+                                {
+                                    if (item.Id == frm.IlceId)
+                                    {
+                                        <option selected="" value="@item.Id">@item.Ilce1</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@item.Id">@item.Ilce1</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-8">
+                            <label class="form-label" for="Adres">Adres</label>
+                            <textarea class="form-control form-control-sm" id="Adres" rows="2" name="Adres" maxlength="250" style="overflow:auto;resize:none">@frm.Adres</textarea>
+                        </div>
+                        <div class="form-group col-sm-4">
+                            <label class="form-label" for="WebSitesi">Web Sitesi</label>
+                            <input type="text" id="WebSitesi" class="form-control form-control-sm" name="WebSitesi" maxlength="250" value="@frm.WebSitesi">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-4">
+                            <label class="form-label" for="Facebook">Facebook</label>
+                            <input type="text" id="Facebook" class="form-control form-control-sm" name="Facebook" maxlength="250" value="@frm.Facebook">
+                        </div>
+                        <div class="form-group col-sm-4">
+                            <label class="form-label" for="Twitter">X (Twetter)</label>
+                            <input type="text" id="Twitter" class="form-control form-control-sm" name="Twitter" maxlength="250" value="@frm.Twitter">
+                        </div>
+                        <div class="form-group col-sm-4">
+                            <label class="form-label" for="Instagram">Instegram</label>
+                            <input type="text" id="Instagram" class="form-control form-control-sm" name="Instagram" maxlength="250" value="@frm.Instagram">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-sm-8">
+                            <label class="form-label" for="FirmaHakkinda">Firma Hakkında</label>
+                            <textarea class="form-control form-control-sm" id="FirmaHakkinda" rows="4" name="FirmaHakkinda" style="overflow:auto;resize:none">@frm.FirmaHakkinda</textarea>
+                        </div>
+                        <div class="form-group col-sm-4">
+                            <label class="form-label">Firma Logosu (400x200 boyutlarında olması önerilir)</label>
+                            <div id="image-preview">
+                                @* Resim tablosu Firma Tablosuna bağlandığında background-image olarak resim yolu verilecek *@
+                                <label for="image-upload" id="image-label">Resim Seç</label>
+                                <input type="file" name="Logo" id="image-upload" accept=".jpg, .jpeg, .png, .bmp, .tiff, .tif,|images/*" />
+                            </div>
+                        </div>
+                        <div class="form-group col-sm-12"></div>
+                    </div>
+                    @if (ViewBag.KullaniciYetki)
+                    {
+                        <div class="panel-content border-faded border-left-0 border-right-0 border-bottom-0 d-flex flex-row">
+                            <button type="button" class="btn btn-primary ml-auto waves-effect waves-themed" id="Kaydet">Kaydet</button>
+                        </div>
+                    }
+
+                 @*   </form>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Script
+{
+    <script src="~/Areas/Otomasyon/Content/js/jquery.uploadPreview.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(":input").inputmask();
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#Email').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(".emailhata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#EmailDuzenle').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(".emailhata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#illerFirma').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.ilhata").remove();
+                }
+            }); // Validation hata kaldırma
+            $('#ilcelerFirma').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.ilcehata").remove();
+                }
+            }); // Validation hata kaldırma
+            $("#illerFirma").change(function () { //Firma Düzenleme Tab'ındaki Seçilen İl'in İlçeleri listeleniyor.
+                ilId = $(this).find("option:selected").val();
+                var id = ilId;
+                $("#ilcelerFirma").empty();
+                $("#ilcelerFirma").append("<option value='0'> İlçe Seçiniz </option>");
+                if (id > 0) {
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        url: "/Otomasyon/FirmaSubeIslemleri/IlceGetir/" + id,
+                        success: function (durum) {
+                            $.each(durum, function () {
+                                $("#ilcelerFirma").append("<option value=" + this.Id + "> " + this.IlceAd + " </option>");
+                            });
+                        }
+                    });
+                }
+            });
+            $("#Kaydet").click(function () {
+                if (($("#FirmaAdi").val() == "")) {
+                    $("#FirmaAdi").focus();
+                    $("#FirmaAdiHata").append("<div class='hata' style='color:red'>Firma Adını giriniz.</div>");
+                }
+                else if (($("#Yetkili").val() == "")) {
+                    $("#Yetkili").focus();
+                    $("#YetkiliHata").append("<div class='hata' style='color:red'>Firma Yetkilisini giriniz.</div>");
+                }
+                else if (($("#Email").val() == "")) {
+                    $("#Email").focus();
+                    $("#EmailHata").append("<div class='emailhata' style='color:red'>Email adresini giriniz.</div>");
+                }
+                else if (($("#CepTel").val() == "")) {
+                    $("#CepTel").focus();
+                    $("#CepTelHata").append("<div class='cephata' style='color:red'>Cep Telefonunu giriniz.</div>");
+                }
+                else if (($("#IlId").val() == "0")) {
+                    $("#IlId").focus();
+                    $("#IlIdHata").append("<div class='ilhata' style='color:red'>İl seçiniz.</div>");
+                }
+                else if (($("#IlceId").val() == "0")) {
+                    $("#IlceId").focus();
+                    $("#IlceIdHata").append("<div class='ilcehata' style='color:red'>İlçe seçiniz.</div>");
+                }
+                else {
+                    var logo = document.getElementById('image-upload');
+                    var id = $("#Id").val();
+                    var FirmaData = new FormData();
+                    FirmaData.append("FirmaAdi", $("#FirmaAdi").val());
+                    FirmaData.append("Yetkili", $("#Yetkili").val());
+                    FirmaData.append("TCKimlikNo", $("#TCKimlikNo").val());
+                    FirmaData.append("VergiDairesi", $("#VergiDairesi").val());
+                    FirmaData.append("VergiNo", $("#VergiNo").val());
+                    FirmaData.append("CepTel", $("#CepTel").val());
+                    FirmaData.append("SabitTel", $("#SabitTel").val());
+                    FirmaData.append("Fax", $("#Fax").val());
+                    FirmaData.append("Email", $("#Email").val());
+                    FirmaData.append("IlId", $("#illerFirma").val());
+                    FirmaData.append("IlceId", $("#ilcelerFirma").val());
+                    FirmaData.append("Adres", $("#Adres").val());
+                    FirmaData.append("FirmaHakkinda", $("#FirmaHakkinda").val());
+                    FirmaData.append("WebSitesi", $("#WebSitesi").val());
+                    FirmaData.append("Facebook", $("#Facebook").val());
+                    FirmaData.append("Twitter", $("#Twitter").val());
+                    FirmaData.append("Instagram", $("#Instagram").val());
+                    // Resim verisini formdata ya eklemek için
+                    for (i = 0; i < logo.files.length; i++) {
+                        //Appending each file to FormData object
+                        FirmaData.append(logo.files[i].name, logo.files[i]);
+                    }
+                    // Resim verisini formdata ya eklemek için
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: FirmaData,
+                        contentType: false,
+                        processData: false,
+                        beforeSend: function () {
+                            Swal.fire(
+                            {
+                                title: "Firma Güncelleniyor...!",
+                                html: "<strong>Lütfen Bekleyin.</strong>",
+                                onBeforeOpen: function onBeforeOpen() {
+                                    Swal.showLoading();
+                                }
+                            });
+                        },
+                        url: "/Otomasyon/FirmaSubeIslemleri/FirmaGuncelle/"+ id,
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                swal.close();
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+
+            $.uploadPreview({ // Resim Yükleme ile ilgili kodlar
+                input_field: "#image-upload",   // Default: .image-upload
+                preview_box: "#image-preview",  // Default: .image-preview
+                label_field: "#image-label",    // Default: .image-label
+                label_default: "Logo Seç",   // Default: Choose File
+                label_selected: "Logo Değiştir",  // Default: Change File
+                no_label: false                 // Default: false
+            }); // Resim Yükleme ile ilgili kodlar
+
+        });
+
+    </script>
+}
+
+

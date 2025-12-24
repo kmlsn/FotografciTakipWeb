@@ -1,0 +1,33 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool kullaniciyetki = ky.FirstOrDefault(x => x.SayfaId == 12 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 12 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool kullanicilistesiyetki = ky.FirstOrDefault(x => x.SayfaId == 105 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 105 && x.Sil == false && x.Aktif == true).SayfaYetki;
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Kullanıcı-Yetki İşlemleri" ? "active open" : "";
+    string altmenukullanicilistesi = ViewBag.AltMenu == "Kullanıcı Listesi" ? "active" : "";
+}
+@if (kullaniciyetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Kullanıcı/Yetki İşlemleri" data-filter-tags="kullanıcı yetki işlemleri">
+            <i class="fal fa-users"></i>
+            <span class="nav-link-text" data-i18n="nav.kullanici_yetki_islemleri">Kullanıcı/Yetki İşlemleri</span>
+        </a>
+        <ul>
+            @if (lisans.KullaniciYetkiIslemleri_KullaniciListesi)
+            {
+                if (kullanicilistesiyetki)
+                {
+                    <li class=@altmenukullanicilistesi>
+                        <a href="~/Admin/KullaniciIslemleri/KullaniciListesi" title="Kullanıcı Listesi" data-filter-tags="kullanıcı yetki işlemleri kullanıcı listesi">
+                            <span class="nav-link-text" data-i18n="nav.kullanici_yetki_islemleri_kullanici_listesi">Kullanıcı Listesi</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}

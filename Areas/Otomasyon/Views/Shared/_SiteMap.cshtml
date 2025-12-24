@@ -1,0 +1,24 @@
+﻿<div class="demo-v-spacing" style="margin-bottom:15px">
+    <ol class="breadcrumb bg-fusion-300 breadcrumb-seperator-3">
+        <li class="breadcrumb-item">
+            <a href="/Otomasyon/Dashboard/Index" class="text-white">
+                <i class="fal fa-home mr-1"></i>
+            </a>
+        </li>
+        @if ((ViewBag.UstMenu != "" || ViewBag.UstMenu != null) && (ViewBag.AltMenu == "" || ViewBag.AltMenu == null))
+        {
+            <li class="breadcrumb-item active text-white">@ViewBag.UstMenu</li>
+        }
+        else if ((ViewBag.UstMenu != "" || ViewBag.UstMenu != null) && (ViewBag.AltMenu != "" || ViewBag.AltMenu != null) && (ViewBag.AltMenu2 == "" || ViewBag.AltMenu2 == null))
+        {
+            <li class="breadcrumb-item active text-white">@ViewBag.UstMenu</li>
+            <li class="breadcrumb-item active text-white">@ViewBag.AltMenu</li>
+        }
+        else if ((ViewBag.UstMenu != "" || ViewBag.UstMenu != null) && (ViewBag.AltMenu != "" || ViewBag.AltMenu != null) && (ViewBag.AltMenu2 != "" || ViewBag.AltMenu2 != null))
+        {
+            <li class="breadcrumb-item active text-white">@ViewBag.UstMenu</li>
+            <li class="breadcrumb-item active text-white">@ViewBag.AltMenu</li>
+            <li class="breadcrumb-item active text-white">@ViewBag.AltMenu2</li>
+        }
+    </ol>
+</div>

@@ -1,0 +1,337 @@
+﻿
+@{
+    ViewBag.Title = "Müşteri Mesajları";
+    Layout = "~/Areas/Otomasyon/Views/Shared/_Layout.cshtml";
+}
+@using FotografciTakipWeb.Models
+@model List<MusteriMesaj>
+@{
+    List<Sube> SubeListesi = ViewBag.SubeListesi;
+    List<SubeToKullanici> SubeKullanici = ViewBag.SubeKullanici;
+    string clss = "";
+    string durum = "";
+    string cevaptarihi = "";
+    KullaniciYetki KullaniciYetki = ViewBag.KullaniciYetki;
+}
+
+@section Head
+{
+    <style>
+        .modal {
+            overflow: auto !important; /*Açılan ikinci modal ekranda kaymadığı için eklendi*/
+        }
+    </style>
+}
+
+
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h2> Müşteri Mesajları</h2>
+            </div>
+            <div class="border-bottom"></div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="dtmesajlar" class="table table-bordered table-hover table-striped table-sm w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th class="w-10">Müşteri Kodu</th>
+                                <th>Konu</th>
+                                <th class="w-15">Mesaj Tarihi</th>
+                                <th class="w-15">Cevap Tarihi</th>
+                                <th class="w-15">Durum</th>
+                                <th class="w-15">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderByDescending(x => x.OkunduBit).OrderBy(x => x.Durum))
+                            {
+                                clss = "";
+                                if (!item.OkunduBit)
+                                {
+                                    clss = "fw-700";
+                                }
+                                if (item.MesajId == null)
+                                {
+                                    if (item.Durum == "5")
+                                    { clss = clss + " bg-success-100"; }
+                                    else if (item.Durum == "7")
+                                    { clss = clss + " bg-danger-100"; }
+                                    else if (item.Durum == "1")
+                                    { clss = clss + " bg-warning-100"; }
+                                    switch (item.Durum)
+                                    {
+                                        case "1":
+                                            durum = "Cevap Bekleniyor";
+                                            break;
+                                        case "2":
+                                            durum = "Okundu";
+                                            break;
+                                        case "3":
+                                            durum = "Cevaplandı";
+                                            break;
+                                        case "4":
+                                            durum = "Değerlendiriliyor";
+                                            break;
+                                        case "5":
+                                            durum = "Konu Kapandı";
+                                            break;
+                                        case "6":
+                                            durum = "Konu Açık";
+                                            break;
+                                        case "7":
+                                            durum = "İptal";
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                    <tr>
+                                        <td class="w-10 align-middle @clss">@item.Musteri.MusteriKodu</td>
+                                        <td class="align-middle @clss">@item.Konu</td>
+                                        <td class="w-15 align-middle @clss">@item.MesajTarihi.ToShortDateString() @item.MesajTarihi.ToShortTimeString() </td>
+                                        <td class="w-15 align-middle @clss">
+                                            @if (item.CevapTarihi != null)
+                                            {
+                                                cevaptarihi = Convert.ToDateTime(item.CevapTarihi).ToShortDateString();
+                                                cevaptarihi = cevaptarihi + " ";
+                                                cevaptarihi = cevaptarihi + Convert.ToDateTime(item.CevapTarihi).ToShortTimeString();
+                                            }
+                                            @cevaptarihi
+                                        </td>
+                                        <td class="w-15 align-middle @clss">@durum</td>
+                                        <td class="w-15 align-middle @clss">
+                                            @if (KullaniciYetki.KayitDetayi)
+                                            {
+                                                <button type='button' class='btn btn-sm btn-primary mesajoku' style='color:white' data-mesajid='@item.Id'>Görüntüle</button>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script
+{
+    <script>
+        function dateFormat(d) {
+            //console.log(d);
+            //console.log((d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear());
+            return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+        }
+        function timeFormat(t) {
+            var saat = t.getHours();
+            var dakika = t.getMinutes();
+            var zaman = saat + ":" + dakika
+            return zaman;
+        }
+        $(document).ready(function () {
+            $(":input").inputmask();
+            var adres;
+            var notlar;
+            var dt;
+            $('input').on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $(this).next("div.hata").remove();
+                }
+            }); // Validation hata kaldırma
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+            $("#YeniEkle").click(function () {
+                $("#Konu").val("");
+                $("#Mesaj").val("");
+            });
+            $("#Kaydet").click(function () {
+                if ($("#Konu").val() == "") // Kişi seçilmişse zorunlu alan kontrolü
+                {
+                    $("#Konu").focus();
+                    $("#KonuHata").append("<div class='hata' style='color:red'>Konumuz neydi?</div>");
+                }
+                else if ($("#CepTel").val() == "") // Kişi seçilmişse zorunlu alan kontrolü
+                {
+                    $("#Mesaj").focus();
+                    $("#MesajHata").append("<div class='hata' style='color:red'>Lütfen bize talebinizi yazınız!</div>");
+                }
+                else {
+                    $('#YeniKayitEkleModal').modal('hide');
+                    var Konu = $("#Konu").val();
+                    var MesajData = new FormData();
+                    MesajData.append("Konu", $("#Konu").val());
+                    MesajData.append("Mesaj", $("#Mesaj").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: MesajData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Musteri/Dashboard/MesajKaydet/",
+                        success: function (data) {
+                            if (data.Sonuc == false) {
+                                alertify.set('notifier', 'delay', 5);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.error(data.Mesaj);
+                            }
+                            else if (data.Sonuc == true) {
+                                alertify.set('notifier', 'delay', 3);
+                                alertify.set('notifier', 'position', 'top-center');
+                                alertify.success(data.Mesaj);
+                                dt.api().ajax.reload();
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }
+            });
+
+
+            $("#dtmesajlar").on('click', '.mesajoku', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                var id = $(this).data("mesajid");
+                window.location.replace("/Otomasyon/Musteriler/MesajDetay/" + id);
+            });
+
+            // TABLOLAMADAN ÖNCE OLMALI, Çünkü; Önce tüm tablo yükleniyor, sayfalama daha sonra yapılıyor.
+
+            //dt = $('#dtmesajlar').dataTable(
+            // {
+            //     responsive: true,
+            //     //"destroy": true,
+            //     //"order": [[0, "desc"]],
+            //     //"searching": false, // arama kaldır
+            //     //"lengthChange": false, // sayfa başına göster kaldır
+            //     //"ordering": false,
+            //     //"createdRow": function (row, data, dataIndex) {
+            //     //    if (data["OkunduBit"] == false) {
+            //     //        $('td', row).addClass('fw-700');
+            //     //    }
+            //     //    if (data["Durum"] == "5") {
+            //     //        $('td', row).addClass('bg-success-100');
+            //     //    }
+            //     //},
+            //     //"columns": [
+            //     //     { "data": "OkunduBit", "autowidth": true, "className": "align-middle", "visible": false },
+            //     //     { "data": "MusteriKodu", "autowidth": true, "className": "align-middle" },
+            //     //     { "data": "Konu", "autowidth": true, "className": "align-middle" },
+            //     //     {
+            //     //         "data": null,
+            //     //         "className": "align-middle",
+            //     //         "render": function (data, type, row) {
+            //     //             if (row.MesajTarihi != null) {
+            //     //                 var t = parseInt(row.MesajTarihi.match(/\d+/)[0]);
+            //     //                 var tarih = new Date(t);
+            //     //                 return dateFormat(tarih) + " - " + timeFormat(tarih)
+            //     //             }
+            //     //             return "";
+            //     //         }
+            //     //     },
+            //     //     {
+            //     //         "data": null,
+            //     //         "className": "align-middle",
+            //     //         "render": function (data, type, row) {
+            //     //             if (row.CevapTarihi != null) {
+            //     //                 var t = parseInt(row.CevapTarihi.match(/\d+/)[0]);
+            //     //                 var tarih = new Date(t);
+            //     //                 return dateFormat(tarih) + " - " + timeFormat(tarih)
+            //     //             }
+            //     //             return "";
+            //     //         }
+            //     //     },
+            //     //     {
+            //     //         "data": null,
+            //     //         "className": "align-middle",
+            //     //         "render": function (data, type, row) {
+            //     //             if (row.Durum=="1") {
+            //     //                 return "Cevap Bekleniyor"
+            //     //             }
+            //     //             else if (row.Durum == "2") {
+            //     //                 return "Okundu"
+            //     //             }
+            //     //             else if (row.Durum == "3") {
+            //     //                 return "Cevaplandı"
+            //     //             }
+            //     //             else if (row.Durum == "4") {
+            //     //                 return "Değerlendiriliyor"
+            //     //             }
+            //     //             else if (row.Durum == "5") {
+            //     //                 return "Konu Kapandı"
+            //     //             }
+            //     //             else if (row.Durum == "6") {
+            //     //                 return "Konu Açık"
+            //     //             }
+            //     //             else if (row.Durum == "7") {
+            //     //                 return "İptal"
+            //     //             }
+            //     //             else
+            //     //             {
+            //     //                 return ""
+            //     //             }
+            //     //         }
+            //     //     },
+            //     //     {
+            //     //         "data": null,
+            //     //         "className": "align-middle",
+            //     //         "render": function (data, type, row) {
+            //     //             islem = "";
+            //     //             if ($("#Yetkiler").data("duzenle") == "True") {
+            //     //                 islem = islem + "<a type='button' class='btn btn-sm btn-primary mesajoku' style='color:white' data-mesajid='" + row.Id + "'>Görüntüle</a>"
+            //     //             }
+            //     //             return islem
+            //     //         }
+            //     //     }
+            //     //],
+            //     //"processing": true,
+            //     //"ajax": {
+            //     //    "url": "/Otomasyon/Musteriler/MesajListesi/",
+            //     //    "contentType": 'application/json; charset=utf-8',
+            //     //    'type': 'POST',
+            //     //    'data': function (data) { return data = JSON.stringify(data); }
+            //     //},
+            //     "oLanguage": {
+            //         "sSearchPlaceholder": "Tabloda Ara",
+            //         "sZeroRecords": "Kayıt yok.",
+            //         "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+            //         "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+            //         "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+            //         "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+            //         "processing": "Yükleniyor... Lütfen Bekleyin",
+            //         "oPaginate": {
+            //             "sPrevious": "Önceki",
+            //             "sNext": "Sonraki",
+            //             "sFirst": "İlk",
+            //             "sLast": "Son"
+            //         }
+            //     }
+            // });
+
+            dt = $('#dtmesajlar').dataTable(
+             {
+                 responsive: true,
+                 "ordering": false,
+                 "oLanguage": {
+                     "sSearchPlaceholder": "Tabloda Ara",
+                     "sZeroRecords": "Kayıt yok.",
+                     "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                     "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                     "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                     "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                     "processing": "Yükleniyor... Lütfen Bekleyin",
+                     "oPaginate": {
+                         "sPrevious": "Önceki",
+                         "sNext": "Sonraki",
+                         "sFirst": "İlk",
+                         "sLast": "Son"
+                     }
+                 }
+             });
+        });
+
+    </script>
+}

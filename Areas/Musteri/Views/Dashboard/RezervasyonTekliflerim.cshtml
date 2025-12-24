@@ -1,0 +1,413 @@
+﻿@{
+    ViewBag.Title = "Rezervasyon Tekliflerim";
+    Layout = "~/Areas/Musteri/Views/Shared/_Layout.cshtml";
+    ViewBag.AdSoyad = Session["AdSoyad"];
+    ViewBag.Email = Session["Email"];
+    ViewBag.Firma = Session["Firma"];
+    ViewBag.FirmaLogo = Session["FirmaLogo"];
+}
+@using FotografciTakipWeb.Models
+@model List<Sozlesme>
+@section Head
+{
+    <style type="text/css">
+        a {
+            color: black;
+        }
+    </style>
+
+}
+
+
+<div class="modal fade" id="SozlesmeDetayModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header"><h4 class="modal-title" id="DetayBaslik">Sözleşme Detay Bilgileri</h4><button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button></div><div class="modal-body">
+                <div class="modal-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <td class="w-25"><b>Firma :</b></td>
+                            <td id="FirmaAdi"></td>
+                            <td class="w-25"><b>Firma Yetkilisi :</b></td>
+                            <td id="YetkiliPersonel"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25"><b>Sözleşme No :</b></td>
+                            <td id="SozlesmeDetaySozlesmeNo"></td>
+                            <td class="w-25"><b>Rezervasyon Türü :</b></td>
+                            <td id="RezervasyonTuru"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25"><b>Sözleşme Tarihi :</b></td>
+                            <td id="SozlesmeDetaySozlesmeTarihi"></td>
+                            <td class="w-25"><b>Saat :</b></td>
+                            <td id="OrganizasyonSaati"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25"><b>Opsiyon Tarihi :</b></td>
+                            <td id="SozlesmeDetayOpsiyonTarihi"></td>
+                            <td class="w-25"></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25"><b>Müşteri :</b></td>
+                            <td id="Musteri"></td>
+                            <td class="w-25"><b>Müşteri Telefon :</b></td>
+                            <td id="MusteriTelefon"></td>
+                        </tr>
+                        <tr id="OrganizasyonKimin"></tr>
+                        <tr>
+                            <td class="w-25"><b>Paketler :</b></td>
+                            <td id="SozlesmeDetayPaketler"></td>
+                            <td class="w-25"><b>Ek Hizmetler :</b></td>
+                            <td id="SozlesmeDetayEkHizmetler"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25"><b>Sözleşme Tutarı :</b></td>
+                            <td id="SozlesmeTutari"></td>
+                            <td class="w-25"><b>Durum :</b></td>
+                            <td id="Durum"></td>
+                        </tr>
+                        <tr>
+                            <td class="w-25"><b>Organizasyon Yeri :</b></td>
+                            <td id="SozlesmeDetayOrganizasyonYeri"></td>
+                            <td class="w-25"><b>Notlar :</b></td>
+                            <td id="Notlar">&nbsp;</td>
+                        </tr>
+                        <tr>
+                            <td class="w-25" colspan="4"><b>Randevular :</b></td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <table class="table table-sm table-bordered w-100">
+                                    <thead>
+                                        <tr>
+                                            <th>Tarih</th>
+                                            <th>Zaman</th>
+                                            <th>Açıklama</th>
+                                            <th>Personel</th>
+                                            <th>Randevu Türü</th> @* Çekim / Organizasyon*@
+                                        </tr>
+                                    </thead>
+                                    <tbody id="SozlesmeDetayRandevular"></tbody>
+                                </table>
+
+                            </td>
+                            @*<td class="w-25"><b>Notlar :</b></td>
+                                <td id="Notlar"></td>*@
+                        </tr>
+                        @*<tr>
+                                <td><b>İşlem :</b></td>
+                                <td>
+                                    <div class="d-flex mt-2">
+                                        <a href="#" class="btn btn-sm btn-outline-danger mr-2" id="Sil2" title="Kaydı Sil" data-dismiss="modal"><i class="fal fa-times"></i> Sil</a>
+                                        <a href="#" class="btn btn-sm btn-outline-primary mr-2" id="Duzenle2" title="Kaydı Düzenle"><i class="fal fa-edit"></i> Düzenle</a>
+                                    </div>
+                                </td>
+                            </tr>*@
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-xl-12">
+        <div id="panel-1" class="panel shadow-5">
+            <div class="panel-hdr">
+                <h2> Rezervasyon Tekliflerim</h2>
+                <input type="hidden" data-yetki="@ViewBag.MusteriYetkileri.SozlesmeYazdir" id="sozlesmeyazdiryetki" />
+            </div>
+            <div class="panel-container show">
+                <div class="panel-content">
+                    <!-- datatable start -->
+                    <table id="tb-SozlesmeListesi" class="table table-sm table-bordered table-hover table-striped w-100">
+                        <thead class="bg-primary-500">
+                            <tr>
+                                <th class="w-5 text-center align-middle" style="display:none">Sözleşme No Sıralama</th>
+                                <th class="w-5 text-center align-middle">Sözleşme No</th>
+                                <th class="w-5 text-center align-middle">Sözleşme Tarihi</th> @*//1*@
+                                <th class="w-15 text-center align-middle">Rezervasyon Türü</th>
+                                <th class="w-10 text-center align-middle">Rezervasyon Tarihi/Saati</th>
+                                <th class="w-10 text-center align-middle">Opsiyon Tarihi</th>
+                                <th class="w-15 text-center align-middle">Rezervasyon</th>
+                                <th class="w-10 text-center align-middle">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teklif-satir"></tbody>
+                    </table>
+                    <!-- datatable end -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Script
+{
+    @*Yeni Rezervasyon ekle için ...*@
+    <script>
+        var dt,islem;
+        function dateFormat(d) {
+            //console.log(d);
+            //console.log((d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear());
+            return (d.getDate() + "").padStart(2, "0") + "." + ((d.getMonth() + 1) + "").padStart(2, "0") + "." + d.getFullYear();
+        }
+        function timeFormat(t) {
+            var saat = t.getHours();
+            var dakika = t.getMinutes();
+            var zaman = saat + ":" + dakika
+            return zaman;
+        }
+        function ParaFormat(fiyat) {
+            var para_sembol = "TL"
+            var format = new Intl.NumberFormat('de-DE', {
+                style: 'currency',
+                currency: 'TRY',
+                minumumFractionDigits: 2
+            })
+            //return format.format(fiyat)
+            return format.format(fiyat).replace('TRY', para_sembol)
+        }
+        $(document).ready(function () {
+
+
+            $("#tb-SozlesmeListesi").on('click', '.sozlesmedetay', function () {// Satıra ait "Düzenle" butonuna basıldığında düzenleme yapılacak modal penceresi açılarak gerekli bilgiler dolduruluyor.
+                //document.getElementById("SozlesmeId").innerHTML = $(this).data("sozlesmeid");
+                var randevular = "";
+                $("#SozlesmeDetayRandevular").empty();
+                document.getElementById("SozlesmeDetaySozlesmeNo").innerHTML = $(this).data("sozlesmeno");
+                document.getElementById("FirmaAdi").innerHTML = $(this).data("firmaadi");
+                document.getElementById("RezervasyonTuru").innerHTML = $(this).data("rezervasyontur");
+                document.getElementById("YetkiliPersonel").innerHTML = $(this).data("yetkilipersonel");
+                document.getElementById("SozlesmeDetaySozlesmeTarihi").innerHTML = $(this).data("sozlesmetarih");
+                var baslangic = $(this).data("baslangicsaat");
+                var bitis = $(this).data("bitissaat");
+                document.getElementById("OrganizasyonSaati").innerHTML = baslangic + " - " + bitis;
+                if ($(this).data("opsiyontarihi") == "01.01.0001") {
+                    document.getElementById("SozlesmeDetayOpsiyonTarihi").innerHTML = "";
+                }
+                else {
+                    document.getElementById("SozlesmeDetayOpsiyonTarihi").innerHTML = $(this).data("opsiyontarihi");
+                }
+                //document.getElementById("GorevliPersonel").innerHTML = $(this).data("gorevlipersonel");
+                document.getElementById("Musteri").innerHTML = $(this).data("musteriadisoyadi");
+                var musteritel = $(this).data("musteritelefon").replace(/(\d\d\d\d)(\d\d\d)(\d\d\d\d)/, "($1) $2 - $3");
+                document.getElementById("MusteriTelefon").innerHTML = musteritel;
+                if ($(this).data("yetkiliadsoyad") != null && ($(this).data("modeller") == null || $(this).data("urunler") == null)) {
+                    $("#OrganizasyonKimin").empty();
+                    $("#OrganizasyonKimin").append("<td class='w-25'><b>Organizasyon - Yetkili :</b></td>" +
+                                                   "<td id='OrganizasyonYetkili'>" + $(this).data("yetkiliadsoyad") + "</td>" +
+                                                   "<td class='w-25'><b>Organizasyon - Yetkili Tel/Email :</b> </td>" +
+                                                   "<td id='OrganizasyonYetkiliTel'>" + $(this).data("yetkilitel") + " / " + $(this).data("yetkiliemail") + "</td>");
+                }
+                if ($(this).data("cocukadsoyad") != null) {
+                    $("#OrganizasyonKimin").empty();
+                    var annebaba = "";
+                    if ($(this).data("annead") != "" || $(this).data("babaad") != "") {
+                        annebaba = $(this).data("annead") + " / " + $(this).data("babaad");
+                    }
+                    $("#OrganizasyonKimin").append("<td class='w-25'><b>Organizasyon - Cocuk Ad/Soyad :</b></td>" +
+                                                   "<td id='OrganizasyonCocuk'>" + $(this).data("cocukadsoyad") + "</td>" +
+                                                   "<td class='w-25'><b>Organizasyon - Anne/Baba :</b> </td>" +
+                                                   "<td id='OrganizasyonAnneBaba'>" + annebaba + "</td>");
+                }
+                if ($(this).data("modeller") != null) {
+                    $("#OrganizasyonKimin").empty();
+                    $("#OrganizasyonKimin").append("<td class='w-25'><b>Organizasyon - Modeller :</b></td>" +
+                                                   "<td id='OrganizasyonModeller'>" + $(this).data("modeller") + "</td>" +
+                                                   "<td class='w-25'><b>Organizasyon - Yetkili :</b> </td>" +
+                                                   "<td id='OrganizasyonModellerYetkili'>" + $(this).data("yetkiliadsoyad") + " / " + $(this).data("yetkilitel") + "</td>");
+                }
+                if ($(this).data("urunler") != null) {
+                    $("#OrganizasyonKimin").empty();
+                    $("#OrganizasyonKimin").append("<td class='w-25'><b>Organizasyon - Ürünler :</b></td>" +
+                                                   "<td id='OrganizasyonUrunler'>" + $(this).data("urunler") + "</td>" +
+                                                   "<td class='w-25'><b>Organizasyon - Yetkili :</b> </td>" +
+                                                   "<td id='OrganizasyonUrunlerYetkili'>" + $(this).data("yetkiliadsoyad") + " / " + $(this).data("yetkilitel") + "</td>");
+                }
+                if ($(this).data("gelinad") != null || $(this).data("damatad") != null) {
+                    $("#OrganizasyonKimin").empty();
+                    $("#OrganizasyonKimin").append("<td class='w-25'><b>Gelin/Damat :</b></td>" +
+                                                   "<td id='OrganizasyonGelinDamat'>" + $(this).data("gelinad") + " / " + $(this).data("damatad") + "</td>" +
+                                                   "<td class='w-25'><b>Gelin/Damat Telefon :</b> </td>" +
+                                                   "<td id='OrganizasyonGelinDamatTel'>" + $(this).data("gelintel") + " / " + $(this).data("damattel") + "</td>");
+                }
+                document.getElementById("SozlesmeDetayPaketler").innerHTML = $(this).data("paketler");
+                document.getElementById("SozlesmeDetayEkHizmetler").innerHTML = $(this).data("ekhizmetler");
+                document.getElementById("SozlesmeTutari").innerHTML = accounting.formatMoney($(this).data("sozlesmetutar"), "TL", 2, ".", ",", "%v %s");
+                if ($(this).data("bitti") == true) {
+                    document.getElementById("Durum").innerHTML = $(this).data("durum") + " - Bitti";
+                }
+                else if ($(this).data("iptal") == true) {
+                    document.getElementById("Durum").innerHTML = $(this).data("durum") + " - İptal";
+                }
+                else if ($(this).data("bitti") == false && $(this).data("iptal") == false) {
+                    document.getElementById("Durum").innerHTML = $(this).data("durum");
+                }
+                document.getElementById("SozlesmeDetayOrganizasyonYeri").innerHTML = $(this).data("organizasyonyeri");
+                document.getElementById("Notlar").innerHTML = $(this).data("notlar");
+
+                var id = $(this).data("sozlesmeid")
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    contentType: false,
+                    processData: false,
+                    url: "/Musteri/Dashboard/SozlesmeRandevulari/" + id,
+                    success: function (data) {
+                        if (data.Sonuc == false) {
+                        }
+                        else if (data.Sonuc == true) {
+                            $.each(data.data, function (index, item_1) {
+                                var t = item_1.Tarih;
+                                var tarih = dateFormat(new Date(parseInt(t.match(/\d+/)[0])));
+
+                                var bs = item_1.Baslangic;
+                                var bt = item_1.Bitis;
+                                var bs1 = timeFormat(new Date(parseInt(bs.match(/\d+/)[0])));
+                                var bt1 = timeFormat(new Date(parseInt(bt.match(/\d+/)[0])));
+                                var pers = "";
+                                var cekimrandevu = "";
+                                $.each(item_1.Personel, function (index, personel) {
+                                    pers = pers + personel.pers + " - " + personel.gorev + "<br /> "
+                                });
+                                if (item_1.CekimRandevu == true) {
+                                    cekimrandevu = "<span class='badge badge-success'> ÇEKİM </span>"
+                                }
+                                else {
+                                    cekimrandevu = "<span class='badge badge-primary'> ORGANİZASYON </span>"
+                                }
+                                if (item_1.Iptal == true) {
+                                    randevular = randevular + "<tr class='bg-danger-50'>" +
+			                                        "<td>" + item_1.Tarih + "</td>" +
+			                                        "<td>" + item_1.Baslangic + " - " + item_1.Bitis + "</td>" +
+			                                        "<td>" + item_1.Aciklama + "</td>" +
+                                                    "<td>" + pers + "</td>" +
+			                                        "<td>" + cekimrandevu + "</td>" +
+		                                        "</tr>";
+                                }
+                                else {
+                                    randevular = randevular + "<tr>" +
+                                                    "<td>" + item_1.Tarih + "</td>" +
+                                                    "<td>" + item_1.Baslangic + " - " + item_1.Bitis + "</td>" +
+                                                    "<td>" + item_1.Aciklama + "</td>" +
+                                                    "<td>" + pers + "</td>" +
+                                                    "<td>" + cekimrandevu + "</td>" +
+                                                "</tr>";
+                                }
+                            });
+                            $("#SozlesmeDetayRandevular").append(randevular);
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+
+
+            });
+            $("#tb-SozlesmeListesi").on('click', '.sozlesmeyazdir', function () {
+                var id = $(this).data("sozlesmeno");
+                window.open("/Musteri/Dashboard/SozlesmeYazdir/" + id, '_blank');
+            });
+            dt = $('#tb-SozlesmeListesi').dataTable(
+                   {
+                       responsive: true,
+                       "destroy": true,
+                       "searching": false, // arama kaldır
+                       "lengthChange": false, // sayfa başına göster kaldır
+                       //"order": [[0, "desc"]],
+                       "ordering":false,
+                       //"order": [[7, "desc"], [8, "asc"]],
+                       "createdRow": function (row, data, dataIndex) {
+                           if (data["Iptal"] == true) {
+                               //$(row).addClass('bg-warning-100 text-white');
+                               $('td', row).addClass('bg-danger-600');
+                               $('a', row).addClass('text-white');
+                           }
+                       },
+                       "columns": [
+                                   { "data": "SozlesmeNo", "autowidth": true, "className": "align-middle", "visible": false },
+                                   { "data": "SozlesmeNo", "autowidth": true, "className": "align-middle" },
+                                   { "data": "SozlesmeTarihi", "autowidth": true, "className": "align-middle", },
+                                   { "data": "RezervasyonTur", "autowidth": true, "className": "align-middle", },
+                                   {
+                                       "data": null,
+                                       "autowidth": true,
+                                       "className": "align-middle",
+                                       "render": function (data, type, row) {
+                                           return row.RezervasyonTarihi + "</br>" + row.BaslangicSaat + " - " + row.BitisSaat
+                                       }
+                                   },
+                                   { "data": "OpsiyonTarihi", "autowidth": true, "className": "align-middle" },
+                                   {
+                                       "data": null,
+                                       "autowidth": true,
+                                       "className": "align-middle",
+                                       "render": function (data, type, row) {
+                                           islem = "";
+                                           if (row.OpsiyonBit==true) {
+                                               islem= "Opsiyonlu Rezervasyon"
+                                           }
+                                           else if (row.TeklifBit == true)
+                                           {
+                                               islem = "Rezervasyon Teklifi"
+                                           }
+                                           return islem
+                                       }
+                                   },
+                                   {
+                                       "data": null,
+                                       "autowidth": true,
+                                       "className": "align-middle text-center",
+                                       "render": function (data, type, row) {
+                                           ekhizmet = row.EkHizmetler.replace(/<span class='fw-700'>/g, "<span>");
+                                           paket = row.Paketler.replace(/<span class='fw-700'>/g, "<span>");
+                                           islem = "";
+                                           islem = islem + "<a type='button' class='btn btn-sm btn-primary mr-2 sozlesmedetay' style='color:white' title='Sözleşme Detayları' data-sozlesmeid='" + row.Id + "' data-firmaadi='" + row.FirmaAdi + "' data-sozlesmeno='" + row.SozlesmeNo + "'" +
+                                                               "data-sozlesmetarih='" + row.SozlesmeTarihi + "' data-opsiyontarihi='" + row.OpsiyonTarihi + "' data-rezervasyontur='" + row.RezervasyonTur + "' data-musteriadisoyadi='" + row.MusteriAdiSoyadi + "' data-musteritelefon='" + row.MusteriCepTel + "'" +
+                                                               "data-yetkilipersonel='" + row.YetkiliPersonel + "' data-gorevlipersonel='" + row.GorevliPersonel + "' data-baslangicsaat='" + row.BaslangicSaat + "' data-bitissaat='" + row.BitisSaat + "' data-yetkiliadsoyad='" + row.YetkiliAdSoyad + "'" +
+                                                               "data-yetkilitel='" + row.YetkiliTel + "' data-yetkiliemail='" + row.YetkiliEmail + "' data-annead='" + row.AnneAd + "' data-annetel='" + row.AnneTel + "' data=anneemail='" + row.AnneEmail + "' data-babaad='" + row.BabaAd + "'" +
+                                                               "data-babatel='" + row.BabaTel + "' data-babaemail='" + row.BabaEmail + "' data-cocukadsoyad='" + row.CocukAdSoyad + "' data-modeller='" + row.Modeller + "' data-urunler='" + row.Urunler + "' data-gelinad='" + row.GelinAd + "'" +
+                                                               "data-gelintel='" + row.GelinTel + "' data-gelinemail='" + row.GelinEmail + "' data-damatad='" + row.DamatAd + "' data-damattel='" + row.DamatTel + "' data-damatemail='" + row.DamatEmail + "' data-teklifbit='" + row.TeklifBit + "' data-paketler='" + paket + "'" +
+                                                               "data-ekhizmetler='" + ekhizmet + "' data-paketlerfiyat='" + row.PaketlerFiyat + "' data-ekhizmetlerfiyat='" + row.EkHizmetlerFiyat + "' data-sozlesmetutar='" + row.SozlesmeTutar + "' data-organizasyonyeri='" + row.OrganizasyonYeri + "' data-notlar='" + row.Notlar + "'" +
+                                                               "data-durum='" + row.Durum + "' data-bitti='" + row.Bitti + "' data-iptal='" + row.Iptal + "' data-toggle='modal' data-target='#SozlesmeDetayModal'>Detay</a>"
+                                           if ($("#sozlesmeyazdiryetki").data("yetki") == "True") {
+                                               if (row.Iptal == false) {
+                                                   islem = islem + "<a type='button' class='btn btn-sm btn-secondary sozlesmeyazdir' style='color:white' data-sozlesmeid='" + row.Id + "' data-sozlesmeno='" + row.SozlesmeNo + "' data-rezervasyontur='" + row.RezervasyonTur + "'>Yazdır</a>"
+                                               }
+                                           }
+                                           return islem
+                                       }
+                                   }
+                       ],
+                       "processing": true,
+                       "ajax": {
+                           "url": "/Musteri/Dashboard/RezervasyonTeklifleriListesi/",
+                           "contentType": 'application/json; charset=utf-8',
+                           'type': 'POST',
+                           'data': function (data) { return data = JSON.stringify(data); }
+                       },
+
+                       "oLanguage": {
+                           'sProcessing': 'Yükleniyor... Lütfen Bekleyin',
+                           "sSearchPlaceholder": "Tabloda Ara",
+                           "sZeroRecords": "Kayıt yok.",
+                           "sLengthMenu": "Sayfa başına _MENU_ kayıt göster",
+                           "sInfo": "_TOTAL_ kaydın _START_ ile _END_ arası gösteriliyor ",
+                           "sInfoEmpty": "0 kaydın 0 ile 0 arası gösteriliyor",
+                           "sInfoFiltered": "(_MAX_ toplam kayıttan filtrelendi)",
+                           "oPaginate": {
+                               "sPrevious": "Önceki",
+                               "sNext": "Sonraki",
+                               "sFirst": "İlk",
+                               "sLast": "Son"
+                           }
+                       }
+                   });
+
+        });
+    </script>
+}
+
+

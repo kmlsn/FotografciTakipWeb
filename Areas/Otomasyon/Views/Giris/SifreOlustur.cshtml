@@ -1,0 +1,172 @@
+﻿
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<!--
+Template Name:  SmartAdmin Responsive WebApp - Template build with Twitter Bootstrap 4
+Version: 4.0.0
+Author: Sunnyat Ahmmed
+Website: http://gootbootstrap.com
+Purchase: https://wrapbootstrap.com/theme/smartadmin-responsive-webapp-WB0573SK0
+License: You must have a valid license purchased only from wrapbootstrap.com (link above) in order to legally use this theme for your project.
+-->
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <title>
+        Giriş Yap
+    </title>
+    <meta name="description" content="Login">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+    <!-- Call App Mode on ios devices -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Remove Tap Highlight on Windows Phone IE -->
+    <meta name="msapplication-tap-highlight" content="no">
+    <!-- base css -->
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Otomasyon/Content/css/vendors.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Otomasyon/Content/css/app.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Otomasyon/Content/css/notifications/sweetalert2/sweetalert2.bundle.css">
+    <!-- Place favicon.ico in the root directory -->
+    @*<link rel="apple-touch-icon" sizes="180x180" href="~/Areas/Otomasyon/Content/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/Areas/Otomasyon/Content/img/favicon/favicon-32x32.png">*@
+    <link rel="apple-touch-icon" sizes="180x180" href="~/Areas/Otomasyon/Content/img/Tetra_Logo_apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/Areas/Otomasyon/Content/img/Tetra_Logo_Favico.ico">
+    <link rel="mask-icon" href="~/Areas/Otomasyon/Content/img/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <!-- Optional: page related CSS-->
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Otomasyon/Content/css/page-login.css">
+    <script src="~/Areas/Otomasyon/Content/js/notifications/sweetalert2/sweetalert2.bundle.js"></script>
+</head>
+<body>
+    <div class="blankpage-form-field">
+        <div class="page-logo-giris m-0 w-100 align-items-center justify-content-center rounded border-bottom-left-radius-0 border-bottom-right-radius-0 px-4">
+            <a href="javascript:void(0)" class="page-logo-link press-scale-down d-flex align-items-center">
+                <img src="~/Areas/Otomasyon/Content/img/TetraBilisim_FotografciTakipUygulamasi.png" alt="TeTRa Bilişim" aria-roledescription="logo">
+                @*<img src="~/Content/img/Logo_Tek_28x28.png" alt="TeTRa Bilişim" aria-roledescription="logo">
+                @*<span class="page-logo-text mr-1">SmartAdmin WebApp</span>
+                <span class="page-logo-text mr-1">TeTRa Yazılım <br /> Fotoğrafçı Takip Uygulaması</span>*@
+            </a>
+        </div>
+        <div class="card p-4 border-top-left-radius-0 border-top-right-radius-0">
+            @*<form id="frm-giris">*@
+            <form id="frm-giris">
+                <input type="password" id="KullaniciId" class="form-control" placeholder="KullaniciId" style="display:none" value="@ViewBag.KullaniciId">
+                <div class="form-group" id="sifre1hata">
+                    <label class="form-label" for="Sifre">Şifre</label>
+                    <input type="password" id="Sifre" class="form-control" placeholder="Şifre" required name="Sifre">
+                </div>
+                <div class="form-group" id="sifre2hata">
+                    <label class="form-label" for="SifreTekrar">Şifre Tekrar</label>
+                    <input type="password" id="SifreTekrar" class="form-control" placeholder="Şifre Tekrar" required name="SifreTekrar">
+                </div>
+                <button type="button" id="Kaydet" class="btn btn-outline-default float-right">Kaydet</button>
+            </form>
+        </div>
+        <div class="blankpage-footer text-center">
+            <a href="~/Otomasyon/Giris/GirisYap"><strong>Giriş Yap</strong></a> | <a href="https://fotografcitakip.com/"><strong>Kayıt Ol</strong></a>
+        </div>
+    </div>
+    <script src="~/Areas/Otomasyon/Content/js/vendors.bundle.js"></script>
+    <script src="~/Areas/Otomasyon/Content/js/app.bundle.js"></script>
+    <script src="~/Areas/Otomasyon/Content/js/notifications/sweetalert2/sweetalert2.bundle.js"></script>
+    <!-- Page related scripts -->
+    <script>
+        $("#Kaydet").click(function (event) {
+
+            $("#Sifre").on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $("#sifre1hatamesaj").remove();
+                }
+            }); // Validation hata kaldırma
+            $("#SifreTekrar").on('focusout', function (e) {
+                if ($(this).val != "") {
+                    $("#sifre2hatamesaj").remove();
+                }
+            }); // Validation hata kaldırma
+            $("#kullanicisartlari").change('checked', function (e) {
+                if ($(this).is(":checked")) {
+                    $("#kullanicisartlarihatamesaj").remove();
+                }
+            }); // Validation hata kaldırma
+
+            var sifre1 = $("#Sifre").val();
+            var sifre2 = $("#SifreTekrar").val();
+            if (sifre1 == "") {
+                $("#Sifre").focus();
+                $("#sifre1hata").append("<div class='p-2' id='sifre1hatamesaj' style='color:red'>Bir şifre Giriniz.</div>");
+            }
+            else if (sifre1.length < 6) {
+                $("#Sifre").focus();
+                $("#sifre1hata").append("<div class='p-2' id='sifre1hatamesaj' style='color:red'>Şifreniz en az 6 karakter olmalıdır.</div>");
+            }
+            else if (sifre1 != "" && sifre2 == "") {
+                $("#SifreTekrar").focus();
+                $("#sifre2hata").append("<div class='p-2' id='sifre2hatamesaj' style='color:red'>Şifreyi Tekrar Giriniz.</div>");
+            }
+            else if (sifre1 == "" && sifre2 != "") {
+                $("#Sifre").focus();
+                $("#sifre1hata").append("<div class='p-2' id='sifre1hatamesaj' style='color:red'>Bir şifre Giriniz.</div>");
+            }
+            else if (sifre1 != sifre2 && sifre1 != "" && sifre2 != "") {
+                $("#Sifre").focus();
+                $("#sifre2hata").append("<div class='p-2' id='sifre1hatamesaj' style='color:red'>Şifreler Uyuşmuyor.</div>");
+            }
+            else if (sifre1 != sifre2 && sifre1 != "" && sifre2 != "" && sifre1.length < 6) {
+                $("#Sifre").focus();
+                $("#sifre1hata").append("<div class='p-2' id='sifre1hatamesaj' style='color:red'>Şifreniz en az 6 karakter olmalıdır.</div>");
+            }
+            else if (sifre1 != sifre2 && sifre1 != "" && sifre2 != "" && sifre1.length < 6) {
+                $("#Sifre").focus();
+                $("#sifre1hata").append("<div class='p-2' id='sifre1hatamesaj' style='color:red'>Şifreniz en az 6 karakter olmalıdır.</div>");
+            }
+            else {
+                var KullaniciData = new FormData();
+                KullaniciData.append("Sifre", $("#Sifre").val());
+                KullaniciData.append("KullaniciId", $("#KullaniciId").val());
+                $.ajax({
+                    type: "POST",
+                    datatype: 'json',
+                    data: KullaniciData,
+                    contentType: false,
+                    processData: false,
+                    url: "/Otomasyon/Giris/SifreOlustur/",
+                    success: function (data) {
+                        if (data.Sonuc == true) {
+                            var timerInterval;
+                            Swal.fire(
+                            {
+                                title: "BİLGİ",
+                                html: "<strong>Yeni şifreniz başarıyla kaydedildi. Giriş sayfasına yönlendiriliyorsunuz.</strong>",
+                                type: "info",
+                                timer: 3000,
+                                showConfirmButton: false,
+                                confirmButtonText: "Tamam",
+                                onBeforeOpen: function onBeforeOpen() {
+                                    Swal.showLoading();
+                                },
+                                onClose: function onClose() {
+                                    clearInterval(timerInterval);
+                                }
+                            }).then(function (result) {
+                                if (
+                                    result.dismiss === Swal.DismissReason.timer
+                                ) {
+                                    window.location.replace("/Otomasyon/Giris/GirisYap");  // Satın alma sayfasına yönlendirilecek
+                                }
+                            });
+                        }
+                        else if (data.Sonuc == false) {
+                            window.location.replace("/Otomasyon/Giris/SifreOlusturHata");
+                        }
+                    },
+                    error: function (err) {
+                        alert("HATA");
+                    }
+                });
+            }// şifre güncelleme
+        });
+
+    </script>
+</body>
+</html>

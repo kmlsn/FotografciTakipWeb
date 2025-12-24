@@ -1,0 +1,143 @@
+﻿@using FotografciTakipWeb.Models
+@{
+    Lisanslar lisans = (Lisanslar)Session["Lisans"];
+
+    //List<KullaniciYetki> ky = ViewBag.KullaniciYetkileri;
+    List<KullaniciYetki> ky = (List<KullaniciYetki>)Session["Yetkiler"];
+    bool ayaryetki = ky.FirstOrDefault(x => x.SayfaId == 10 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 10 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool genelayarlaryetki = ky.FirstOrDefault(x => x.SayfaId == 90 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 90 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool emailgonderimayaryetki = ky.FirstOrDefault(x => x.SayfaId == 91 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 91 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool emailhesapayaryetki = ky.FirstOrDefault(x => x.SayfaId == 92 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 92 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool listelemefiltreayaryetki = ky.FirstOrDefault(x => x.SayfaId == 93 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 93 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool smsgonderimayaryetki = ky.FirstOrDefault(x => x.SayfaId == 94 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 94 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool musteriayaryetki = ky.FirstOrDefault(x => x.SayfaId == 95 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 95 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool rezervasyonayaryetki = ky.FirstOrDefault(x => x.SayfaId == 96 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 96 && x.Sil == false && x.Aktif == true).SayfaYetki;
+    bool sozlesmeciktiayaryetki = ky.FirstOrDefault(x => x.SayfaId == 97 && x.Sil == false && x.Aktif == true) == null ? false : ky.FirstOrDefault(x => x.SayfaId == 97 && x.Sil == false && x.Aktif == true).SayfaYetki;
+}
+@{
+    string ustmenuclass = ViewBag.UstMenu == "Ayarlar" ? "active open" : "";
+    string altmenugenelayarlar = ViewBag.AltMenu == "Genel Ayarlar" ? "active" : "";
+    string altmenuemailgonderim = ViewBag.AltMenu == "Email Gönderim Ayarları" ? "active" : "";
+    string altmenuemailhesap = ViewBag.AltMenu == "Email Hesap Ayarları" ? "active" : "";
+    string altmenulisteleme = ViewBag.AltMenu == "Listeleme Filtre Ayarları" ? "active" : "";
+    string altmenusmsgonderim = ViewBag.AltMenu == "SMS Gönderim Ayarları" ? "active" : "";
+    string altmenumusteri = ViewBag.AltMenu == "Müşteri Ayarları" ? "active" : "";
+    string altmenurezervasyon = ViewBag.AltMenu == "Rezervasyon Ayarları" ? "active" : "";
+    string altmenusozlesme = ViewBag.AltMenu == "Sözleşme Çıktı Ayarları" ? "active" : "";
+}
+@if (ayaryetki)
+{
+    <li class=@ustmenuclass>
+        <a href="#" title="Ayarlar" data-filter-tags="ayarlar">
+            <i class="fal fa-cog"></i>
+            <span class="nav-link-text" data-i18n="nav.ayarlar">Ayarlar</span>
+        </a>
+        <ul>
+            @if (lisans.Ayarlar_GenelAyarlar)
+            {
+                if (genelayarlaryetki)
+                {
+                    <li class=@altmenugenelayarlar>
+                        <a href="~/Admin/Ayarlar/GenelAyarlar" title="Genel Ayarlar" data-filter-tags="ayarlar genel ayarlar">
+                            <span class="nav-link-text" data-i18n="nav.ayarlar_genel_ayarlar">Genel Ayarlar</span>
+                        </a>
+                    </li>
+                }
+
+            }
+            @if (lisans.Ayarlar_EmailGonderimAyarlari)
+            {
+                if (emailgonderimayaryetki)
+                {
+                    <li class=@altmenuemailgonderim>
+                        <a href="~/Admin/Ayarlar/EmailGonderimAyarlari" title="Email Gönderim Ayarları" data-filter-tags="ayarlar email gönderim ayarları">
+                            <span class="nav-link-text" data-i18n="nav.ayarlar_email_gönderim_ayarları">Email Gönderim Ayarları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Ayarlar_EmailHesapAyarlari)
+            {
+                if (emailhesapayaryetki)
+                {
+                    <li class=@altmenuemailhesap>
+                        <a href="~/Admin/Ayarlar/EmailHesapAyarlari" title="Email Hesap Ayarları" data-filter-tags="ayarlar email hesap ayarları">
+                            <span class="nav-link-text" data-i18n="nav.ayarlar_email_hesap_ayarlari">Email Hesap Ayarları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Ayarlar_ListelemeFiltreAyarlari)
+            {
+                if (listelemefiltreayaryetki)
+                {
+                    <li class=@altmenulisteleme>
+                        <a href="~/Admin/Ayarlar/ListelemeFiltreAyarlari" title="Listeleme Filtre Ayarları" data-filter-tags="ayarlar listeleme filtre ayarları">
+                            <span class="nav-link-text" data-i18n="nav.ayarlar_listeleme_filtre_ayarlari">Listeleme Filtre Ayarları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Ayarlar_SmsGonderimAyarlari)
+            {
+                if (smsgonderimayaryetki)
+                {
+                    <li class=@altmenusmsgonderim>
+                        <a href="~/Admin/Ayarlar/SmsGonderimAyarlari" title="SMS Gönderim Ayarları" data-filter-tags="ayarlar sms gönderim ayarları">
+                            <span class="nav-link-text" data-i18n="nav.ayarlar_sms_gonderim_ayarlari">SMS Gönderim Ayarları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Ayarlar_MusteriAyarlari)
+            {
+                if (musteriayaryetki)
+                {
+                    <li class=@altmenumusteri>
+                        <a href="~/Admin/Ayarlar/MusteriAyarlari" title="Müşteri Ayarları" data-filter-tags="ayarlar müşteri ayarları">
+                            <span class="nav-link-text" data-i18n="nav.ayarlar_musteri_ayarlari">Müşteri Ayarları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Ayarlar_RezervasyonAyarlari)
+            {
+                if (rezervasyonayaryetki)
+                {
+                    <li class=@altmenurezervasyon>
+                        <a href="~/Admin/Ayarlar/RezervasyonAyarlari" title="Rezervasyon Ayarları" data-filter-tags="ayarlar rezervasyon ayarları">
+                            <span class="nav-link-text" data-i18n="nav.ayarlar_rezervasyon_ayarlari">Rezervasyon Ayarları</span>
+                        </a>
+                    </li>
+                }
+            }
+            @if (lisans.Ayarlar_SozlesmeCiktiAyarlari)
+            {
+                if (sozlesmeciktiayaryetki)
+                {
+                    <li class=@altmenusozlesme>
+                        <a href="~/Admin/Ayarlar/SozlesmeCiktiAyarlari" title="Sözleşme Çıktı Ayarları" data-filter-tags="ayarlar sözleşme çıktı ayarları">
+                            <span class="nav-link-text" data-i18n="nav.ayarlar_sozlesme_cikti_ayarlari">Sözleşme Çıktı Ayarları</span>
+                        </a>
+                    </li>
+                }
+            }
+        </ul>
+    </li>
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

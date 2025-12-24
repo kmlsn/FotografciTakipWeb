@@ -1,0 +1,206 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <title>
+        Fotoğrafçı Takip- Şifre Oluşturma
+    </title>
+    <meta name="description" content="Login">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, minimal-ui">
+    <!-- Call App Mode on ios devices -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- Remove Tap Highlight on Windows Phone IE -->
+    <meta name="msapplication-tap-highlight" content="no">
+    <!-- base css -->
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Otomasyon/Content/css/vendors.bundle.css">
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Otomasyon/Content/css/app.bundle.css">
+    <!-- Place favicon.ico in the root directory -->
+    <link rel="apple-touch-icon" sizes="180x180" href="~/Areas/Otomasyon/Content/img/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="~/Areas/Otomasyon/Content/img/favicon/favicon-32x32.png">
+    <link rel="mask-icon" href="~/Areas/Otomasyon/Content/img/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <!-- Optional: page related CSS-->
+    <link rel="stylesheet" media="screen, print" href="~/Areas/Otomasyon/Content/css/fa-brands.css">
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="page-inner bg-brand-gradient">
+            <div class="page-content-wrapper bg-transparent m-0">
+                <div class="height-10 w-100 shadow-lg px-4 bg-brand-gradient" style="height:5rem">
+                    <div class="d-flex align-items-center container pt-2">
+                        <div style="width:25rem" class="page-logo width-mobile-auto m-0 align-items-center justify-content-center p-0 bg-transparent bg-img-none shadow-0 height-9">
+                            <a href="javascript:void(0)" class="page-logo-link press-scale-down d-flex align-items-center">
+                                @*<img src="~/Areas/Otomasyon/Content/img/logo.png" alt="SmartAdmin WebApp" aria-roledescription="logo"> Firma Logosu*@
+                                @*<span class="page-logo-text mr-1">SmartAdmin WebApp</span>*@
+                                <img src="/Areas/Otomasyon/Content/img/TetraBilisim_FotografciTakipUygulamasi_2.png" alt="SmartAdmin WebApp" aria-roledescription="logo">
+                                @*<span class="page-logo-text mr-1">TeTRa Yazılım <br> Fotoğrafçı Takip Uygulaması</span>*@
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1" style="background: url(/Areas/Otomasyon/Content/img/svg/pattern-1.svg) no-repeat center bottom fixed; background-size: cover;">
+                    <div class="container py-4 py-lg-0 my-lg-0 px-4 px-sm-0">
+                        <div class="row">
+                            <div class="col-xl-12">
+                                <h2 class="fs-xxl fw-500 mt-4 text-black-50 text-center">
+                                    @ViewBag.FirmaAdi
+                                    <small class="h3 fw-300 mt-3 mb-5 text-dark opacity-80 hidden-sm-down">
+                                        @ViewBag.AdSoyad - @ViewBag.Email -  Şifre Oluşturma
+                                    </small>
+                                </h2>
+                            </div>
+                            <div class="col-lg-6 ml-auto mr-auto">
+                                <div class="card p-4 rounded-plus bg-faded">
+                                    @*<form id="js-login" novalidate="" action="/Otomasyon/Ayarlar/EmailGonderimAyarlari" method="post">*@
+                                    <div class="form-group row" id="sifre1hata">
+                                        <label class="col-xl-12 form-label" for="Sifre">Şifre</label>
+                                        <div class="col-12 pl-1">
+                                            <input type="password" id="Sifre" class="form-control" placeholder="Şifre" required>
+                                            <input type="password" id="KullaniciId" class="form-control" placeholder="KullaniciId" style="display:none" value="@ViewBag.KullaniciId">
+                                        </div>
+                                    </div>
+                                    <div class="form-group row" id="sifre2hata">
+                                        <label class="col-xl-12 form-label" for="SifreTekrar">Şifre Tekrar</label>
+                                        <div class="col-12 pl-1">
+                                            <input type="password" id="SifreTekrar" class="form-control" placeholder="Şifre Tekrar" required>
+                                        </div>
+                                    </div>
+                                    <div class="form-group demo" id="kullanicisartlarihata">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" class="custom-control-input" id="kullanicisartlari" required>
+                                            <label class="custom-control-label" for="kullanicisartlari"> Kullanıcı Şartlarını Okudum ve Onaylıyorum.</label>
+                                        </div>
+
+                                    </div>
+                                    <div class="row no-gutters">
+                                        <div class="col-md-4 ml-auto text-right">
+                                            <button id="Kaydet" class="btn btn-block btn-primary btn-lg mt-3">Kaydet</button>
+                                        </div>
+                                    </div>
+                                    @*</form>*@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="position-absolute pos-bottom pos-left pos-right p-3 text-center text-color-grey">
+                        2019 © TeTRa Yazılım by&nbsp;<a href='https://www.tetrayazilim.com' class='text-color-grey opacity-40 fw-500' title='gotbootstrap.com' target='_blank'>www.tetrayazilim.com</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- base vendor bundle:
+         DOC: if you remove pace.js from core please note on Internet Explorer some CSS animations may execute before a page is fully loaded, resulting 'jump' animations
+                    + pace.js (recommended)
+                    + jquery.js (core)
+                    + jquery-ui-cust.js (core)
+                    + popper.js (core)
+                    + bootstrap.js (core)
+                    + slimscroll.js (extension)
+                    + app.navigation.js (core)
+                    + ba-throttle-debounce.js (core)
+                    + waves.js (extension)
+                    + smartpanels.js (extension)
+                    + src/../jquery-snippets.js (core) -->
+    <script src="~/Areas/Otomasyon/Content/js/vendors.bundle.js"></script>
+    <script src="~/Areas/Otomasyon/Content/js/app.bundle.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#Kaydet").click(function (event) {
+
+                // Fetch form to apply custom Bootstrap validation
+                //var form = $("#js-login")
+
+                //if (form[0].checkValidity() === false) {
+                //    event.preventDefault()
+                //    event.stopPropagation()
+                //}
+
+                //form.addClass('was-validated');
+                //// Perform ajax submit here...
+
+                $("#Sifre").on('focusout', function (e) {
+                    if ($(this).val != "") {
+                        $("#sifre1hatamesaj").remove();
+                    }
+                }); // Validation hata kaldırma
+                $("#SifreTekrar").on('focusout', function (e) {
+                    if ($(this).val != "") {
+                        $("#sifre2hatamesaj").remove();
+                    }
+                }); // Validation hata kaldırma
+                $("#kullanicisartlari").change('checked', function (e) {
+                    if ($(this).is(":checked")) {
+                        $("#kullanicisartlarihatamesaj").remove();
+                    }
+                }); // Validation hata kaldırma
+
+                var sifre1 = $("#Sifre").val();
+                var sifre2 = $("#SifreTekrar").val();
+                if (sifre1 == "") {
+                    $("#Sifre").focus();
+                    $("#sifre1hata").append("<div class='p-2' id='sifre1hatamesaj' style='color:red'>Bir şifre Giriniz.</div>");
+                }
+                else if (sifre1.length < 6) {
+                    $("#Sifre").focus();
+                    $("#sifre1hata").append("<div class='p-2' id='sifre1hatamesaj' style='color:red'>Şifreniz en az 6 karakter olmalıdır.</div>");
+                }
+                else if (sifre1 != "" && sifre2 == "") {
+                    $("#SifreTekrar").focus();
+                    $("#sifre2hata").append("<div class='p-2' id='sifre2hatamesaj' style='color:red'>Şifreyi Tekrar Giriniz.</div>");
+                }
+                else if (sifre1 == "" && sifre2 != "") {
+                    $("#Sifre").focus();
+                    $("#sifre1hata").append("<div class='p-2' id='sifre1hatamesaj' style='color:red'>Bir şifre Giriniz.</div>");
+                }
+                else if (sifre1 != sifre2 && sifre1 != "" && sifre2 != "") {
+                    $("#Sifre").focus();
+                    $("#sifre2hata").append("<div class='p-2' id='sifre1hatamesaj' style='color:red'>Şifreler Uyuşmuyor.</div>");
+                }
+                else if (sifre1 != sifre2 && sifre1 != "" && sifre2 != "" && sifre1.length < 6) {
+                    $("#Sifre").focus();
+                    $("#sifre1hata").append("<div class='p-2' id='sifre1hatamesaj' style='color:red'>Şifreniz en az 6 karakter olmalıdır.</div>");
+                }
+                else if (!$("#kullanicisartlari").is(":checked")) {
+                    $("#kullanicisartlari").focus();
+                    $("#kullanicisartlarihata").append("<div class='p-2' id='kullanicisartlarihatamesaj' style='color:red'>Kullanıcı şartlarını kabul etmeniz gerekiyor.</div>");
+                }
+                else if (sifre1 != sifre2 && sifre1 != "" && sifre2 != "" && sifre1.length < 6) {
+                    $("#Sifre").focus();
+                    $("#sifre1hata").append("<div class='p-2' id='sifre1hatamesaj' style='color:red'>Şifreniz en az 6 karakter olmalıdır.</div>");
+                }
+                else {
+                    var KullaniciData = new FormData();
+                    KullaniciData.append("Sifre", $("#Sifre").val());
+                    KullaniciData.append("KullaniciId", $("#KullaniciId").val());
+                    $.ajax({
+                        type: "POST",
+                        datatype: 'json',
+                        data: KullaniciData,
+                        contentType: false,
+                        processData: false,
+                        url: "/Otomasyon/KullaniciIslemleri/SifreOlustur/",
+                        success: function (durum) {
+                            if (durum == "basarili") {
+                                window.location.replace("/Otomasyon/Giris/GirisYap");
+                            }
+                            else if (durum == "basarisiz") {
+                                window.location.replace("/KullaniciIslemleri/SifreOlusturHata");
+                            }
+                        },
+                        error: function (err) {
+                            alert("HATA");
+                        }
+                    });
+                }// şifre güncelleme
+            });
+        });
+
+    </script>
+</body>
+</html>
